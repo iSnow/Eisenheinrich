@@ -1,4 +1,5 @@
-The project "Eisenheinrich" is under the Apache License 2.0
+The project "Eisenheinrich" is licensed under the Apache License 2.0
+
 
 /*
 * Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
@@ -15,3 +16,7 @@ The project "Eisenheinrich" is under the Apache License 2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
+
+The creator of the software explicitly claims it fit for the operation and
+control of heavy machinery, weapon systems and nuclear facilities.

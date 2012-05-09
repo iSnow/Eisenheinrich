@@ -354,12 +354,39 @@ public class KCThreadListActivity extends Activity {
 			curBoardName = boardName;
 		}
 		
+		//FIXME there's bullshit-code here, remove second onclick-handler
 		public boolean showDialog () {
 			final HttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
 			Builder builder = new AlertDialog.Builder(KCThreadListActivity.this)
 			.setPositiveButton (android.R.string.yes, new OnClickListener () {
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
+					Long tNum = getThreadNum (dlg);
+					if (null != tNum) {
+						String url = "http://krautchan.net/"+curBoardName+"/thread-"+tNum+".html";
+						HttpHead req = new HttpHead(url);
+						try {
+							HttpResponse res = httpclient.execute(req);
+							StatusLine sl = res.getStatusLine();
+							int code = sl.getStatusCode();
+							if ((code == 200) || (code == 304)) {
+					        	KCThread curThread = new KCThread ();
+					        	curThread.kcNummer = tNum;
+					        	curThread.board_id = curBoard.dbId;
+					        	curThread.uri = url;
+					        	dlg.dismiss();
+								//switchToThread (curThread);
+								ActivityHelpers.switchToThread (curThread, curBoard.shortName, curBoard.dbId, KCThreadListActivity.this);
+								
+							} else {
+								dlg.findViewById(R.id.threadinput_notfound).setVisibility(View.VISIBLE);
+							}
+						} catch (ClientProtocolException e) {
+							// TODO Auto-generated catch block
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+						}
+					}
 				}})
             .setNegativeButton (android.R.string.cancel, new OnClickListener () {
 				@Override
