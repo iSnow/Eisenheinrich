@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item android:id="@+id/main_about"
+	android:icon="@drawable/ic_prefs"
+	android:title="@string/about" />
+<item android:id="@+id/prefs"
+	android:icon="@android:drawable/ic_menu_preferences"
+	android:title="@string/prefs" 
+	android:enabled="false"/>
+
+</menu>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/forward"
+	android:icon="@drawable/ic_forward"
+	android:title="@string/forward" />
+<item android:id="@+id/reload"
+	android:icon="@drawable/ic_reload"
+	android:title="@string/reload" />
+<item android:id="@+id/edit_boards"
+	android:icon="@drawable/ic_prefs"
+	android:title="@string/edit" />
+<item android:id="@+id/prefs"
+	android:icon="@android:drawable/ic_menu_preferences"
+	android:title="@string/prefs" 
+	android:enabled="false"/>
+<item android:id="@+id/home"
+	android:icon="@drawable/ic_menu_home"
+	android:title="@string/home" />
+</menu>

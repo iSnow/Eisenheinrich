@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:title="@string/reply" 
+	android:icon="@drawable/ic_edit" 
+	android:id="@+id/reply"/>
+<item android:id="@+id/go_thread" 
+    android:icon="@drawable/ic_menu_goto" 
+    android:title="@string/go_thread" 
+    android:enabled="false">
+</item><item android:id="@+id/bookmark"
+	android:icon="@drawable/ic_bookmark"
+	android:title="@string/bookmark" />
+<item android:id="@+id/reload"
+	android:icon="@drawable/ic_reload"
+	android:title="@string/reload" />
+<item android:id="@+id/prefs"
+	android:icon="@android:drawable/ic_menu_preferences"
+	android:title="@string/prefs"
+	android:enabled="false"/>
+<item android:id="@+id/home"
+	android:icon="@drawable/ic_menu_home"
+	android:title="@string/home" />
+
+</menu>

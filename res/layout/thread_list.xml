@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/thread_list"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:weightSum="1" android:gravity="top">
+    <FrameLayout 
+        android:id="@+id/threadlist_watcher_wrapper" 
+    	android:layout_width="match_parent" 
+    	android:layout_gravity="top" 
+    	android:layout_height="wrap_content">
+        <ProgressBar 
+        	style="?android:attr/progressBarStyleHorizontal" 
+        	android:id="@+id/threadlist_watcher" 
+        	android:layout_width="match_parent" 
+        	android:layout_height="wrap_content" 
+        	android:layout_gravity="center_vertical"
+        	android:layout_marginTop="10dp"
+        	android:layout_marginBottom="10dp"></ProgressBar>
+    </FrameLayout>
+	<ListView android:id="@+id/thread_listview" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+</LinearLayout>
+
+

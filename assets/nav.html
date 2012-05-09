@@ -1,0 +1,855 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="nav_files/style.css">
+      <title>Navigation</title>
+
+      <style type="text/css">
+         h2
+         {
+            margin-top: 15px;
+         }
+
+         body, html
+         {
+            margin: 0; padding: 0;
+         }
+
+         body
+         {
+            padding: .5em;
+            margin-bottom: 2em;
+         }
+
+         div.radio_idle
+         {
+            margin-top: 2px;
+            margin-bottom: 2px;
+            border: 2px solid #444444;
+            background-color: #cccccc;
+            padding: 2px;
+         }
+
+         div.radio_onair
+         {
+            margin-top: 2px;
+            margin-bottom: 2px;
+            border: 2px solid #44aa44;
+            background-color: #cceecc;
+            padding: 2px;
+         }
+
+         div.radio_offline
+         {
+            margin-top: 2px;
+            margin-bottom: 2px;
+            border: 2px solid #aa4444;
+            background-color: #eecccc;
+            padding: 2px;
+         }
+
+         div.radio_smalltext
+         {
+            font-size: smaller;
+            clear: both;
+         }
+
+      </style>
+
+      <!--[if IE]>
+      <style type="text/css">
+         span.nav_group_button
+         {
+            padding-top: auto;
+            padding-bottom: auto;
+            cursor: hand;
+         }
+      </style>
+      <![endif]-->
+
+      <script type="text/javascript" src="nav_files/prototype.js"></script>
+      <script type="text/javascript" src="nav_files/scriptaculous.js"></script>
+      <script type="text/javascript" src="nav_files/webtoolkit.js"></script>
+      <script type="text/javascript" src="nav_files/common.js"></script>
+
+      <script type="text/javascript">
+         var msgIRCUsers = new Template("(#{users} User)");
+
+         var msgRadioOffline = "Offline";
+         var msgRadioLabelIdle = "Radio";
+         var msgRadioLabelOnAir = "Radio (on air)";
+         var msgRadioNowPlaying = "Momentan l&auml;uft:";
+         var msgRadioNextshow = "N&auml;chste Sendung:";
+         var msgRadioStatusIdle = "Momentan sendet niemand";
+         var msgRadioDJ = "DJ:";
+
+         var reload_busy = false;
+         var last_post_stats;
+
+         function toggleMenu(button, area)
+         {
+            var tog = document.getElementById('nav_' + area);
+
+            if (tog.style.display)
+            {
+               tog.style.display = "";
+               configSet('nav.collapse.' + area, 0);
+            }
+
+            else
+            {
+               tog.style.display = "none";
+               configSet('nav.collapse.' + area, 1);
+            }
+
+            button.innerHTML = (tog.style.display) ? '+' : '&minus;';
+         }
+
+         function buttonMarkRead()
+         {
+            if (reload_busy)
+               return;
+
+            reload_busy = true;
+
+            $('button_markread').src = '/images/button-working.gif';
+
+            for(board in last_post_stats)
+            {
+               configSet('board.' + board + '.lastvisited',
+                  last_post_stats[board].newest_posttime);
+
+               $('board_' + board).removeClassName('board_newposts');
+               $('board_' + board).style.background = 0;
+            }
+
+            reloadPoststats();
+         }
+
+         function buttonReload()
+         {
+            if (reload_busy)
+               return;
+
+            reload_busy = true;
+
+            $('button_reload').src = '/images/button-working.gif';
+
+            reloadPoststats();
+         }
+
+         function reloadPoststats()
+         {
+            new Ajax.Request('/ajax/newposts',
+               { method: 'get',
+                 onSuccess: updatePoststats,
+                 onComplete: function()
+                 {
+                    $('button_reload').src = '/images/button-refresh.gif';
+                    $('button_markread').src = '/images/button-checkmark.gif';
+                    reload_busy = false;
+                 }
+               } );
+         }
+
+         function replaceClasses(e, newClass)
+         {
+            var classes;
+            var i;
+
+            classes = e.classNames().toArray();
+
+            for(i = 0; i < classes.length; i++)
+               e.removeClassName(classes[i]);
+
+            e.addClassName(newClass);
+         }
+
+         function formatRadioShowTime(begin, end)
+         {
+            var dateBegin;
+            var dateEnd;
+
+            dateBegin = new Date(begin * 1000);
+            dateEnd = new Date(end * 1000);
+
+            return(sprintf('%02d:%02d - %02d:%02d',
+               dateBegin.getHours(), dateBegin.getMinutes(),
+               dateEnd.getHours(), dateEnd.getMinutes()));
+         }
+
+         function formatRadioShowDateTime(begin, end)
+         {
+            var dateBegin;
+            var dateEnd;
+
+            dateBegin = new Date(begin * 1000);
+            dateEnd = new Date(end * 1000);
+
+            return(sprintf('%02d.%02d. %02d:%02d - %02d:%02d',
+               dateBegin.getDate(), dateBegin.getMonth() + 1,
+               dateBegin.getHours(), dateBegin.getMinutes(),
+               dateEnd.getHours(), dateEnd.getMinutes()));
+         }
+
+         function formatDJName(e, dj, showThread)
+         {
+            e.childElements().invoke('remove');
+
+            if (showThread != null)
+            {
+               var link;
+
+               link = Builder.node('a',
+                  { 'href': '/resolve/rfk/' + showThread,
+                    'target': 'main' }, dj);
+
+               e.innerHTML = '';
+               e.appendChild(link);
+            }
+
+            else
+               e.innerHTML = dj;
+         }
+
+         function updatePoststats(response)
+         {
+            var data;
+            var config;
+            var t;
+
+            if (!response.responseJSON.success)
+               return;
+
+            /* display number of IRC users if current IRC stats
+             * are available.
+             */
+
+            if ('ircstats' in response.responseJSON.data)
+               $('ircstats').innerHTML = msgIRCUsers.evaluate(
+                  { users: response.responseJSON.data.ircstats.numusers });
+
+            else
+               $('ircstats').innerHTML = '';
+
+            /* display radio status if current data is available
+             */
+
+            if ('radiostats' in response.responseJSON.data)
+               updateRadioStats(response.responseJSON.data.radiostats);
+
+            /* mark boards with unread posts since last refresh
+             */
+
+            data = response.responseJSON.data.post_stats;
+            desuConfig = desuConfigLoad();
+
+            for(board in data)
+               if (!(board in last_post_stats))
+                  window.location.reload();
+
+            for(board in last_post_stats)
+               if (!(board in data))
+                  window.location.reload();
+
+            for(board in data)
+            {
+               $('board_' + board).down('a').innerHTML =
+                  sprintf('/%s/ - %s', board, data[board].description);
+
+               t = configGet('board.' + board + '.lastvisited');
+
+               if ((t == null) || (data[board].newest_posttime > t))
+               {
+                  $('board_' + board).addClassName('board_newposts');
+                  $('board_' + board).style.background = '#aaaacc';
+
+                  if (data[board].newest_posttime >
+                     last_post_stats[board].newest_posttime)
+                     $('board_' + board).highlight();
+               }
+
+               else if (data[board].newest_posttime <= t)
+               {
+                  $('board_' + board).removeClassName('board_newposts');
+                  $('board_' + board).style.background = 0;
+               }
+            }
+
+            last_post_stats = data;
+
+            deleteOldHiddenThreads();
+
+            
+            showAppealsReminder(response.responseJSON.data.appeals.open_appeals,
+               response.responseJSON.data.appeals.own_appeals);
+            
+         }
+
+         function updateRadioStats(radio)
+         {
+            if (radio != null)
+            {
+               /* radio on the air
+                */
+
+               if (radio.active)
+               {
+                  $('radio_status_box').childElements().invoke('hide');
+
+                  replaceClasses($('radio_status_box'), 'radio_onair');
+                  $('radio_status_box').select('hr').invoke('show');
+
+                  $('radio_label').innerHTML = msgRadioLabelOnAir;
+
+                  $('radio_track').show().innerHTML = radio.artist + ' - ' +
+                     radio.title;
+                  formatDJName($('radio_dj').show(),
+                     msgRadioDJ + ' ' + radio.dj, radio.thread);
+
+                  if (('begin' in radio) && ('end' in radio))
+                     $('radio_time').show().innerHTML = '(' +
+                        formatRadioShowTime(radio.begin, radio.end) + ')';
+               }
+
+               /* radio is idle, but information about the next planned
+                * show is available
+                */
+
+               else if ('nextshow' in radio)
+               {
+                  var show = radio.nextshow;
+
+                  $('radio_status_box').childElements().invoke('hide');
+
+                  $('radio_label').innerHTML = msgRadioLabelIdle;
+
+                  replaceClasses($('radio_status_box'), 'radio_idle');
+                  $('radio_status_box').select('hr').invoke('show');
+
+                  $('radio_status').show().innerHTML = msgRadioNextshow;
+                  $('radio_track').show().innerHTML = show.show;
+                  $('radio_description').show().innerHTML = '(' + show.description + ')';
+                  formatDJName($('radio_dj').show(),
+                     msgRadioDJ + ' ' + show.dj, show.thread);
+                  $('radio_time').show().innerHTML = '(' +
+                     formatRadioShowDateTime(show.begin, show.end) + ')';
+               }
+
+               /* radio is idle and no information about future shows
+                * is available
+                */
+
+               else
+               {
+                  $('radio_status_box').childElements().invoke('hide');
+
+                  $('radio_label').innerHTML = msgRadioLabelIdle;
+
+                  replaceClasses($('radio_status_box'), 'radio_idle');
+
+                  $('radio_status').show().innerHTML = msgRadioStatusIdle;
+               }
+            }
+
+            else
+            {
+               $('radio_status_box').childElements().invoke('hide');
+
+               $('radio_label').show().innerHTML = msgRadioLabelIdle;
+               $('radio_status').show().innerHTML = msgRadioOffline;
+
+               replaceClasses($('radio_status_box'), 'radio_offline');
+            }
+         }
+
+         function helpTip(text)
+         {
+            Tip(text, DELAY, 400, SHADOW, true, SHADOWCOLOR, '#333333',
+                ABOVE, true);
+         }
+
+         function deleteOldHiddenThreads()
+         {
+            var hiddenThreads;
+            var i;
+
+            for (board in last_post_stats)
+            {
+               hiddenThreads = configGet('board.' + board + '.hiddenthreads');
+
+               if (hiddenThreads == null)
+                  return;
+
+               for(i = 0; i < hiddenThreads.length; i++)
+                  if (parseInt(hiddenThreads[i]) <
+                     parseInt(last_post_stats[board].oldest_postnumber))
+                  {
+                     hiddenThreads.splice(i, 1);
+                     i--;
+                  }
+            }
+         }
+      </script>
+   </head>
+
+   <body>
+      <script type="text/javascript" src="nav_files/wz_tooltip.js"></script>
+
+      <div class="menu_title">KRAUTCHAN</div>
+      <ul class="boardlist">
+      <li><a href="http://krautchan.net/news" target="main">News</a></li>
+      <li><a href="irc://irc.inn.at.euirc.net/#krautchan">IRC <i><span id="ircstats"></span></i></a></li>
+      <li><a href="http://krautchan.net/pjirc/irc.html" target="_blank">IRC-Applet</a></li>
+      <li><a href="http://krautchan.net/regeln.html" target="main">Regeln</a></li>
+      <li><a href="http://krautchan.net/faq.html" target="main">FAQ</a></li>
+      <li><a href="http://krautchan.net/rss/global-threads" target="main">RSS</a></li>
+      <li><a href="http://krautchan.net/donations" target="main">Spenden / Donations</a></li>
+      </ul>
+
+      
+      <script type="text/javascript">
+          $('ircstats').innerHTML = msgIRCUsers.evaluate(
+            { users: 67 });
+      </script>
+      
+
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, 'radio');">−</span><span id="radio_label">Radio</span></h2>
+      <div id="nav_radio">
+      
+      <div id="radio_status_box" class="radio_idle">
+         <div id="radio_status" class="radio_smalltext"></div>
+         <div id="radio_track" class="radio_smalltext"></div>
+         <div id="radio_description" class="radio_smalltext"></div>
+         <hr>
+         <div id="radio_dj" class="radio_smalltext"></div>
+         <div id="radio_time" class="radio_smalltext"></div>
+      </div>
+      <div>
+      <a href="http://radio.krautchan.net:8000/radio.mp3.m3u">MP3</a>
+      <a href="http://radio.krautchan.net:8000/radio.ogg.m3u">OGG</a>
+      <a href="http://radio.krautchan.net:8000/radiohq.ogg.m3u">OGG-HQ</a>
+      </div>
+      <ul class="boardlist">
+         <li><a href="http://radio.krautchan.net/" target="main">Website</a></li>
+      </ul>
+      </div>
+
+      
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, 'admin');">−</span>Administration</h2>
+      <div id="nav_admin">
+      
+      <ul class="boardlist">
+         <li><a href="http://krautchan.net/login" target="main">Login/Logout</a></li>
+
+         
+
+         
+
+         
+
+         
+
+         
+            <li><a href="http://krautchan.net/admin/bans" target="main">Sperrungen</a></li>
+         
+
+         
+
+         
+
+         
+      </ul>
+      </div>
+
+      <p id="appeals_reminder" style="display: none">
+         <a href="http://krautchan.net/admin/bans" target="main">
+            <img src="nav_files/admin-icon-banappeal.png" id="appeals_icon_normal">
+            <img src="nav_files/admin-icon-banappeal.png" id="appeals_icon_blink">
+         </a>
+      </p>
+
+      <script type="text/javascript">
+         var msgAppeals = "{n} Sperrung(en) mit unbearbeiteten Einspr&uuml;chen.";
+         var msgOwnAppeals = "{n} davon f&uuml;r von dir erstellte Sperrungen.";
+
+         function showAppealsReminder(appeals, ownAppeals)
+         {
+            var s;
+            var icon;
+
+            if (appeals == 0)
+            {
+               $('appeals_reminder').hide();
+               return;
+            }
+
+            s = msgAppeals.replace(/\{n\}/, appeals);
+
+            if (ownAppeals > 0)
+               s += " " + msgOwnAppeals.replace(/\{n\}/, ownAppeals);
+
+            $('appeals_reminder').show();
+
+            if (ownAppeals > 0)
+            {
+               $('appeals_icon_normal').hide();
+               icon = $('appeals_icon_blink');
+               icon.show();
+               icon.pulsate({ duration: 30.0, pulses: 60 });
+            }
+
+            else
+            {
+               $('appeals_icon_blink').hide();
+               icon = $('appeals_icon_normal');
+               icon.show();
+            }
+
+            icon.onmouseover = function() { helpTip(s); };
+            icon.onmouseout = function() { UnTip(); };
+         }
+
+         showAppealsReminder(0, 0);
+      </script>
+      
+
+      
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2056');">−</span>VIP</h2>
+      <div id="nav_2056">
+      
+      <ul class="boardlist">
+         
+            
+            <li id="board_b" class="board_newposts"><a href="http://krautchan.net/b/" target="main">/b/ - Breivik Geofarm</a></li>
+            
+         
+            
+            <li id="board_int" class="board_newposts"><a href="http://krautchan.net/int/" target="main">/int/ - International</a></li>
+            
+         
+            
+            <li id="board_vip" class="board_newposts"><a href="http://krautchan.net/vip/" target="main">/vip/ - Beste der Besten</a></li>
+            
+         
+      </ul>
+      </div>
+      
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2057');">−</span>Allgemein</h2>
+      <div id="nav_2057">
+      
+      <ul class="boardlist">
+         
+            
+            <li id="board_a" class="board_newposts"><a href="http://krautchan.net/a/" target="main">/a/ - Anime &amp; Manga</a></li>
+            
+         
+            
+            <li id="board_c" class="board_newposts"><a href="http://krautchan.net/c/" target="main">/c/ - Computer</a></li>
+            
+         
+            
+            <li id="board_d" class="board_newposts"><a href="http://krautchan.net/d/" target="main">/d/ - Drogen</a></li>
+            
+         
+            
+            <li id="board_e" class="board_newposts"><a href="http://krautchan.net/e/" target="main">/e/ - Essen &amp; Trinken</a></li>
+            
+         
+            
+            <li id="board_f" class="board_newposts"><a href="http://krautchan.net/f/" target="main">/f/ - Fahrzeuge</a></li>
+            
+         
+            
+            <li id="board_fb" class="board_newposts"><a href="http://krautchan.net/fb/" target="main">/fb/ - Frag Bernd</a></li>
+            
+         
+            
+            <li id="board_fit" class="board_newposts"><a href="http://krautchan.net/fit/" target="main">/fit/ - Fitness</a></li>
+            
+         
+            
+            <li id="board_jp" class="board_newposts"><a href="http://krautchan.net/jp/" target="main">/jp/ - Otakuhimmel</a></li>
+            
+         
+            
+            <li id="board_k" class="board_newposts"><a href="http://krautchan.net/k/" target="main">/k/ - Kreatives</a></li>
+            
+         
+            
+            <li id="board_l" class="board_newposts"><a href="http://krautchan.net/l/" target="main">/l/ - Literatur</a></li>
+            
+         
+            
+            <li id="board_li" class="board_newposts"><a href="http://krautchan.net/li/" target="main">/li/ - Lifestyle</a></li>
+            
+         
+            
+            <li id="board_m" class="board_newposts"><a href="http://krautchan.net/m/" target="main">/m/ - Musik</a></li>
+            
+         
+            
+            <li id="board_p" class="board_newposts"><a href="http://krautchan.net/p/" target="main">/p/ - Politik &amp; News</a></li>
+            
+         
+            
+            <li id="board_ph" class="board_newposts"><a href="http://krautchan.net/ph/" target="main">/ph/ - Philosophie</a></li>
+            
+         
+            
+            <li id="board_sp" class="board_newposts"><a href="http://krautchan.net/sp/" target="main">/sp/ - Spielzeug</a></li>
+            
+         
+            
+            <li id="board_t" class="board_newposts"><a href="http://krautchan.net/t/" target="main">/t/ - Technik</a></li>
+            
+         
+            
+            <li id="board_tv" class="board_newposts"><a href="http://krautchan.net/tv/" target="main">/tv/ - Film &amp; Fernsehen</a></li>
+            
+         
+            
+            <li id="board_v" class="board_newposts"><a href="http://krautchan.net/v/" target="main">/v/ - Videospiele</a></li>
+            
+         
+            
+            <li id="board_w" class="board_newposts"><a href="http://krautchan.net/w/" target="main">/w/ - Wissenschaft</a></li>
+            
+         
+            
+            <li id="board_we" class="board_newposts"><a href="http://krautchan.net/board/we/" target="main">/we/ - Weltschmerz</a></li>
+            
+         
+            
+            <li id="board_wp" class="board_newposts"><a href="http://krautchan.net/wp/" target="main">/wp/ - Wallpaper</a></li>
+            
+         
+            
+            <li id="board_x" class="board_newposts"><a href="http://krautchan.net/x/" target="main">/x/ - Paranormales</a></li>
+            
+         
+      </ul>
+      </div>
+      
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '3588215');">−</span>Trial</h2>
+      <div id="nav_3588215">
+      
+      <ul class="boardlist">
+         
+            
+            <li id="board_n" class="board_newposts"><a href="http://krautchan.net/n/" target="main">/n/ - Natur &amp; Tierwelt</a></li>
+            
+         
+            
+            <li id="board_rfk" class="board_newposts"><a href="http://krautchan.net/rfk/" target="main">/rfk/ - Radio Freies Krautchan</a></li>
+            
+         
+            
+            <li id="board_z" class="board_newposts"><a href="http://krautchan.net/z/" target="main">/z/ - Zeichnen</a></li>
+            
+         
+            
+            <li id="board_zp" class="board_newposts"><a href="http://krautchan.net/zp/" target="main">/zp/ - MS Paint</a></li>
+            
+         
+      </ul>
+      </div>
+      
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2058');">−</span>Wichsvorlagen</h2>
+      <div id="nav_2058">
+      
+      <ul class="boardlist">
+         
+            
+            <li id="board_h" class="board_newposts"><a href="http://krautchan.net/h/" target="main">/h/ - Hentai</a></li>
+            
+         
+            
+            <li id="board_s" class="board_newposts"><a href="http://krautchan.net/s/" target="main">/s/ - Sexy Frauen</a></li>
+            
+         
+      </ul>
+      </div>
+      
+      
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2085');">−</span>Sonstiges</h2>
+      <div id="nav_2085">
+      
+      <ul class="boardlist">
+         
+            
+            <li id="board_kc" class="board_newposts"><a href="http://krautchan.net/kc/" target="main">/kc/ - Krautchan</a></li>
+            
+         
+      </ul>
+      </div>
+      
+
+      <p>
+      <span class="board_newposts"><b>Markierte</b></span> Boards enthalten neue Posts.
+      </p>
+      <p>
+      <img src="nav_files/button-refresh.gif" onclick="buttonReload();" alt="Aktualisieren" style="cursor: pointer;" id="button_reload">
+         Aktualisieren<br>
+      <img src="nav_files/button-checkmark.gif" onclick="buttonMarkRead();" alt="Alle gelesen" style="cursor: pointer;" id="button_markread">
+         Alle gelesen
+      </p>
+
+      
+      <p>
+      <b>[ provisorium ]</b>
+      </p>
+      
+
+      <script type="text/javascript">
+         last_post_stats = {
+         
+            a:
+               { newest_posttime: 1311819832,
+                 oldest_postnumber: 82670 },
+         
+            b:
+               { newest_posttime: 1311836229,
+                 oldest_postnumber: 3289069 },
+         
+            c:
+               { newest_posttime: 1311835795,
+                 oldest_postnumber: 132616 },
+         
+            d:
+               { newest_posttime: 1311825964,
+                 oldest_postnumber: 36000 },
+         
+            e:
+               { newest_posttime: 1311822275,
+                 oldest_postnumber: 21883 },
+         
+            f:
+               { newest_posttime: 1311807961,
+                 oldest_postnumber: 7385 },
+         
+            fb:
+               { newest_posttime: 1311835740,
+                 oldest_postnumber: 22999 },
+         
+            fit:
+               { newest_posttime: 1311831148,
+                 oldest_postnumber: 18610 },
+         
+            h:
+               { newest_posttime: 1311813008,
+                 oldest_postnumber: 13396 },
+         
+            int:
+               { newest_posttime: 1311836233,
+                 oldest_postnumber: 6106609 },
+         
+            jp:
+               { newest_posttime: 1311818833,
+                 oldest_postnumber: 16889 },
+         
+            k:
+               { newest_posttime: 1311808416,
+                 oldest_postnumber: 14174 },
+         
+            kc:
+               { newest_posttime: 1311827394,
+                 oldest_postnumber: 18298 },
+         
+            l:
+               { newest_posttime: 1311798573,
+                 oldest_postnumber: 13978 },
+         
+            li:
+               { newest_posttime: 1311812407,
+                 oldest_postnumber: 4411 },
+         
+            m:
+               { newest_posttime: 1311813900,
+                 oldest_postnumber: 42125 },
+         
+            n:
+               { newest_posttime: 1311771950,
+                 oldest_postnumber: 507 },
+         
+            p:
+               { newest_posttime: 1311832514,
+                 oldest_postnumber: 53327 },
+         
+            ph:
+               { newest_posttime: 1311809660,
+                 oldest_postnumber: 4553 },
+         
+            rfk:
+               { newest_posttime: 1311787656,
+                 oldest_postnumber: 85 },
+         
+            s:
+               { newest_posttime: 1311814273,
+                 oldest_postnumber: 35116 },
+         
+            sp:
+               { newest_posttime: 1311822893,
+                 oldest_postnumber: 2726 },
+         
+            t:
+               { newest_posttime: 1311817358,
+                 oldest_postnumber: 15046 },
+         
+            tv:
+               { newest_posttime: 1311826549,
+                 oldest_postnumber: 30217 },
+         
+            v:
+               { newest_posttime: 1311835921,
+                 oldest_postnumber: 17191 },
+         
+            vip:
+               { newest_posttime: 1311827454,
+                 oldest_postnumber: 6436 },
+         
+            w:
+               { newest_posttime: 1311798149,
+                 oldest_postnumber: 7036 },
+         
+            we:
+               { newest_posttime: 1311800921,
+                 oldest_postnumber: 28221 },
+         
+            wp:
+               { newest_posttime: 1311802805,
+                 oldest_postnumber: 6137 },
+         
+            x:
+               { newest_posttime: 1311817525,
+                 oldest_postnumber: 3264 },
+         
+            z:
+               { newest_posttime: 1311790873,
+                 oldest_postnumber: 542 },
+         
+            zp:
+               { newest_posttime: 1311813804,
+                 oldest_postnumber: 1 },
+         
+         };
+
+         var initial_radio_stats = {"last_update":"1311836221","nextshow":{"dj":"asd","show":"m","begin":"1312941600","id":"4730","description":"mmm","end":"1312950600"},"active":0};
+
+         updateRadioStats(initial_radio_stats);
+         deleteOldHiddenThreads();
+      </script>
+
+
+      <div class="desuchan_version">
+         <span class="desu">Desu</span><span class="chan">Chan</span> 0.80
+      </div>
+   
+
+</body></html>

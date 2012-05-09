@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+<string name="app_name">Eisenheinrich</string>
+<string name="site_name">Krautchan</string>
+<string name="sample_simple_list_selected">Selected: </string>
+<string name="bookmark">Bookmark</string>
+<string name="reload">Reload</string>
+<string name="forward">Vorwärts</string>
+<string name="prefs">Einstellungen</string>
+<string name="home">Home</string>
+<string name="disclaimer_filename">disclaimer_fragment.html</string>
+<string name="reply">Reply</string>
+<string name="ok">OK :3</string>
+<string name="go_thread">Zu Faden</string>
+<string name="new_posting">Neues Posting</string>
+<string name="test">Test</string>
+<string name="load_thread">Faden laden</string>
+<string name="new_thread">Neuer Faden</string>
+<string name="edit">Edit</string>
+<string name="about">Über Eisenheinrich</string>
+<string name="cancel">Cancel ;_;</string>
+<string name="all">Alle an/aus</string>
+</resources>

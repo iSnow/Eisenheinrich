@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_board_list_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <Button
+        android:id="@+id/edit_board_list_button_toggle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="@string/all"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/edit_board_list_view2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="top"
+        android:orientation="vertical"
+        android:weightSum="1">
+    	<!--  android:paddingTop="40dp" -->
+
+        <ListView
+            android:id="@+id/android:list"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.00"
+            android:choiceMode="multipleChoice" >
+        </ListView>
+
+        <Button
+            android:id="@+id/edit_board_list_button_ok"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1.00"
+            android:text="@string/ok" />
+
+        <Button
+            android:id="@+id/edit_board_list_button_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1.00"
+            android:text="@string/cancel" />
+    </LinearLayout>
+
+</FrameLayout>

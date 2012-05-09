@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<ImageView android:id="@+id/backdrop" 
+		android:src="@drawable/heindroid"
+		android:scaleType="center" 
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent" />
+	<LinearLayout android:id="@+id/linearLayout2" 
+		android:layout_width="match_parent" 
+		android:orientation="vertical" 
+		android:layout_height="match_parent" 
+		android:gravity="bottom">
+		<ScrollView
+		    android:id="@+id/main_buttons_scrollview"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content" 
+		    android:layout_margin="3dp" 
+		    android:layout_marginBottom="6dp">
+		    <TableLayout android:id="@+id/bookmark_table" 
+		    	android:layout_width="match_parent" 
+		    	android:layout_height="wrap_content" 
+		    	android:stretchColumns="*" 
+		    	android:gravity="center_vertical|left|fill_vertical" android:collapseColumns="*">
+    		</TableLayout>
+		</ScrollView>
+
+		<Button
+		    android:id="@+id/main_test"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:text="Test"
+		    android:textSize="16dp"
+		    android:visibility="gone" />
+
+		<Button android:text="Zum Krautkanal"
+		 	android:id="@+id/main_goto_kc" 
+		 	android:layout_height="wrap_content" 
+		 	android:layout_width="match_parent" 
+		 	android:textSize="16dp"/>
+		<Button android:layout_width="match_parent" 
+			android:text="Über Eisenheinrich" 
+			android:id="@+id/about_button" 
+			android:layout_height="wrap_content" 
+			android:textSize="16dp"
+			android:visibility="gone"/>
+	</LinearLayout>
+</FrameLayout>
