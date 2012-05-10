@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.krautchan.R;
-import net.krautchan.android.activity.EisenheinrichActivity;
 import net.krautchan.android.activity.Prefs;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -69,70 +68,31 @@ public class DisclaimerDialog {
         disclaimerDialog.show();
 	}
 	
-	/*private void readMessage() throws IOException {
-		String[] assets = parent.getAssets().list("");
-		for (String aName : assets) {
-			String fName = parent.getString (R.string.disclaimer_filename);
-			if (fName.equals(aName)) {
-				StringBuilder builder = new StringBuilder();
-					AssetManager m = parent.getAssets();
-					InputStream is = m.open(fileName);
-					BufferedReader r = new BufferedReader(new InputStreamReader(is));
-					String line;
-					while ((line = r.readLine()) != null) {
-						builder.append(line);
-					}
-					r.close();
-				message = builder.toString().replaceAll("\n", "").trim();
-				Pattern titlePattern = Pattern.compile("<div class=\"titlebar\">(.+?)</div>");
-				Matcher matcher = titlePattern.matcher(message);
-				message = message.replaceAll("<div class=\"titlebar\">(.+?)</div>\\s*", "");
-				title = "Nope";
-				if (matcher.find()) {
-					title = matcher.group(1);
-				}
-				message = message.replaceAll("\\<li\\>", "\n");
-				message = message.replaceAll("\\<a.*?\\>.*?</a>", "");
-				message = message.replaceAll("\\<.*?\\>", "");
-				message = message.replaceAll("\n +", "\n");
-				message = message.replaceAll(" +", " ");
-				message = message.replaceAll("\\|", "\n\n");
-				message = message.trim();
-			}
+	private void readMessage() throws IOException {	
+		StringBuilder builder = new StringBuilder();
+		AssetManager m = parent.getAssets();
+		String fName = parent.getString (R.string.disclaimer_filename);
+		InputStream is = m.open(fName);
+		BufferedReader r = new BufferedReader(new InputStreamReader(is));
+		String line;
+		while ((line = r.readLine()) != null) {
+			builder.append(line);
 		}
-	}*/
-	
-	private void readMessage() throws IOException {
-		String[] assets = parent.getAssets().list("");
-		// Disregard this, I suck cocks. Drunken code. Remove the loop, go with m.open(fName) 
-		for (String aName : assets) {
-			String fName = parent.getString (R.string.disclaimer_filename);
-			if (fName.equals(aName)) {
-				StringBuilder builder = new StringBuilder();
-					AssetManager m = parent.getAssets();
-					InputStream is = m.open(fName);
-					BufferedReader r = new BufferedReader(new InputStreamReader(is));
-					String line;
-					while ((line = r.readLine()) != null) {
-						builder.append(line);
-					}
-					r.close();
-				message = builder.toString().replaceAll("\n", "").trim();
-				Pattern titlePattern = Pattern.compile("<div class=\"titlebar\">(.+?)</div>");
-				Matcher matcher = titlePattern.matcher(message);
-				message = message.replaceAll("<div class=\"titlebar\">(.+?)</div>\\s*", "");
-				title = "Nope";
-				if (matcher.find()) {
-					title = matcher.group(1);
-				}
-				message = message.replaceAll("\\<li\\>", "\n");
-				message = message.replaceAll("\\<a.*?\\>.*?</a>", "");
-				message = message.replaceAll("\\<.*?\\>", "");
-				message = message.replaceAll("\n +", "\n");
-				message = message.replaceAll(" +", " ");
-				message = message.replaceAll("\\|", "\n\n");
-				message = message.trim();
-			}
+		r.close();
+		message = builder.toString().replaceAll("\n", "").trim();
+		Pattern titlePattern = Pattern.compile("<div class=\"titlebar\">(.+?)</div>");
+		Matcher matcher = titlePattern.matcher(message);
+		message = message.replaceAll("<div class=\"titlebar\">(.+?)</div>\\s*", "");
+		title = "Nope";
+		if (matcher.find()) {
+			title = matcher.group(1);
 		}
+		message = message.replaceAll("\\<li\\>", "\n");
+		message = message.replaceAll("\\<a.*?\\>.*?</a>", "");
+		message = message.replaceAll("\\<.*?\\>", "");
+		message = message.replaceAll("\n +", "\n");
+		message = message.replaceAll(" +", " ");
+		message = message.replaceAll("\\|", "\n\n");
+		message = message.trim();	
 	}
 }

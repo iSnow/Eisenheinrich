@@ -84,6 +84,7 @@ public class EisenheinrichActivity extends Activity {
 			this.finish();
 		}
 		try {
+			//FIXME we get nullpointer exceptions in the line below. Prefs should not be an activity
 			if (!prefs.isDisclaimerAck()) {
 				DisclaimerDialog dlg = new DisclaimerDialog(this);
 				dlg.show();

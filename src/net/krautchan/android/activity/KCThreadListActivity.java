@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpHead;
 import org.xml.sax.InputSource;
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.dialog.GoToThreadDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
@@ -312,7 +313,8 @@ public class KCThreadListActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.go_thread:
-			new GoToThreadAction(curBoard.shortName).showDialog ();
+			//new GoToThreadAction(curBoard.shortName).showDialog ();
+			new GoToThreadDialog (this, curBoard, Eisenheinrich.getInstance().getHttpClient()).showDialog();
 			return true;
 		case R.id.bookmark:
 			//newGame();
@@ -347,7 +349,7 @@ public class KCThreadListActivity extends Activity {
 	}
 	
 	
-	private final class GoToThreadAction {
+	/*private final class GoToThreadAction {
 		String 	curBoardName;
 		AlertDialog dlg = null;
 		public GoToThreadAction (String boardName) {
@@ -449,6 +451,6 @@ public class KCThreadListActivity extends Activity {
 			}
 			return null;
 		}
-	}
+	}*/
 	
 }
