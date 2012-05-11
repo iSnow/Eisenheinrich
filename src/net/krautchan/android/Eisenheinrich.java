@@ -116,7 +116,7 @@ public class Eisenheinrich extends Application {
 		}
 
 		@Override
-		public void notifyDone(boolean successful) {
+		public void notifyDone(boolean successful, String message) {
 			if (successful)
 				this.vars = null;
 		}

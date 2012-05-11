@@ -115,12 +115,11 @@ public class KCPostActivity extends Activity {
 						}
 
 						@Override
-						public void notifyDone(boolean successful) {
+						public void notifyDone(boolean successful, String message) {
 							if (successful) {
 								KCPostActivity.this.finish();
 							} else {
-								Toast.makeText(KCPostActivity.this, "Pfostierung failed: ", Toast.LENGTH_LONG).show();
-								
+								Toast.makeText(KCPostActivity.this, message, Toast.LENGTH_LONG).show();
 							}
 						}
 			    		

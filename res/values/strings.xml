@@ -20,4 +20,5 @@
 <string name="about">Über Eisenheinrich</string>
 <string name="cancel">Cancel ;_;</string>
 <string name="all">Alle an/aus</string>
+<string name="banned">Posten nicht möglich, du bist gebannt</string>
 </resources>

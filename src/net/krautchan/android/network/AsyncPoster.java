@@ -19,7 +19,12 @@ package net.krautchan.android.network;
 import java.io.File;
 import java.util.List;
 
+import net.krautchan.R;
+import net.krautchan.android.Eisenheinrich;
+
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -48,6 +53,8 @@ public class AsyncPoster {
 	public void postInThread() {
 		new Thread(new Runnable() {
 			public void run () {
+				httpclient.getParams().setParameter("http.protocol.handle-redirects",false);
+
 			    HttpContext localContext = new BasicHttpContext();
 				HttpPost httppost = new HttpPost("http://krautchan.net/post");
 		
@@ -73,25 +80,35 @@ public class AsyncPoster {
 					}
 					httppost.setEntity(entity);
 					HttpResponse response = httpclient.execute(httppost, localContext);
-					notifyPeers (true);
 					
-					/*StatusLine sl = response.getStatusLine();
-					System.out.println (sl);
-					Header headers[] = response.getAllHeaders();
-					for (Header h:headers) {
-						System.out.println (h.getName()+" "+h.getValue());
-					}*/
+					StatusLine sl = response.getStatusLine();
+					if (sl.getStatusCode() == 302) {
+						//System.out.println (sl);
+						Header headers[] = response.getAllHeaders();
+						String location = null;
+						for (Header h:headers) {
+							if (h.getName().equals("Location")) {
+								location = h.getValue();
+							}
+							//System.out.println (h.getName()+" "+h.getValue());
+						}
+						if ((null != location) && (location.startsWith("/banned"))) {
+							notifyPeers (false, Eisenheinrich.getInstance().getString(R.string.banned));
+						} else {
+							notifyPeers (true, null);
+						}
+					}
 				} catch (Exception e) {
-					notifyPeers (false);
+					notifyPeers (false, "Failed in postInThread() - "+e.getMessage());
 					Log.e(TAG, "Failed in postInThread()", e);
 				} 
 			}
 		}).start();
 	}
 	
-	private void notifyPeers (boolean success) {
+	private void notifyPeers (boolean success, String message) {
 		for (AsyncPosterPeer peer : peers) {
-			peer.notifyDone(true);
+			peer.notifyDone(true, message);
 		}
 	}
 	
@@ -103,6 +120,6 @@ public class AsyncPoster {
 	public interface AsyncPosterPeer {
 		public void storePostVariables (PostVariables vars);
 		public PostVariables getPostVariables();
-		public void notifyDone (boolean successful);
+		public void notifyDone (boolean successful, String message);
 	}
 }
