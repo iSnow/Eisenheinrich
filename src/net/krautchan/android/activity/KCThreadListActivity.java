@@ -28,13 +28,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpHead;
-import org.xml.sax.InputSource;
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.GoToThreadDialog;
@@ -46,31 +39,22 @@ import net.krautchan.data.KODataListener;
 import net.krautchan.parser.KCPageParser;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Process;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -347,110 +331,4 @@ public class KCThreadListActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
-	
-	/*private final class GoToThreadAction {
-		String 	curBoardName;
-		AlertDialog dlg = null;
-		public GoToThreadAction (String boardName) {
-			curBoardName = boardName;
-		}
-		
-		//FIXME there's bullshit-code here, remove second onclick-handler
-		public boolean showDialog () {
-			final HttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
-			Builder builder = new AlertDialog.Builder(KCThreadListActivity.this)
-			.setPositiveButton (android.R.string.yes, new OnClickListener () {
-				@Override
-				public void onClick(DialogInterface arg0, int arg1) {
-					Long tNum = getThreadNum (dlg);
-					if (null != tNum) {
-						String url = "http://krautchan.net/"+curBoardName+"/thread-"+tNum+".html";
-						HttpHead req = new HttpHead(url);
-						try {
-							HttpResponse res = httpclient.execute(req);
-							StatusLine sl = res.getStatusLine();
-							int code = sl.getStatusCode();
-							if ((code == 200) || (code == 304)) {
-					        	KCThread curThread = new KCThread ();
-					        	curThread.kcNummer = tNum;
-					        	curThread.board_id = curBoard.dbId;
-					        	curThread.uri = url;
-					        	dlg.dismiss();
-								//switchToThread (curThread);
-								ActivityHelpers.switchToThread (curThread, curBoard.shortName, curBoard.dbId, KCThreadListActivity.this);
-								
-							} else {
-								dlg.findViewById(R.id.threadinput_notfound).setVisibility(View.VISIBLE);
-							}
-						} catch (ClientProtocolException e) {
-							// TODO Auto-generated catch block
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-						}
-					}
-				}})
-            .setNegativeButton (android.R.string.cancel, new OnClickListener () {
-				@Override
-				public void onClick(DialogInterface arg0, int arg1) {
-					dlg.dismiss();
-				}
-			});
-			
-			ScrollView scroll = new ScrollView(KCThreadListActivity.this);
-		    scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		    scroll.addView(getLayoutInflater().inflate(R.layout.thread_input_dialog, null));
-		    dlg = builder.setView(scroll)
-				.setTitle(R.string.load_thread)
-				.create();
-			dlg.show();
-			Button okButton = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
-			okButton.setOnClickListener(new android.view.View.OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					Long tNum = getThreadNum (dlg);
-					if (null != tNum) {
-						String url = "http://krautchan.net/"+curBoardName+"/thread-"+tNum+".html";
-						HttpHead req = new HttpHead(url);
-						try {
-							HttpResponse res = httpclient.execute(req);
-							StatusLine sl = res.getStatusLine();
-							int code = sl.getStatusCode();
-							if ((code == 200) || (code == 304)) {
-					        	KCThread curThread = new KCThread ();
-					        	curThread.kcNummer = tNum;
-					        	curThread.board_id = curBoard.dbId;
-					        	curThread.uri = url;
-					        	dlg.dismiss();
-								//switchToThread (curThread);
-								ActivityHelpers.switchToThread (curThread, curBoard.shortName, curBoard.dbId, KCThreadListActivity.this);
-								
-							} else {
-								dlg.findViewById(R.id.threadinput_notfound).setVisibility(View.VISIBLE);
-							}
-						} catch (ClientProtocolException e) {
-							// TODO Auto-generated catch block
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-						}
-					}
-				}
-				
-			});
-			return true;
-		}
-		
-		private Long getThreadNum (AlertDialog dlg) {
-			String numStr = ((EditText)dlg.findViewById(R.id.thread_num)).getText().toString();
-			Long kcNum = null;
-			try {
-				kcNum = Long.decode(numStr);
-				return kcNum;
-			} catch (NumberFormatException ex) {
-				dlg.findViewById(R.id.threadinput_error).setVisibility(View.VISIBLE);
-			}
-			return null;
-		}
-	}*/
-	
 }

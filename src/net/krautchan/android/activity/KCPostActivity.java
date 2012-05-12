@@ -17,15 +17,12 @@ package net.krautchan.android.activity;
 */
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import net.krautchan.R;
@@ -34,39 +31,23 @@ import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.network.AsyncPoster;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
 import net.krautchan.android.network.PostVariables;
-import net.krautchan.data.KCBoard;
-import net.krautchan.data.KCThread;
 import net.krautchan.data.PostActivityParams;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.Toast;
-import android.widget.TableLayout.LayoutParams;
 
 public class KCPostActivity extends Activity {
 	static final String TAG = "KCPostActivity";
@@ -234,44 +215,6 @@ public class KCPostActivity extends Activity {
         Log.i(TAG, "onActivityResult - done");
 	}
 
-
-	/*protected void postInThread(String name, String title, String content, boolean sage) {
-		HttpClient httpclient = new DefaultHttpClient();
-	    HttpContext localContext = new BasicHttpContext();
-		httpclient.getParams().setParameter("http.useragent",Eisenheinrich.getInstance().USER_AGENT);
-		HttpPost httppost = new HttpPost("http://krautchan.net/post");
-
-		try {
-		    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-		    entity.addPart("internal_n", new StringBody(name)); // Bernd name
-		    entity.addPart("internal_s", new StringBody(title)); // Post subject
-		    entity.addPart("internal_t", new StringBody(content));  // Comment
-			if (sage)
-				entity.addPart("sage", new StringBody("1"));// Säge
-			entity.addPart("forward", new StringBody("thread")); // forward to thread or board -> thread for us
-			entity.addPart("board", new StringBody(curBoardName)); // board
-			if (null != curThreadKCNum) {
-				entity.addPart("parent", new StringBody(curThreadKCNum.toString())); // thread ID
-			}
-			for (int i = 0; i < MAX_IMAGES; i++) {
-				if (files[i] != null) {
-					entity.addPart(fileNames[i], new FileBody(new File (Environment.getExternalStorageDirectory(), "/DCIM/"+fileNames[i])));
-				}
-			}
-			httppost.setEntity(entity);
-			HttpResponse response = httpclient.execute(httppost, localContext);
-			this.finish();
-			StatusLine sl = response.getStatusLine();
-			System.out.println (sl);
-			Header headers[] = response.getAllHeaders();
-			for (Header h:headers) {
-				System.out.println (h.getName()+" "+h.getValue());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			// FIXME Do logging & reporting
-		} 
-	}*/
 	
 	@SuppressWarnings("unused")
 	private void calculateImageRows () {

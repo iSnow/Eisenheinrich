@@ -57,6 +57,9 @@ public class BookmarkCheck  {
 							StatusLine sl = res.getStatusLine();
 							int code = sl.getStatusCode();
 							results[count] = ((code == 200) || (code == 304));
+							if (res.getEntity() != null ) {
+								res.getEntity().consumeContent();
+							}
 						} catch (ClientProtocolException e) {
 							e.printStackTrace();
 							return;

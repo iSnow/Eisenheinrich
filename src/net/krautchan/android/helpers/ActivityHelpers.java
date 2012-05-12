@@ -110,15 +110,15 @@ public class ActivityHelpers {
 			TableLayout table, View.OnClickListener listener, Context parent) {
 		ImageButton[] buttons = new ImageButton[numColumns];
 		TableRow row = new TableRow(parent);
-		row.setVisibility(View.GONE);
+		//row.setVisibility(View.GONE);
 		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 				LayoutParams.WRAP_CONTENT));
 		for (int j = 0; j < numColumns; j++) {
 			ImageButton bt = new ImageButton(parent);
-			bt.setVisibility(View.GONE);
+			//bt.setVisibility(View.GONE);
 			buttons[j] = bt;
-			bt.setBackgroundDrawable(parent.getResources().getDrawable(
-					R.drawable.button));
+			bt.setImageDrawable(parent.getResources().getDrawable(R.drawable.icon));
+			bt.setBackgroundDrawable(parent.getResources().getDrawable(R.drawable.button));
 			bt.setOnClickListener(listener);
 			row.addView(bt);
 		}
@@ -170,18 +170,4 @@ public class ActivityHelpers {
 	    return newBitmap;
 	}
 
-
-	/*
-	 * public static Button[] addButtonRow (int numColumns, String[] labels,
-	 * TableLayout table, View.OnClickListener listener, Context parent) {
-	 * Button[] buttons = new Button[numColumns]; TableRow row = new
-	 * TableRow(parent); row.setLayoutParams(new LayoutParams(
-	 * LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT)); for (int j = 0; j
-	 * < numColumns; j++) { Button bt = new Button(parent); buttons[j] = bt;
-	 * bt.setText(labels[j]);
-	 * bt.setBackgroundDrawable(parent.getResources().getDrawable
-	 * (R.drawable.button)); bt.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10);
-	 * bt.setOnClickListener(listener); row.addView(bt); } table.addView(row);
-	 * return buttons; }
-	 */
 }

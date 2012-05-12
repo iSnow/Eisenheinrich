@@ -236,7 +236,7 @@ public class EisenheinrichActivity extends Activity {
 					bt.setText("/"+board.shortName+"/ - "+thread.kcNummer.toString()+"\n"+digest);
 					bt.setBackgroundDrawable(getResources().getDrawable(R.drawable.button));
 				    bt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-				    bt.setTextColor(getResources().getColor(R.color.off_white));
+				    bt.setTextColor(getResources().getColor(R.color.White));
 				    bt.setOnClickListener(new BookmarkOnClickListener(thread, board));
 				    row.addView(bt);
 				}   

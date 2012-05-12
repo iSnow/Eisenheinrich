@@ -135,6 +135,9 @@ public class KCPageParser implements Runnable {
 				curChar = reader.read();
 			}
 			reader.close();
+			if (response.getEntity() != null ) {
+				response.getEntity().consumeContent();
+			}
 			tParser.notifyDone();
 			
 		} catch (Exception e) {

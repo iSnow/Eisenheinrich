@@ -80,7 +80,6 @@ public class AsyncPoster {
 					}
 					httppost.setEntity(entity);
 					HttpResponse response = httpclient.execute(httppost, localContext);
-					
 					StatusLine sl = response.getStatusLine();
 					if (sl.getStatusCode() == 302) {
 						//System.out.println (sl);
@@ -97,6 +96,9 @@ public class AsyncPoster {
 						} else {
 							notifyPeers (true, null);
 						}
+					}
+					if (response.getEntity() != null ) {
+						response.getEntity().consumeContent();
 					}
 				} catch (Exception e) {
 					notifyPeers (false, "Failed in postInThread() - "+e.getMessage());
