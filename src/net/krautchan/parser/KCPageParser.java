@@ -25,10 +25,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.widget.Toast;
-
-import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.activity.KCBoardListActivity;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;

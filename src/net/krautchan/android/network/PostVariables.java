@@ -1,5 +1,7 @@
 package net.krautchan.android.network;
 
+import android.net.Uri;
+
 /*
 * Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
 *
@@ -23,7 +25,7 @@ public class PostVariables {
 	public String title;
 	public String content;
 	public boolean sage;
-	public String[] fileUrl;
+	public Uri[] files;
 	
 	public int hashCode() {
 		return (boardName+","+threadNumber+","+content).hashCode();

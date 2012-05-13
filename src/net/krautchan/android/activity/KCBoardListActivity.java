@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.http.HttpEntity;
-import org.xml.sax.InputSource;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.data.KCBoard;
 import net.krautchan.parser.KCBoardListParser;

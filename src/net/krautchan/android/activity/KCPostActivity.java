@@ -53,17 +53,16 @@ public class KCPostActivity extends Activity {
 	static final String TAG = "KCPostActivity";
 	private static final int MAX_IMAGES = 4;//max 4 images per posting
 	private static final int NUM_COLS = 2;//2 rows of image buttons
-	private String curBoardName;
-	private Long curThreadKCNum;
-	//private byte[][] files = new byte[MAX_IMAGES][]; 
-	//private String[] fileNames = new String[MAX_IMAGES]; 
+	private PostVariables vars;
 	private List<ImageButton> buttons = new ArrayList<ImageButton>();
 	private int imageClicked = -1; //FIXME this is an ugly way to track which image button was clicked. See if we can set some userdata on the intent or get the control in onActivityResult()
 	private int imageRows = 1;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) { 
-		super.onCreate(savedInstanceState);        
+		super.onCreate(savedInstanceState);   
+		vars = new PostVariables();
+		vars.files = new Uri[MAX_IMAGES];
 		calculateImageRows();
 		setContentView(R.layout.post_view);
 		Bundle b = getIntent().getExtras();
@@ -74,15 +73,14 @@ public class KCPostActivity extends Activity {
 	    try {
 			in = new ObjectInputStream(bitch);
 		    params = (PostActivityParams)in.readObject();
-		    curThreadKCNum = params.curThreadKCNum;
-		    curBoardName = params.curBoardName;
+		    vars.boardName = params.curBoardName;
+		    if (null != params.curThreadKCNum) {
+		    	vars.threadNumber = params.curThreadKCNum.toString();
+		    }
 		    Button okButton = (Button)findViewById(R.id.ok_button);
 		    okButton.setOnClickListener(new View.OnClickListener() {
 			    public void onClick(View v) {
 			    	HttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
-			    	PostVariables vars = new PostVariables();
-			    	vars.boardName = curBoardName;
-			    	vars.threadNumber = curThreadKCNum.toString();
 			    	List<AsyncPosterPeer> peers = new ArrayList<AsyncPosterPeer>();
 			    	peers.add(Eisenheinrich.posterPeer);
 			    	peers.add(new AsyncPosterPeer() {
@@ -200,7 +198,8 @@ public class KCPostActivity extends Activity {
             	  if (null != uri) {
             		  Log.i(TAG, uri);
             		  Uri imgUri=Uri.parse(uri);
-            		  buttons.get(imageClicked).setImageURI(imgUri);  
+            		  buttons.get(imageClicked).setImageURI(imgUri); 
+            		  vars.files[imageClicked] = imgUri;
             		  try {
             			Bitmap b = ActivityHelpers.scaleDownBitmap(ActivityHelpers.loadBitmap(new URL(imgUri.toString())), 125, true);
 						buttons.get(imageClicked).setImageBitmap(b);

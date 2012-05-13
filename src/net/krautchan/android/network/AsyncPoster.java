@@ -17,6 +17,7 @@ package net.krautchan.android.network;
 */
 
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 
 import net.krautchan.R;
@@ -31,6 +32,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -41,19 +43,22 @@ public class AsyncPoster {
 	private String TAG = "AsyncPoster";
 	private final PostVariables postVars;
 	private List<AsyncPosterPeer> peers;
-	private HttpClient httpclient;
+	private HttpClient httpClient;
 	
 	public AsyncPoster(PostVariables postVars, HttpClient httpClient , List<AsyncPosterPeer> peers) {
 		super();
 		this.postVars = postVars;
-		this.httpclient = httpClient;
+		this.httpClient = httpClient;
 		this.peers = peers;
 	}
 
 	public void postInThread() {
 		new Thread(new Runnable() {
 			public void run () {
-				httpclient.getParams().setParameter("http.protocol.handle-redirects",false);
+				httpClient.getParams().setParameter("http.protocol.handle-redirects",false);
+
+				HttpConnectionParams.setSoTimeout(httpClient.getParams(), 30000);
+				HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), 30000); 
 
 			    HttpContext localContext = new BasicHttpContext();
 				HttpPost httppost = new HttpPost("http://krautchan.net/post");
@@ -70,16 +75,19 @@ public class AsyncPoster {
 					if (null != postVars.threadNumber) {
 						entity.addPart("parent", new StringBody(postVars.threadNumber)); // thread ID
 					}
-					if (null != postVars.fileUrl) {
-						for (int i = 0; i < postVars.fileUrl.length; i++) {
-							if (postVars.fileUrl[i] != null) {
-								String fileName = getFileName (postVars.fileUrl[i]);
-								entity.addPart(fileName, new FileBody(new File (Environment.getExternalStorageDirectory(), "/DCIM/"+fileName)));
+					if (null != postVars.files) {
+						for (int i = 0; i < postVars.files.length; i++) {
+							if (postVars.files[i] != null) {
+								File f = new File(new URI(postVars.files[i].toString()));
+								if (!f.exists()) {
+									System.out.println (f.getAbsolutePath());
+								}
+								entity.addPart(f.getName(), new FileBody(f));
 							}
 						}
 					}
 					httppost.setEntity(entity);
-					HttpResponse response = httpclient.execute(httppost, localContext);
+					HttpResponse response = httpClient.execute(httppost, localContext);
 					StatusLine sl = response.getStatusLine();
 					if (sl.getStatusCode() == 302) {
 						//System.out.println (sl);
@@ -114,10 +122,10 @@ public class AsyncPoster {
 		}
 	}
 	
-	private static String getFileName (String fileUrl)  {
+	/*private static String getFileName (String fileUrl)  {
 		int delim = fileUrl.lastIndexOf("/");
 		return fileUrl.substring(delim+1);
-	}
+	}*/
 	
 	public interface AsyncPosterPeer {
 		public void storePostVariables (PostVariables vars);
