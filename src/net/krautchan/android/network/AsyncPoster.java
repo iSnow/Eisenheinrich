@@ -18,6 +18,7 @@ package net.krautchan.android.network;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import net.krautchan.R;
@@ -36,11 +37,13 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import android.os.Environment;
 import android.util.Log;
 
 public class AsyncPoster {
-	private String TAG = "AsyncPoster";
+	private static final String TAG = "AsyncPoster";
+	//private static final String CHARSETNAME= "ISO-8859-1";
+	private static final String CHARSETNAME= "UTF-8";
+	private static final Charset CHARSET = Charset.forName(CHARSETNAME);
 	private final PostVariables postVars;
 	private List<AsyncPosterPeer> peers;
 	private HttpClient httpClient;
@@ -56,22 +59,21 @@ public class AsyncPoster {
 		new Thread(new Runnable() {
 			public void run () {
 				httpClient.getParams().setParameter("http.protocol.handle-redirects",false);
-
+				httpClient.getParams().setParameter("http.protocol.content-charset", CHARSETNAME); 
 				HttpConnectionParams.setSoTimeout(httpClient.getParams(), 30000);
 				HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), 30000); 
 
 			    HttpContext localContext = new BasicHttpContext();
 				HttpPost httppost = new HttpPost("http://krautchan.net/post");
-		
 				try {
-				    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-				    entity.addPart("internal_n", new StringBody(postVars.posterName)); // Bernd name
-				    entity.addPart("internal_s", new StringBody(postVars.title)); // Post subject
-				    entity.addPart("internal_t", new StringBody(postVars.content));  // Comment
+				    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, null, CHARSET);
+				    entity.addPart("internal_n", new StringBody(postVars.posterName, CHARSET)); // Bernd name
+				    entity.addPart("internal_s", new StringBody(postVars.title, CHARSET)); // Post subject
+				    entity.addPart("internal_t", new StringBody(postVars.content, CHARSET));  // Comment
 					if (postVars.sage)
 						entity.addPart("sage", new StringBody("1"));// Säge
 					entity.addPart("forward", new StringBody("thread")); // forward to thread or board -> thread for us
-					entity.addPart("board", new StringBody(postVars.boardName)); // board
+					entity.addPart("board", new StringBody(postVars.boardName, CHARSET)); // board
 					if (null != postVars.threadNumber) {
 						entity.addPart("parent", new StringBody(postVars.threadNumber)); // thread ID
 					}

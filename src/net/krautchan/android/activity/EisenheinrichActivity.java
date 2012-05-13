@@ -82,15 +82,16 @@ public class EisenheinrichActivity extends Activity {
 		Prefs prefs = Prefs.getInstance();
 		if (null == prefs) {
 			this.finish();
-		}
-		try {
-			//FIXME we get nullpointer exceptions in the line below. Prefs should not be an activity
-			if (!prefs.isDisclaimerAck()) {
-				DisclaimerDialog dlg = new DisclaimerDialog(this);
-				dlg.show();
+		} else {
+			try {
+				//FIXME we get nullpointer exceptions in the line below. Prefs should not be an activity
+				if (!prefs.isDisclaimerAck()) {
+					DisclaimerDialog dlg = new DisclaimerDialog(this);
+					dlg.show();
+				}
+			} catch (IOException e) {
+				Process.killProcess(Process.myPid());
 			}
-		} catch (IOException e) {
-			Process.killProcess(Process.myPid());
 		}
 	}
 	

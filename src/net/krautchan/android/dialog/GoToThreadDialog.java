@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.activity.KCBoardListActivity;
 import net.krautchan.android.activity.KCThreadListActivity;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.data.KCBoard;
@@ -87,16 +88,26 @@ public class GoToThreadDialog {
 					StatusLine sl = res.getStatusLine();
 					int code = sl.getStatusCode();
 					if ((code == 200) || (code == 304)) {
-			        	KCThread curThread = new KCThread ();
+			        	final KCThread curThread = new KCThread ();
 			        	curThread.kcNummer = tNum;
 			        	curThread.board_id = board.dbId;
 			        	curThread.uri = url;
-			        	dlg.dismiss();
-						//switchToThread (curThread);
-						ActivityHelpers.switchToThread (curThread, board.shortName, board.dbId, parent);
-						dlg.dismiss();
+			        	parent.runOnUiThread(new Runnable () {
+							@Override
+							public void run() {	
+					        	dlg.dismiss();
+								//switchToThread (curThread);
+								ActivityHelpers.switchToThread (curThread, board.shortName, board.dbId, parent);
+								dlg.dismiss();
+							}
+			        	});
 					} else {
-						dlg.findViewById(R.id.threadinput_notfound).setVisibility(View.VISIBLE);
+						parent.runOnUiThread(new Runnable () {
+							@Override
+							public void run() {	
+								dlg.findViewById(R.id.threadinput_notfound).setVisibility(View.VISIBLE);
+							}
+						});
 					}
 				} catch (ClientProtocolException e) {
 					// TODO Auto-generated catch block
