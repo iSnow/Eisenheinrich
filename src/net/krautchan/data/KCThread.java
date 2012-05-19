@@ -65,7 +65,7 @@ public class KCThread extends KrautObject {
 	}
 	
 	private void makeDigest (KCPosting posting) {
-		if (null == posting)
+		if ((null == posting) || (null == digest))
 			digest = "";
 		digest = posting.content;
 		int len = digest.length();

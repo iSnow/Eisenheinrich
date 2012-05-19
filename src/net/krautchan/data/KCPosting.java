@@ -111,7 +111,8 @@ public class KCPosting extends KrautObject {
 		locContent = locContent.replaceAll("<a href=\"/resolve/.+?\">", "");
 		locContent = locContent.replaceAll("https?://www.youtube.com/(.+?)([\\s<\\.])", "<a href=\"http://www.youtube.com/$1\" class=\"youtubelink\" onclick=\"alert('open:youtube:$1');return false;\">YouTube</a>$2");
 		locContent = locContent.replaceAll("https?://youtu.be/(.+?)([\\s<\\.])", "<a href=\"http://www.youtube.com/watch?v=$1\" class=\"youtubelink\" onclick=\"alert('open:youtube:$1');return false;\">YouTube</a>$2");
-		
+		locContent = locContent.replaceAll("https?://(www)?\\.*(.+?)/(.+?)([\\s<>\\(\\)\\.])", "<a href=\"http://$2/$3\" class=\"extlink\" onclick=\"alert('open:ext:$2/$3');return false;\">$2</a>$4");
+			
 		content = "<p><span>"+locContent.trim()+"</span></p>";
 	}
 	

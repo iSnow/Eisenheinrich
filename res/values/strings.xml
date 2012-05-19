@@ -21,4 +21,6 @@
 <string name="cancel">Cancel ;_;</string>
 <string name="all">Alle an/aus</string>
 <string name="banned">Posten nicht möglich, du bist gebannt</string>
+<string name="update_available_title">Update verfügbar</string>
+<string name="update_available_text">Ein Update von Eisenheinrich ist unter http://eisenheinrich.datensalat.net verfügbar\n\n Diese Seite jetzt öffnen?</string>
 </resources>

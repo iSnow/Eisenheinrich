@@ -50,6 +50,9 @@ public class Eisenheinrich extends Application {
 		public static final String FILE_PATH = "http://krautchan.net/files";
 		public static final String SD_DIR = "eisenheinrich";
 		public static final String IMAGE_DIR = "/images";
+		public static final String HOME_PAGE = "http://eisenheinrich.datensalat.net/";
+		public static final String UPDATE_VERSION_URL = "http://eisenheinrich.datensalat.net/version.txt";
+		public static final String UPDATE_PAGE = "http://eisenheinrich.datensalat.net/mobile.html";
 	}
 	private List<String> selectedBoards;
 	public String USER_AGENT;

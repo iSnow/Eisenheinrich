@@ -21,6 +21,7 @@ import java.util.*;
 import junit.framework.Assert;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -298,6 +299,18 @@ public class KCThreadViewActivity extends Activity {
 		}
 	}*/
 	
+	private void openExternalLink(String url) {
+		if (!url.startsWith("http://") && !url.startsWith("https://")) {
+			url = "http://" + url;
+		}
+		Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		try {
+			startActivity(browser);
+		} catch (ActivityNotFoundException ex) {
+			 //FIXME implement some toast or dialog shit
+		}
+	}
+	
 	private void viewImage (String fileName) {
 		Uri uri = Uri.parse(FileContentProvider.URI_PREFIX+"/"+fileName);
 		startActivity(new Intent(Intent.ACTION_VIEW, uri));
@@ -342,6 +355,8 @@ public class KCThreadViewActivity extends Activity {
 					startVideo(args[2]);
 				} else if (args[1].equals("image")) {
 					viewImage (args[2]);
+				} else if (args[1].equals("ext")) {
+					openExternalLink (args[2]);
 				}
 			}
 			return true;

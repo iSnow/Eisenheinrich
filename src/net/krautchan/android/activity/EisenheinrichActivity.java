@@ -51,9 +51,12 @@ import android.widget.TextView;
 import net.krautchan.R; 
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.DisclaimerDialog;
+import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.network.BookmarkCheck;
 import net.krautchan.android.network.BookmarkCheck.BookmarkTesterPeer;
+import net.krautchan.android.network.UpdateCheck;
+import net.krautchan.android.network.UpdateCheck.UpdateCheckPeer;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
 
@@ -72,6 +75,9 @@ public class EisenheinrichActivity extends Activity {
 				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, KCBoardListActivity.class));
 		    }
 	    });
+	    
+	    UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.DEFAULTS.UPDATE_VERSION_URL);
+	    up.checkForUpdate(this);
 	    
 		/*try {
 			InetAddress.getByName("krautchan.net");
@@ -157,59 +163,6 @@ public class EisenheinrichActivity extends Activity {
 		}
 	}
 	
-	
-	/*@Deprecated
-	public void showBookmarks () {
-		final HttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
-		final int maxNumColumns = 3;
-		Collection<KCBoard> boards = Eisenheinrich.getInstance().dbHelper.getBoards();
-		Collection <KCThread> threads = Eisenheinrich.getInstance().dbHelper.getBookmarks();
-		Collection <KCThread> bookmarks = new HashSet<KCThread>();
-		for (KCThread thread: threads) {
-			KCBoard board = getBoard (boards, thread.board_id);
-			if (null != board) {
-				String url = "http://krautchan.net/"+board.shortName+"/thread-"+thread.kcNummer+".html";
-				HttpHead req = new HttpHead(url);
-				try {
-					HttpResponse res = httpclient.execute(req);
-					StatusLine sl = res.getStatusLine();
-					int code = sl.getStatusCode();
-					if ((code == 200) || (code == 304)) {
-			        	bookmarks.add(thread);
-					} else {
-						Eisenheinrich.getInstance().dbHelper.deleteThread(thread.dbId);
-					}
-				} catch (ClientProtocolException e) {
-					e.printStackTrace();
-					return;
-				} catch (IOException e) {
-					e.printStackTrace();
-					return;
-				}
-			}
-		}
-		int numCols = maxNumColumns;
-		int numThreads = bookmarks.size();
-		if (numThreads == 0) {
-			return;
-		}
-		// try to get an even distribution of cols and rows
-		while ((numCols >= 1) && ((numThreads / numCols) < numCols)) {
-			numCols--; 
-		} 
-		
-		int remainder = numThreads % numCols;
-		int rows = (int) Math.round(Math.floor((double)numThreads / (double)numCols));
-		TableLayout table = null;
-		table = (TableLayout) findViewById(R.id.bookmark_table);
-        Iterator<KCThread> iter = bookmarks.iterator();
-        if (0 != remainder) {
-        	addBookmarksRow (iter, remainder, table);
-        }
-		for (int i = 0; i < rows; i++) {
-			addBookmarksRow (iter, numCols, table);
-		}
-	}*/
 	
 	private void addBookmarksRow (Iterator<KCThread> iter, int numColumns, TableLayout table) {
 		if ((null == table)|| (null == iter)){
@@ -341,4 +294,19 @@ public class EisenheinrichActivity extends Activity {
 			
 		}
 	};
+	
+	private class UpdatePeer implements UpdateCheckPeer {
+
+		@Override
+		public void updateAvailable() {
+			EisenheinrichActivity.this.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					new UpdateDialog (EisenheinrichActivity.this).show();
+				}
+				
+			});
+		}
+	}
 }

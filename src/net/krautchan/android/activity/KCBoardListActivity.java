@@ -300,12 +300,4 @@ public class KCBoardListActivity extends ListActivity {
 		}
 	}
 
-	/*private static InputSource retrieveInputStream(HttpEntity httpEntity) {
-		InputSource insrc = null;
-		try {
-			insrc = new InputSource(httpEntity.getContent());
-		} catch (Exception e) {
-		}
-		return insrc;
-	}*/
 }

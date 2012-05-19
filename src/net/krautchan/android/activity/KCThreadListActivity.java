@@ -164,6 +164,9 @@ public class KCThreadListActivity extends Activity {
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
+				if (null != siteReachableWatchdog) {
+					siteReachableWatchdog.cancel();
+				}
 				Iterator<KCThread> iter = threads.iterator();
 				KCThread curThread = null;
 				boolean found = false;

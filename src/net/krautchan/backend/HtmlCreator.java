@@ -18,8 +18,10 @@ package net.krautchan.backend;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
+import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.data.*;
 
 
@@ -52,7 +54,7 @@ public class HtmlCreator {
 			}
 			html = html.replace("</ul>", "<li id='"+post.dbId+"'><div id='"+post.kcNummer+"'>"+innerHtml+"</div></li></ul>");
 		}
-		//FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
+		FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
 		return html;
 	}
 }
