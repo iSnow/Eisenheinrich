@@ -95,7 +95,7 @@ public class KCThreadListActivity extends Activity {
 			}})
         .create();
 	    //TODO den Watchdog-Timer auch beim onRestart- und so weiter handler einbauen
-	    siteReachableWatchdog.schedule(new TimerTask () {
+	    /*siteReachableWatchdog.schedule(new TimerTask () {
 			@Override
 			public void run() {
 				KCThreadListActivity.this.runOnUiThread(new Runnable() {
@@ -105,7 +105,7 @@ public class KCThreadListActivity extends Activity {
 				});
 			}
 	    	
-	    }, 10000);
+	    }, 10000);*/
 	    final Handler progressHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	        	if (0 == msg.arg1) {
@@ -120,6 +120,7 @@ public class KCThreadListActivity extends Activity {
 		try {
 			in = new ObjectInputStream(bitch);
 		    curBoard = (KCBoard)in.readObject();
+		    this.setTitle("/"+curBoard.shortName+"/ - "+curBoard.name);
 			list.setAdapter(adapter);
 			heini.addThreadListener(new KODataListener<KCThread>() {
 				@Override
@@ -248,10 +249,15 @@ public class KCThreadListActivity extends Activity {
 					KCPosting post = item.getFirstPosting();
 					if (null != post) {
 						TextView titleLabel = (TextView) v.findViewById(R.id.threadListTitle);
-						titleLabel.setText(post.title);
+						if ((null != post.title) && (post.title.length() != 0)) {
+							titleLabel.setText(post.title);
+						} else {
+							titleLabel.setVisibility(View.GONE);
+						}
 						TextView dateLabel = (TextView) v.findViewById(R.id.threadListDate);
 						dateLabel.setText(post.creationShortDate);
-						
+						TextView authorLabel = (TextView) v.findViewById(R.id.threadListAuthor);
+						authorLabel.setText(post.user);
 						TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
 						contentLabel.setText(item.digest);
 					}
@@ -300,22 +306,19 @@ public class KCThreadListActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.go_thread:
-			//new GoToThreadAction(curBoard.shortName).showDialog ();
 			new GoToThreadDialog (this, curBoard, Eisenheinrich.getInstance().getHttpClient()).showDialog();
 			return true;
 		case R.id.bookmark:
-			//newGame();
 			return true;
 		case R.id.reload: {
 			threads.clear(); 
 			adapter.notifyDataSetInvalidated();
-			Thread t = new Thread (new KCPageParser()
+			new Thread (new KCPageParser()
 				.setBasePath("http://krautchan.net/")
 				.setUrl("http://krautchan.net/board/"+curBoard.shortName+"/0")
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
-				);
-			t.start();
+				).start();
 			View progWrapper = findViewById(R.id.threadlist_watcher_wrapper);
 			progWrapper.setVisibility(View.VISIBLE);
 			return true; 

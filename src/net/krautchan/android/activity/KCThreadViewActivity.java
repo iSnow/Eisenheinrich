@@ -36,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.*;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -55,12 +56,14 @@ public class KCThreadViewActivity extends Activity {
 	private String 					html = null;
 	private WebView 				webView;
 	private boolean					webViewBack = true;
-	//private Handler 				mHandler = new Handler();
+	private Handler 				mHandler = new Handler();
 	private String 					boardName = null;
 	private Long 					boardId = null;
 	private KCThread 				thread = null;
 	private boolean 				javascriptInterfaceBroken = true;
 	private Handler 				progressHandler = null;
+	private boolean 				visitedPostsCollapsible = true;
+	private boolean 				visitedPostsAreCollapsed = true;
 
 	@Override
 	public void onCreate(Bundle bndl) { 
@@ -99,7 +102,8 @@ public class KCThreadViewActivity extends Activity {
 		webView.setWebViewClient(new KCWebViewClient());
 		
 		// TODO: http://krautchan.net/ajax/checkpost?board=b
-
+		
+		//TODO: review http://stackoverflow.com/questions/7424510/uncaught-typeerror-when-using-a-javascriptinterface
 		/*
 		 * Workaround for
 		 * https://code.google.com/p/android/issues/detail?id=12987
@@ -112,6 +116,7 @@ public class KCThreadViewActivity extends Activity {
 		try {
 			if ("2.3".equals(Build.VERSION.RELEASE)) {
 				javascriptInterfaceBroken = true;
+				visitedPostsCollapsible = false;
 			}
 		} catch (Exception e) {
 			// Ignore, and assume user javascript interface is working
@@ -125,8 +130,7 @@ public class KCThreadViewActivity extends Activity {
 
 		if (null == template) {
 			try {
-				InputStream is = this.getAssets().open(
-						"kd_thread_view_template.html");
+				InputStream is = this.getAssets().open("kd_thread_view_template.html");
 				BufferedReader r = new BufferedReader(new InputStreamReader(is));
 				StringBuilder builder = new StringBuilder();
 				String line;
@@ -149,6 +153,7 @@ public class KCThreadViewActivity extends Activity {
 			Bundle b = getIntent().getExtras();
 			boardName = b.getString("boardName");
 			boardId = b.getLong("boardId");
+			visitedPostsCollapsible = b.getBoolean("visitedPostsCollapsible");
 			Assert.assertNotNull(boardId);
 			byte[] threadS = b.getByteArray("thread");
 			ByteArrayInputStream bitch = new ByteArrayInputStream(threadS);
@@ -157,6 +162,7 @@ public class KCThreadViewActivity extends Activity {
 				in = new ObjectInputStream(bitch);
 				thread = (KCThread) in.readObject();
 				thread.board_id = boardId;
+				this.setTitle("/"+boardName+"/"+thread.kcNummer);
 			} catch (StreamCorruptedException e) {
 				Toast toast = Toast.makeText(this, "WebPageLoader::onCreate failed: " + e.getMessage(), Toast.LENGTH_LONG);
 				toast.show();
@@ -168,21 +174,27 @@ public class KCThreadViewActivity extends Activity {
 				toast.show();
 			}
 			if ((null != thread) && (null != pListener)) {
-				Eisenheinrich.getInstance().addPostListener(new PostingListener());
-				// String rssUrl =
-				// "http://krautchan.net/rss/thread-posts/"+boardName;
-				/*
-				 * try { thread = KCParser.addPostingsToThread (rssUrl, thread);
-				 * } catch (Exception e) { Toast.makeText(this,
-				 * "WebPageLoader::onCreate failed: "+e.getMessage(),
-				 * Toast.LENGTH_LONG); }
-				 */
+				Eisenheinrich.getInstance().addPostListener(pListener);
 			}
+		}
+		if (javascriptInterfaceBroken) {
+			visitedPostsCollapsible = false;
+		}
+		if (visitedPostsCollapsible) {
+			Button toggleCollapsedButton = (Button)findViewById(R.id.show_collapsed);
+		    toggleCollapsedButton.setOnClickListener(new View.OnClickListener() {
+			    public void onClick(View v) {
+			    	v.setVisibility(View.GONE);
+			    	visitedPostsAreCollapsed = !visitedPostsAreCollapsed;
+			    	webView.loadUrl("javascript:toggleCollapsed ("+visitedPostsAreCollapsed+")");
+			    }
+		    });
 		}
 	}
 	
 	public void onBackPressed () {
 		if (!webViewBack) {
+			Eisenheinrich.getInstance().removePostListener(pListener);
 			super.onBackPressed();
 			//webView.clearHistory();
 		}
@@ -192,6 +204,7 @@ public class KCThreadViewActivity extends Activity {
 			renderHtml(html); 
 			webView.clearHistory();
 		} else {
+			Eisenheinrich.getInstance().removePostListener(pListener);
 			super.onBackPressed();
 		}
 	}
@@ -202,10 +215,32 @@ public class KCThreadViewActivity extends Activity {
 		webView.saveState(outState);
 		outState.putString("html", html);
 	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle inState) {
+		//String html = inState.getString("html");
+		webView.restoreState(inState);
+		//super.onRestoreInstanceState(inState);
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	@Override
+	protected void onStop() {
+	    super.onStop();
+	}
+
+	@Override
+	protected void onRestart() {
+	    super.onRestart();
+	}
 
 	private void renderHtml(String html) {
-		webView.loadDataWithBaseURL("http://krautchan.net/", html, "text/html",
-				"utf-8", null);
+		webView.loadDataWithBaseURL("http://krautchan.net/", html, "text/html", "utf-8", null);
 		this.html = html;
 	}
 
@@ -214,24 +249,14 @@ public class KCThreadViewActivity extends Activity {
 		public void notifyAdded(KCPosting item) {
 			thread.addPosting(item);
 			((ProgressBar)findViewById(R.id.threadview_watcher)).incrementProgressBy(5);
-			/*
-			 * Map<Long, KCPosting> postings = thread.postings; if
-			 * (!postings.containsKey(item.dbId)) { postings.put(item.dbId,
-			 * item); runOnUiThread(new Runnable() { public void run() {
-			 * //adapter.add(item); //adapter.notifyDataSetChanged(); } }); }
-			 */
 		}
 
 		@Override
 		public void notifyDone() {
-			List<KCPosting> postings = new ArrayList<KCPosting>();
-			for (Long id : thread.getIds()) {
-				postings.add(thread.getPosting(id));
-			}
 			Message msg = progressHandler.obtainMessage();
         	msg.arg1 = 0;
         	progressHandler.sendMessage(msg);
-			renderHtml(HtmlCreator.addPostings(postings, template));
+        	renderHtml (HtmlCreator.htmlForThread(thread, template));
 		}
 
 		@Override
@@ -241,12 +266,10 @@ public class KCThreadViewActivity extends Activity {
 	}
 
 	private final class KCWebViewClient extends WebViewClient {
-		
 		 @Override
 		    public boolean shouldOverrideUrlLoading(WebView  view, String  url){
 		        return true;
 		    }
-		 
 		 
 		    // Override URL Loading
 		    @Override
@@ -274,30 +297,28 @@ public class KCThreadViewActivity extends Activity {
 						+ "javascript: var jshandler = new handler();";
 				view.loadUrl(handleGingerbreadStupidity);
 			}
-			/*Toast toast = Toast.makeText(KCThreadViewActivity.this, "loaded", Toast.LENGTH_LONG);
-			toast.show();*/
 		}
 
 	}
 
-	/*final class DemoJavaScriptInterface {
+	final class DemoJavaScriptInterface {
 
 		DemoJavaScriptInterface() {
-		}*/
+		}
 
 		/**
 		 * This is not called on the UI thread. Post a runnable to invoke
 		 * loadUrl on the UI thread.
 		 */
-		/*public void clickOnAndroid() {
+		public void clickOnAndroid() {
 			mHandler.post(new Runnable() {
 				public void run() {
-					webView.loadUrl("javascript:wave()");
+					webView.loadUrl("test('hey')");
 				}
 			});
 
 		}
-	}*/
+	}
 	
 	private void openExternalLink(String url) {
 		if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -376,11 +397,15 @@ public class KCThreadViewActivity extends Activity {
 		case R.id.bookmark: 
 			Eisenheinrich.getInstance().dbHelper.bookmarkThread(thread);
 			return true;
-		case R.id.reload: {
+		case R.id.reload: 
+			if (visitedPostsCollapsible) {
+				findViewById(R.id.show_collapsed).setVisibility(View.VISIBLE);
+				visitedPostsAreCollapsed = true;
+			}
 			findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
+			thread.previousLastKcNum = thread.getLastPosting().kcNummer;		
 			thread.clearPostings();
 			ActivityHelpers.switchToThread(thread, boardName, boardId,  this);
-		}
 			return true;
 		case R.id.prefs:
 			return true;

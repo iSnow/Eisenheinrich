@@ -1,4 +1,4 @@
-function quoteClick (elem) {
+	function quoteClick (elem) {
 		var offset = $(elem).offset();
 		
 		if (!($('#quoteoverlay').is(':visible'))) {
@@ -55,4 +55,28 @@ function quoteClick (elem) {
 	
 	function goToByScroll(id){     			
 		$('html,body').animate({scrollTop: $("#"+id).offset().top},'slow');		
+	}
+	
+	function toggleCollapsed (show) {
+		$(".collapsed").css('background', '#333').show();
+		//$(".collapsed").show();
+		/*var rule = getRule (".collapsed");
+		if (rule != undefined) {
+			if (show){
+				rule.style.display = "block";
+			} else {
+				rule.style.display = "none";
+			}
+		}*/
+	}
+	
+	function getRule (ruleName) {
+		var mysheet=document.styleSheets[0];
+		var myrules=mysheet.cssRules? mysheet.cssRules: mysheet.rules;
+		for (i=0; i<myrules.length; i++) {
+			if(myrules[i].selectorText.toLowerCase()==ruleName) { 
+				return myrules[i];
+			}
+		}
+		return undefined;
 	}

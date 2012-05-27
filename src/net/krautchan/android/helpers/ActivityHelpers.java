@@ -60,6 +60,7 @@ public class ActivityHelpers {
 			b.putByteArray("thread", boss.toByteArray());
 			b.putString("boardName", boardShortName);
 			b.putLong("boardId", boardId);
+			b.putBoolean("visitedPostsCollapsible", false);
 			final Long threadNumber = curThread.kcNummer;
 
 			Thread t = new Thread(new KCPageParser()

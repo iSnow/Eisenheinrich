@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -30,6 +31,7 @@ import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
 
 public class KCPageParser implements Runnable {
+	private HttpClient client;
 	private String resolverPath = null;
 	private KCPostingStreamParser pParser = null;
 	private KCThreadStreamParser tParser = null;
@@ -103,7 +105,7 @@ public class KCPageParser implements Runnable {
 		}
 		tParser.setHandler(threadHandler);
 		final char[]filter =  tParser.getFilterMarker();
-		DefaultHttpClient client = new DefaultHttpClient();
+		client = new DefaultHttpClient();
 		HttpGet request = new HttpGet (url);
 		try {
 			HttpResponse response = client.execute(request);
@@ -140,6 +142,8 @@ public class KCPageParser implements Runnable {
 			e.printStackTrace();
 			threadHandler.notifyError(e);
 			//FIXME do something for heaven's sake!
+		} finally {
+	        client.getConnectionManager().shutdown(); // Close the instance here
 		}
 	}
 

@@ -240,7 +240,7 @@ public class Eisenheinrich extends Application {
 	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 		    // Set the default socket timeout (SO_TIMEOUT) 
 		    // in milliseconds which is the timeout for waiting for data.
-	    int timeoutSocket = 5000;
+	    int timeoutSocket = 10000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 	    httpParameters.setParameter( "http.useragent", USER_AGENT);
     	HttpClient httpclient = new DefaultHttpClient(httpParameters);

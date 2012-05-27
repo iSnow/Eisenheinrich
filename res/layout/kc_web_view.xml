@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/thread_view_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" android:orientation="vertical">
+    android:layout_height="match_parent" 
+    android:orientation="vertical">
+
     <FrameLayout 
         android:id="@+id/threadview_watcher_wrapper" 
     	android:layout_width="match_parent" 
@@ -17,6 +19,14 @@
         	android:layout_marginTop="10dp"
         	android:layout_marginBottom="10dp"></ProgressBar>
     </FrameLayout>
+    
+    <Button
+        android:id="@+id/show_collapsed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/show_collapsed"
+        android:visibility="gone" />
+    
     <FrameLayout
         android:id="@+id/webview_wrapper"
         android:layout_width="match_parent"

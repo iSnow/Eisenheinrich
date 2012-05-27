@@ -79,12 +79,6 @@ public class EisenheinrichActivity extends Activity {
 	    UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.DEFAULTS.UPDATE_VERSION_URL);
 	    up.checkForUpdate(this);
 	    
-		/*try {
-			InetAddress.getByName("krautchan.net");
-		} catch (UnknownHostException e) {*/
-			/* TODO For now, disregard this. At some point we should implement code here that checks if we have a 
-				working internet connection */ 
-		//}
 		Prefs prefs = Prefs.getInstance();
 		if (null == prefs) {
 			this.finish();
@@ -113,7 +107,6 @@ public class EisenheinrichActivity extends Activity {
 			BookmarkTesterPeer bmp = new BookmarkPeer(threads);
 			BookmarkCheck bmc = new BookmarkCheck(threads, bmp);
 			bmc.checkBookmarks();
-			//showBookmarks (); 
 		}
 	}
 
@@ -122,6 +115,7 @@ public class EisenheinrichActivity extends Activity {
 	public void onBackPressed() {
 		super.onBackPressed();
 		Eisenheinrich.getInstance().dbHelper.close();
+		this.finish();
 	}
 	
 	public void showBookmarks (Collection <KCThread> bookmarks, boolean[] valid) {

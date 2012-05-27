@@ -16,20 +16,24 @@ package net.krautchan.data;
 */
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class KCThread extends KrautObject {
-	private static final SimpleDateFormat df = new SimpleDateFormat ("EEE, dd MMM yyyy HH:mm:ss z");
-	private static final SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
+	private static final long serialVersionUID = -8659957154306651426L;
+	private static transient final SimpleDateFormat df = new SimpleDateFormat ("EEE, dd MMM yyyy HH:mm:ss z");
+	private static transient final SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
 	public Long kcNummer = null;
 	public Long board_id = null;
 	public Long firstPostDate = null;
 	public Long lastPostDate = null;
 	public String digest = null;
-	private Map<Long, KCPosting>  postings = new LinkedHashMap<Long, KCPosting>();
+	public transient Long previousLastKcNum = null;
+	private Map<Long, KCPosting>  postings = new TreeMap<Long, KCPosting>();
 	
 	public synchronized KCPosting getPosting (Long id) {
 		return postings.get(id);
@@ -38,6 +42,17 @@ public class KCThread extends KrautObject {
 	public synchronized KCPosting getFirstPosting () {
 		if (!postings.isEmpty()) {
 			return postings.entrySet().iterator().next().getValue();
+		}
+		return null;
+	}
+	public synchronized KCPosting  getLastPosting() {
+		if (!postings.isEmpty()) {
+			KCPosting p = null;
+			Iterator<Map.Entry<Long, KCPosting>> iter = postings.entrySet().iterator();
+			while (iter.hasNext()) {
+				p = iter.next().getValue();
+			}
+			return p;
 		}
 		return null;
 	}
@@ -51,9 +66,9 @@ public class KCThread extends KrautObject {
 		}
 		lastPostDate = posting.created;
 		Long id = posting.dbId;
-		//if (!postings.containsKey(id)) {
-		postings.put(id, posting);
-		//}	
+		if (!postings.containsKey(id)) {
+			postings.put(id, posting);
+		}	
 	}
 	
 	public synchronized void clearPostings () {
@@ -96,4 +111,6 @@ public class KCThread extends KrautObject {
 			}
 		}
 	}
+
+	
 }

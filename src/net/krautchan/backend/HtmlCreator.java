@@ -19,14 +19,46 @@ package net.krautchan.backend;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.data.*;
 
-
-
 public class HtmlCreator {
+	
+	public static String htmlForThread (KCThread thread, String template) {
+		KCPosting p = null;
+		StringBuffer buf = new StringBuffer();
+		Iterator<Long> iter = thread.getIds().iterator();
+		while (iter.hasNext()) {
+			p = thread.getPosting(iter.next());
+			String innerHtml = "<p class=\"headline\"><b>"+p.kcNummer+"</b><time class='timeago' datetime='"+p.creationDate+"'>"+p.creationDate+"</time></p>";
+			if (null != p.title) {
+				innerHtml += "<p class=\"topic\">"+p.title+"</p>";
+			}
+			innerHtml += p.content;
+			if (p.imgs.length > 0) {
+				innerHtml += "<div class=\"image-container\">";
+				for (int i = 0; i < p.imgs.length; i++) {
+					if (null != p.imgs[i]) {
+						innerHtml += "<a href=\"/files/"+p.imgs[i]+"\" target=\"_blank\"  onclick=\"alert('open:image:"+p.imgs[i]+"');return false;\"><img src=\"/thumbnails/"+p.imgs[i]+"\"></a>";
+					}
+				}
+				innerHtml += "</div>";
+			}
+			if ((thread.previousLastKcNum != null) &&(p.kcNummer <= thread.previousLastKcNum)) {
+				buf.append ("<li class='collapsed' id='"+p.dbId+"'>");
+			} else {
+				buf.append ("<li id='"+p.dbId+"'>");
+			}
+			buf.append ("<div id='"+p.kcNummer+"'>"+innerHtml+"</div></li>");
+		}
+		String html = template.replace("</ul>",buf.toString()+"</ul>"); 
+		//FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
+		return html;
+	}
 	
 	public static String addPostings (List<KCPosting> postings, String template) {
 		Collections.sort(postings, new Comparator<KCPosting>() {
@@ -54,7 +86,7 @@ public class HtmlCreator {
 			}
 			html = html.replace("</ul>", "<li id='"+post.dbId+"'><div id='"+post.kcNummer+"'>"+innerHtml+"</div></li></ul>");
 		}
-		FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
+		//FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
 		return html;
 	}
 }

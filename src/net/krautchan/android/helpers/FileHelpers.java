@@ -41,6 +41,7 @@ public class FileHelpers {
 				out = new ObjectOutputStream(fos);
 				out.writeObject(payLoad);
 				out.close();
+				fos.close();
 				return true;
 			} 
 		} catch (IOException e) {

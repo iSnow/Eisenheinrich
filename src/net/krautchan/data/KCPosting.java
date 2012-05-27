@@ -16,15 +16,17 @@ package net.krautchan.data;
 * limitations under the License.
 */
 
+import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-public class KCPosting extends KrautObject {
+public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 	private static final long serialVersionUID = 2343973223217952495L;
 	private static final SimpleDateFormat df = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
 	// we get the date as: 		EEE, dd MMM yyyy HH:mm:ss z"
@@ -33,6 +35,7 @@ public class KCPosting extends KrautObject {
 	private static SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
 	private static SimpleDateFormat dfOut = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss");
 	private static final Pattern imgPat = Pattern.compile("href=\"/download/(\\d+\\..+?)/(.+?)\"");
+	private static final Pattern linkPat = Pattern.compile("https?://w?w?w?\\.?(.+?)/(.+?)([\"\\s<>\\(\\)])");
 	public Long 	kcNummer;
 	public Long 	threadId;
 	public Long 	threadKcNummer;
@@ -58,7 +61,7 @@ public class KCPosting extends KrautObject {
 		CONTENT
 	}
 	
-	public void cleanRssContent () {
+	/*public void cleanRssContent () {
 		String locContent = content;
 		//locContent = StringEscapeUtils.unescapeHtml4(locContent);
 		locContent = locContent.replaceAll("<p>", "");
@@ -89,15 +92,15 @@ public class KCPosting extends KrautObject {
 		locContent = locContent.replace("<p>", "");
 		locContent = locContent.replaceAll("<a href=\"/resolve/.+?\">", "");
 		locContent = locContent.replaceAll("</a>", "");
-		/*locContent = locContent.replaceAll("<span.*?>", "");
-		locContent = locContent.replaceAll("</span", "");*/
+		//locContent = locContent.replaceAll("<span.*?>", "");
+		//locContent = locContent.replaceAll("</span", "");
 		locContent = locContent.replaceAll("<br>", " ").trim();
 		if ((locContent.trim().length() == 0) || (locContent.startsWith(title))) {
 			title = null;
 		} else if (title.length() > 40) {
 			title = title.substring(0, 40)+"...";
 		}
-	}
+	}*/
 	
 	public void sanitizeContent () {
 		String locContent = content;
@@ -106,14 +109,33 @@ public class KCPosting extends KrautObject {
 		locContent = locContent.replaceAll("</p>", " ");
 		
 		locContent = locContent.replaceAll("onclick=\"highlightPost\\(\\'\\d+\\'\\);\"", "");		
-		locContent = locContent.replaceAll(">>>(\\d+)</a>", " onclick='quoteClick(this); return false;' class=\"kclnk\"><span class=\"kclnk\">&gt;&gt;</span> $1</a>");
+		locContent = locContent.replaceAll(">>>(\\d+)</a>", " onclick='quoteClick(this); return false;' class=\"kclink\">☛&gt;&gt; $1</a>");
 
 		locContent = locContent.replaceAll("<a href=\"/resolve/.+?\">", "");
-		locContent = locContent.replaceAll("https?://www.youtube.com/(.+?)([\\s<\\.])", "<a href=\"http://www.youtube.com/$1\" class=\"youtubelink\" onclick=\"alert('open:youtube:$1');return false;\">YouTube</a>$2");
-		locContent = locContent.replaceAll("https?://youtu.be/(.+?)([\\s<\\.])", "<a href=\"http://www.youtube.com/watch?v=$1\" class=\"youtubelink\" onclick=\"alert('open:youtube:$1');return false;\">YouTube</a>$2");
-		locContent = locContent.replaceAll("https?://(www)?\\.*(.+?)/(.+?)([\\s<>\\(\\)\\.])", "<a href=\"http://$2/$3\" class=\"extlink\" onclick=\"alert('open:ext:$2/$3');return false;\">$2</a>$4");
-			
-		content = "<p><span>"+locContent.trim()+"</span></p>";
+		Matcher m = linkPat.matcher(locContent);
+		CharBuffer buf = CharBuffer.allocate(locContent.length()+400);
+		int end = 0;
+		while (m.find()) {
+			int gc = m.groupCount();
+			if (gc > 0) {
+				buf.append(locContent.substring(end, m.start()));
+				end = m.end();
+				String host = m.group(1);
+				String name = host;
+				String styleClass="extlink";
+				if (host.contains("youtube")) {
+					styleClass="ytlink";
+					name = "YouTube";
+				} else if (host.contains("krautchan.net")){
+					styleClass="kclink";
+					name = ">>";
+					host = "";
+				}
+				buf.append("<a href=\"http://"+m.group(1)+"/"+m.group(2)+"\" class=\""+styleClass+"\">"+name+"</a>"+m.group(3));
+			}
+		}
+		buf.append(locContent.substring(end, locContent.length()));
+		content = "<p><span>"+buf.rewind().toString().trim()+"</span></p>";
 	}
 	
 	
@@ -160,5 +182,11 @@ public class KCPosting extends KrautObject {
 			default: 
 				throw new IllegalStateException ("Illegal State in KCPosting:setField");
 		}
+	}
+
+
+	@Override
+	public int compareTo(KCPosting arg0) {
+		return kcNummer.compareTo(arg0.kcNummer);
 	}
 }
