@@ -10,9 +10,18 @@
 <script src='file:///android_asset/js/jquery.timeago.de.js' type='text/javascript'></script>
 <script src='file:///android_asset/js/kc.js' type='text/javascript'></script>
 <script type='text/javascript'>
+	var scrollPosId = @@CURPOST@@;
+	
 	$(document).ready(function() {
 		$('time.timeago').timeago();
 	});
+	
+	function gotToPrevLast() {
+		if (scrollPosId != null) {
+			goToByScroll (scrollPosId);
+			toggleCollapsed (true);
+		}
+	}
 	
 	function test(arg) {
 		$('.kc-listwrapper').html("<div>"+arg+"</div>");
@@ -84,4 +93,5 @@
 	<div id="quoteoverlay">
 	</div>
 </body>
+
 </html>

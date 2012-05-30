@@ -256,7 +256,13 @@ public class KCThreadViewActivity extends Activity {
 			Message msg = progressHandler.obtainMessage();
         	msg.arg1 = 0;
         	progressHandler.sendMessage(msg);
-        	renderHtml (HtmlCreator.htmlForThread(thread, template));
+        	String locTemplate = template;
+        	if (null != thread.previousLastKcNum) {
+        		locTemplate = locTemplate.replace("@@CURPOST@@", thread.previousLastKcNum.toString());
+        	} else {
+        		locTemplate = locTemplate.replace("@@CURPOST@@", "null");
+        	}
+        	renderHtml (HtmlCreator.htmlForThread(thread, locTemplate));
 		}
 
 		@Override
@@ -292,10 +298,15 @@ public class KCThreadViewActivity extends Activity {
 			// function(s)
 			// we used to use in the Javascript-to-Java bridge.
 			if (javascriptInterfaceBroken) {
-				String handleGingerbreadStupidity = "javascript:function openQuestion(id) { window.location='http://jshandler:openQuestion:'+id; }; "
+				Log.d(TAG, "onPageFinished::GingerbreadStupidity Path");
+				/*String handleGingerbreadStupidity = "javascript:function openQuestion(id) { window.location='http://jshandler:openQuestion:'+id; }; "
 						+ "javascript: function handler() { this.openQuestion=openQuestion; }; "
-						+ "javascript: var jshandler = new handler();";
+						+ "javascript: var jshandler = new handler();";*/
+				String handleGingerbreadStupidity = "javascript:gotToPrevLast()";
 				view.loadUrl(handleGingerbreadStupidity);
+			} else {
+				Log.d(TAG, "onPageFinished::Sane Path");
+				webView.loadUrl("javascript:gotToPrevLast()");
 			}
 		}
 
@@ -366,8 +377,7 @@ public class KCThreadViewActivity extends Activity {
 	 */
 	final class KCWebChromeClient extends WebChromeClient {
 		@Override
-		public boolean onJsAlert(WebView view, String url, String message,
-				JsResult result) {
+		public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
 			Log.d(TAG, message);
 			result.confirm();
 			String args[] = message.split(":");
@@ -389,6 +399,17 @@ public class KCThreadViewActivity extends Activity {
 		getMenuInflater().inflate(R.menu.options_menu_webview, menu);
 		return true;
 	}
+	
+	private void reload() {
+		if (visitedPostsCollapsible) {
+			findViewById(R.id.show_collapsed).setVisibility(View.VISIBLE);
+			visitedPostsAreCollapsed = true;
+		}
+		findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
+		thread.previousLastKcNum = thread.getLastPosting().kcNummer;		
+		thread.clearPostings();
+		ActivityHelpers.switchToThread(thread, boardName, boardId,  this);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -398,25 +419,17 @@ public class KCThreadViewActivity extends Activity {
 			Eisenheinrich.getInstance().dbHelper.bookmarkThread(thread);
 			return true;
 		case R.id.reload: 
-			if (visitedPostsCollapsible) {
-				findViewById(R.id.show_collapsed).setVisibility(View.VISIBLE);
-				visitedPostsAreCollapsed = true;
-			}
-			findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
-			thread.previousLastKcNum = thread.getLastPosting().kcNummer;		
-			thread.clearPostings();
-			ActivityHelpers.switchToThread(thread, boardName, boardId,  this);
+			reload();
 			return true;
 		case R.id.prefs:
 			return true;
 		case R.id.reply: 
 			ActivityHelpers.createThreadMask (thread, boardName, this);
 			return true;
-		case R.id.home: {
-			Intent intent = new Intent(KCThreadViewActivity.this,
-					EisenheinrichActivity.class);
+		case R.id.home: 
+			Intent intent = new Intent(KCThreadViewActivity.this, EisenheinrichActivity.class);
 			startActivity(intent);
-		}
+			this.finish();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

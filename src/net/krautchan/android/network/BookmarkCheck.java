@@ -28,6 +28,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.conn.ConnectTimeoutException;
 
 public class BookmarkCheck  {
 	private BookmarkTesterPeer peer;
@@ -60,12 +61,16 @@ public class BookmarkCheck  {
 							if (res.getEntity() != null ) {
 								res.getEntity().consumeContent();
 							}
+						} catch (ConnectTimeoutException e) {
+							results[count] = true; //if we can't reach the network, still show bookmarks
+							e.printStackTrace();
+							return;
 						} catch (ClientProtocolException e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
-							return;
 						} catch (IOException e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
-							return;
 						}
 					}
 					count++;

@@ -1,114 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView1"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/postview_wrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_weight="1" >
+    android:layout_gravity="top" >
 
-	    <LinearLayout 
-	android:layout_width="fill_parent" 
-	android:layout_height="wrap_content"
-	android:textSize="12dp" 
-	android:padding="6dp"
- 	android:gravity="top" 
-	android:orientation="vertical"  >
-	<TextView android:id="@+id/poster_name"
-		android:layout_weight="1"
-		android:textColor="@color/GreenYellow" 
-		android:textStyle="bold"
-		android:gravity="left" 
-		android:layout_width="match_parent"
-		android:text="Name" android:layout_height="wrap_content"/>
-	<EditText android:id="@+id/edit_poster_name" 
-		android:layout_width="match_parent" 
-		android:layout_height="wrap_content"/>
-	<TextView android:id="@+id/posting_title"
-		android:layout_height="wrap_content" 
-		android:layout_weight="1"
-		android:textColor="@color/GreenYellow" 
-		android:textStyle="bold"
-		android:gravity="left" 
-		android:layout_width="match_parent"
-		android:text="Titel" 
-		android:layout_marginTop="6dp"/>
-	<EditText android:id="@+id/edit_posting_title" 
-		android:layout_width="match_parent" 
-		android:layout_height="wrap_content"/>
-	<TextView android:id="@+id/posting_content"
-		android:layout_height="wrap_content" 
-		android:layout_weight="1"
-		android:textColor="@color/GreenYellow" 
-		android:textStyle="bold"
-		android:gravity="left" 
-		android:layout_width="match_parent"
-		android:text="Inhalt" android:layout_marginTop="6dp"/>
-	<EditText android:id="@+id/edit_posting_content" 
-		android:layout_width="match_parent" 
-		android:inputType="textMultiLine" android:layout_height="100dp"/>
-	<CheckBox android:id="@+id/sage" 
-		android:layout_width="match_parent" 
-		android:layout_height="wrap_content" 
-		android:text="Säge" 
-		android:checked="false"/>
-	<TextView android:id="@+id/image_area"
-		android:layout_height="wrap_content" 
-		android:layout_weight="1"
-		android:textColor="@color/GreenYellow" 
-		android:textStyle="bold"
-		android:gravity="left" 
-		android:layout_width="match_parent"
-		android:text="Bilder" android:layout_marginTop="6dp"/>
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
 
-	<LinearLayout
-	    android:id="@+id/linearLayout2"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_weight="1"
-	    android:visibility="gone" >
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="vertical"
+            android:padding="6dp"
+            android:textSize="12dp" >
 
-		<Button
-		    android:id="@+id/button2"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:text="Bildersuche" />
+            <TextView
+                android:id="@+id/poster_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="Name"
+                android:textColor="@color/GreenYellow"
+                android:textStyle="bold" />
 
-		<Button
-		    android:id="@+id/button1"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:text="Kamera" />
+            <EditText
+                android:id="@+id/edit_poster_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-	</LinearLayout>
+            <TextView
+                android:id="@+id/posting_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="Titel"
+                android:textColor="@color/GreenYellow"
+                android:textStyle="bold" />
 
-	<TableLayout
-	    android:id="@+id/posting_buttons_table"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_weight="1" >
-	</TableLayout>
+            <EditText
+                android:id="@+id/edit_posting_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-	<LinearLayout
-	    android:id="@+id/linearLayout1"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_weight="1" >
+            <TextView
+                android:id="@+id/posting_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="Inhalt"
+                android:textColor="@color/GreenYellow"
+                android:textStyle="bold" />
 
-	    <Button
-	        android:id="@+id/cancel_button"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="Cancel" />
+            <EditText
+                android:id="@+id/edit_posting_content"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:inputType="textMultiLine" />
 
-	    <Button
-	        android:id="@+id/ok_button"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="fill_horizontal|right"
-	        android:text="OK" />
-	</LinearLayout>
+            <CheckBox
+                android:id="@+id/sage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Säge" />
 
-	
+            <TextView
+                android:id="@+id/image_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="Bilder"
+                android:textColor="@color/GreenYellow"
+                android:textStyle="bold" />
 
-</LinearLayout>
-	</ScrollView>
-	
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone" >
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bildersuche" />
+
+                <Button
+                    android:id="@+id/button1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kamera" />
+            </LinearLayout>
+
+            <TableLayout
+                android:id="@+id/posting_buttons_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+            </TableLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal" >
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="@string/cancel" />
+
+                <Button
+                    android:id="@+id/ok_button"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:text="@string/ok" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/postview_spinner"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</FrameLayout>

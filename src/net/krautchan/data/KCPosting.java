@@ -109,9 +109,9 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		locContent = locContent.replaceAll("</p>", " ");
 		
 		locContent = locContent.replaceAll("onclick=\"highlightPost\\(\\'\\d+\\'\\);\"", "");		
-		locContent = locContent.replaceAll(">>>(\\d+)</a>", " onclick='quoteClick(this); return false;' class=\"kclink\">☛&gt;&gt; $1</a>");
+		locContent = locContent.replaceAll(">>>(\\d+)</a>", " onclick='quoteClick(this); return false;' class=\"kclink\">&gt;&gt; $1</a>");
 
-		locContent = locContent.replaceAll("<a href=\"/resolve/.+?\">", "");
+		locContent = locContent.replaceAll("<a href=\"/resolve(/.+?)\"\\s*>.+?</a>", "<a href=\"/resolve$1\" class=\"kclink\">&gt;&gt; $1</a>");
 		Matcher m = linkPat.matcher(locContent);
 		CharBuffer buf = CharBuffer.allocate(locContent.length()+400);
 		int end = 0;
@@ -183,7 +183,6 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 				throw new IllegalStateException ("Illegal State in KCPosting:setField");
 		}
 	}
-
 
 	@Override
 	public int compareTo(KCPosting arg0) {

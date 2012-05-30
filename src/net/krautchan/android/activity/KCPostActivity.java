@@ -23,7 +23,10 @@ import java.io.StreamCorruptedException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
@@ -50,7 +53,12 @@ import android.widget.TableLayout;
 import android.widget.Toast;
 
 public class KCPostActivity extends Activity {
-	static final String TAG = "KCPostActivity";
+	private static final String TAG = "KCPostActivity";
+	private static final ArrayList<String> FILE_TYPES; 
+	static {
+		final String[] FILE_TYPE_ARRAY = {"gif", "jpg", "jpeg", "png"};
+		FILE_TYPES = new ArrayList<String>(Arrays.asList(FILE_TYPE_ARRAY));
+	}
 	private static final int MAX_IMAGES = 4;//max 4 images per posting
 	private static final int NUM_COLS = 2;//2 rows of image buttons
 	private PostVariables vars;
@@ -77,9 +85,12 @@ public class KCPostActivity extends Activity {
 		    if (null != params.curThreadKCNum) {
 		    	vars.threadNumber = params.curThreadKCNum.toString();
 		    }
-		    Button okButton = (Button)findViewById(R.id.ok_button);
+		    final Button okButton = (Button)findViewById(R.id.ok_button);
 		    okButton.setOnClickListener(new View.OnClickListener() {
 			    public void onClick(View v) {
+			    	findViewById(R.id.postview_spinner).setVisibility(View.VISIBLE);
+			    	okButton.setEnabled(false);
+			    	((Button)findViewById(R.id.cancel_button)).setEnabled(false);
 			    	HttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
 			    	List<AsyncPosterPeer> peers = new ArrayList<AsyncPosterPeer>();
 			    	peers.add(Eisenheinrich.posterPeer);
@@ -119,7 +130,7 @@ public class KCPostActivity extends Activity {
 			    	poster.postInThread();
 			    }
 		    });
-		    Button cancelButton = (Button)findViewById(R.id.cancel_button);
+		    final Button cancelButton = (Button)findViewById(R.id.cancel_button);
 		    cancelButton.setOnClickListener(new View.OnClickListener() {
 		    	public void onClick(View v) {
 		    		((EditText) KCPostActivity.this.findViewById(R.id.edit_poster_name)).setText("");
@@ -194,19 +205,25 @@ public class KCPostActivity extends Activity {
         switch(requestCode){
         case KCFileChooserActivity.REQUEST_CODE:
               if (resultCode == Activity.RESULT_OK) {
-            	  String uri = data.getDataString();
-            	  if (null != uri) {
-            		  Log.i(TAG, uri);
-            		  Uri imgUri=Uri.parse(uri);
-            		  buttons.get(imageClicked).setImageURI(imgUri); 
-            		  vars.files[imageClicked] = imgUri;
-            		  try {
-            			Bitmap b = ActivityHelpers.scaleDownBitmap(ActivityHelpers.loadBitmap(new URL(imgUri.toString())), 125, true);
-						buttons.get(imageClicked).setImageBitmap(b);
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+            	  String uriString = data.getDataString();
+            	  if (null != uriString) {
+            		  String[] components = uriString.split("\\.");
+            		  String suffix = components[components.length-1];
+            		  if ((null != suffix) && (suffix.length() != 0)) {
+            			  if (FILE_TYPES.contains(suffix.toLowerCase())) {
+            				  Log.i(TAG, uriString);
+                    		  Uri imgUri=Uri.parse(uriString);
+                    		  buttons.get(imageClicked).setImageURI(imgUri); 
+                    		  vars.files[imageClicked] = imgUri;
+                    		  try {
+                    			Bitmap b = ActivityHelpers.scaleDownBitmap(ActivityHelpers.loadBitmap(new URL(imgUri.toString())), 125, true);
+        						buttons.get(imageClicked).setImageBitmap(b);
+        					} catch (MalformedURLException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+            			  }
+            		  }
             	  }
               }
               break;

@@ -159,6 +159,11 @@ ul.kc-postlist>li>div>p.headline>time {
 	float: right;
 }
 
+.ban_mark {
+    color: #FF0000;
+    font-weight: bold;
+}
+
 .collapsed {
 	display: block;
 }

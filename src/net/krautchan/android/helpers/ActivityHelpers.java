@@ -42,15 +42,18 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableLayout.LayoutParams;
 
 public class ActivityHelpers {
 	static final String TAG = "ActivityHelpers";
+	private static float scale;
 
 	public static void switchToThread(KCThread curThread,
 			String boardShortName, Long boardId, Activity context) {
+		scale = context.getResources().getDisplayMetrics().density;
 		ByteArrayOutputStream boss = new ByteArrayOutputStream();
 		ObjectOutputStream out;
 		try {
@@ -83,8 +86,7 @@ public class ActivityHelpers {
 		}
 	}
 
-	public static void createThreadMask(KCThread curThread,
-			String boardShortName, Activity context) {
+	public static void createThreadMask(KCThread curThread, String boardShortName, Activity context) {
 		PostActivityParams params = new PostActivityParams();
 		params.curBoardName = boardShortName;
 		if (null != curThread) {
@@ -111,11 +113,13 @@ public class ActivityHelpers {
 			TableLayout table, View.OnClickListener listener, Context parent) {
 		ImageButton[] buttons = new ImageButton[numColumns];
 		TableRow row = new TableRow(parent);
-		//row.setVisibility(View.GONE);
-		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.WRAP_CONTENT));
+		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		//int dip = (int) (60 * scale + 0.5f);
 		for (int j = 0; j < numColumns; j++) {
 			ImageButton bt = new ImageButton(parent);
+			//RelativeLayout.LayoutParams shareParams = new RelativeLayout.LayoutParams(60, 60);
+			//bt.setLayoutParams(shareParams);
+
 			//bt.setVisibility(View.GONE);
 			buttons[j] = bt;
 			bt.setImageDrawable(parent.getResources().getDrawable(R.drawable.icon));

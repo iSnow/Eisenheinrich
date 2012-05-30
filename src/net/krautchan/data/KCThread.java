@@ -17,9 +17,10 @@ package net.krautchan.data;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -77,6 +78,12 @@ public class KCThread extends KrautObject {
 	
 	public synchronized Collection<Long> getIds () {
 		return postings.keySet();
+	}
+	
+	public synchronized Set<KCPosting> getSortedPostings () {
+		TreeSet<KCPosting> s = new TreeSet<KCPosting>();
+		s.addAll(postings.values());
+		return s;
 	}
 	
 	private void makeDigest (KCPosting posting) {

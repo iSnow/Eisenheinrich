@@ -241,7 +241,11 @@ public class KCThreadListActivity extends Activity {
 				shortLabel.setText("Nothing found");
 			} else {
 				TextView numberLabel = (TextView) v.findViewById(R.id.threadListNumber);
-				numberLabel.setText(item.kcNummer.toString());
+				String numLabel = "null";
+				if (null != item.kcNummer) {
+					numLabel = item.kcNummer.toString();
+				};
+				numberLabel.setText(numLabel);
 				Collection<Long> postIds = item.getIds();
 				if (postIds.isEmpty()) {
 					numberLabel.setText("No Posting found");
