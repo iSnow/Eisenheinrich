@@ -22,17 +22,23 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.Globals;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -45,14 +51,18 @@ public class AsyncPoster {
 	private static final String CHARSETNAME= "UTF-8";
 	private static final Charset CHARSET = Charset.forName(CHARSETNAME);
 	private final PostVariables postVars;
+	private Defaults defaults;
+	private Globals globs;
 	private List<AsyncPosterPeer> peers;
-	private HttpClient httpClient;
+	private DefaultHttpClient httpClient;
 	
-	public AsyncPoster(PostVariables postVars, HttpClient httpClient , List<AsyncPosterPeer> peers) {
+	public AsyncPoster(PostVariables postVars, DefaultHttpClient httpClient, Defaults defaults, Globals globs, List<AsyncPosterPeer> peers) {
 		super();
 		this.postVars = postVars;
 		this.httpClient = httpClient;
 		this.peers = peers;
+		this.defaults = defaults;
+		this.globs = globs;
 	}
 
 	public void postInThread() {
@@ -64,7 +74,15 @@ public class AsyncPoster {
 				HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), 30000); 
 
 			    HttpContext localContext = new BasicHttpContext();
-				HttpPost httppost = new HttpPost("http://krautchan.net/post");
+				HttpPost httppost = new HttpPost(Defaults.POST_URL);
+				
+				CookieStore cookieStore = new BasicCookieStore(); 
+				BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.KOMTUR_CODE);
+				cookie.setDomain(defaults.DOMAIN);
+				cookie.setPath("/");
+				cookieStore.addCookie(cookie); 
+				httpClient.setCookieStore(cookieStore); 
+				
 				try {
 				    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, null, CHARSET);
 				    entity.addPart("internal_n", new StringBody(postVars.posterName, CHARSET)); // Bernd name
@@ -102,7 +120,7 @@ public class AsyncPoster {
 							//System.out.println (h.getName()+" "+h.getValue());
 						}
 						if ((null != location) && (location.startsWith("/banned"))) {
-							notifyPeers (false, Eisenheinrich.getInstance().getString(R.string.banned));
+							notifyPeers (false, Eisenheinrich.getInstance().getString(R.string.banned_message));
 						} else {
 							notifyPeers (true, null);
 						}
@@ -120,7 +138,7 @@ public class AsyncPoster {
 	
 	private void notifyPeers (boolean success, String message) {
 		for (AsyncPosterPeer peer : peers) {
-			peer.notifyDone(true, message);
+			peer.notifyDone(success, message);
 		}
 	}
 	

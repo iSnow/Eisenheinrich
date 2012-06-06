@@ -24,20 +24,22 @@ import net.krautchan.data.KODataListener;
 public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 	private String resolverPath = null;
 	private KODataListener<KCThread> handler = null;
+	private Object token;
 	private KCPostingStreamParser pParser = null;
 	
 	private char[][] startTags = {
 			"class=\"thread\"".toCharArray()
 	};
+	private char[] omittedInfo = "<span class=\"omittedinfo\">".toCharArray();
 	
-	public enum StateEnum  {
+	/*public enum StateEnum  {
 		START, 
 		START_THREAD,
 		READ_THREAD,
 		START_POST,
 		READ_POST,
 		END
-	}
+	}*/
 	
 	@Override
 	public KCThread parse(Reader reader) throws Exception {
@@ -48,13 +50,15 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 		int curChar;
 		int postPos = 0;
 		int threadPos = 0;
+		int omittedPos = 0;
+		String omitted="";
 		curChar = reader.read();
 		while (-1 != curChar) {
 			if (curChar == threadFilter[threadPos]) {
 				threadPos++;
 				if (threadPos == threadFilter.length) {
 					pParser.notifyDone();
-					handler.notifyAdded(thread);
+					handler.notifyAdded(thread, token);
 					return thread;
 				}
 			} else {
@@ -65,23 +69,36 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 				if (postPos == postFilter.length) {
 					KCPosting post = pParser.parse(reader);
 					thread.addPosting(post);
+					thread.numPostings++;
 					postPos = 0;
 				}
 			} else {
 				postPos = 0;
 			}	
+			if (curChar == omittedInfo[omittedPos]) {
+				omittedPos++;
+				if (omittedPos == omittedInfo.length) {
+					curChar = reader.read();
+					while ((curChar == ' ') || (curChar == '\r') || (curChar == '\n')) {
+						curChar = reader.read();
+					}
+					while ((curChar >= '0') && ((curChar <= '9'))) {
+						omitted = omitted + ((char)curChar); 
+						curChar = reader.read();
+					}
+					thread.numPostings = Integer.parseInt(omitted);
+					omittedPos = 0;
+				}
+			} else {
+				omittedPos = 0;
+			}	
 			curChar = reader.read();
 		}
 		pParser.notifyDone();
-		handler.notifyAdded(thread);
+		handler.notifyAdded(thread, token);
 		return thread;
 	}	
 
-	@Override
-	public void setHandler(KODataListener<KCThread> handler) {
-		this.handler = handler;
-	}
-	
 	public void setPostingParser(KCPostingStreamParser parser) {
 		pParser = parser;
 	}
@@ -97,7 +114,13 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 	
 	@Override
 	public void notifyDone() {
-		handler.notifyDone();
+		handler.notifyDone(token);
+	}
+
+	@Override
+	public void setHandler(KODataListener<KCThread> handler, Object token) {
+		this.handler = handler;
+		this.token = token;
 	}
 
 }

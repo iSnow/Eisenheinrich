@@ -24,6 +24,7 @@ import net.krautchan.data.KODataListener;
 public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 	private String resolverPath = null;
 	private KODataListener<KCPosting> handler = null;
+	private Object token;
 	
 	private static final char[][] startTags = {
 		"<input name=\"post_".toCharArray(),                 
@@ -98,7 +99,7 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 						if (curTag == startTags.length) {
 							post.dbId = (long)(resolverPath+post.kcNummer).hashCode();
 							if (null != handler) {
-								handler.notifyAdded(post);
+								handler.notifyAdded(post, token);
 							}
 							return post;
 						}
@@ -114,14 +115,15 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 			throw new IllegalStateException ("KCPostingStreamParser missed a field in "+testBuf);
 		}*/
 		if (null != handler) {
-			handler.notifyDone();
+			handler.notifyDone(token);
 		}
 		return null;
 	}
 
 	@Override
-	public void setHandler(KODataListener<KCPosting> handler) {
+	public void setHandler(KODataListener<KCPosting> handler, Object token) {
 		this.handler = handler;
+		this.token = token;
 	}
 
 
@@ -136,7 +138,7 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 
 	@Override
 	public void notifyDone() {
-		handler.notifyDone();
+		handler.notifyDone(token);
 	}
 
 }

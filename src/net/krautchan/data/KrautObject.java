@@ -23,7 +23,6 @@ public abstract class KrautObject implements Serializable {
 	protected static final String baseUrl = "http://krautchan.net/";
 	/** Krautchan's posting-IDs are not unique across boards, boards have no ID
 	 * so we build our own unique id for every data type we transport.
-	 * As we do not have a database, we use numbers based on digested RSS UIDs or URIs.
 	 * 
 	 * NOTE: the contract makes NO stipulations about those IDs being sequential
 	 * neither do they have anything to do with the KC-IDs
@@ -31,6 +30,7 @@ public abstract class KrautObject implements Serializable {
 	public Long dbId;
 	public String uri;
 	public DataEventType type;
+	public transient long cachedTime=0; 
 	
 	public enum DataEventType {
 	    ADD,

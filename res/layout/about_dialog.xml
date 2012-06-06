@@ -18,7 +18,49 @@
             <TextView android:gravity="left" android:layout_width="match_parent" android:layout_weight="1" android:id="@+id/about_text2" android:textColor="@color/LightGrey" android:textStyle="bold" android:text="Ein kleiner Krautchan-Klient von Bernd für Bernd." android:layout_height="0dp" android:layout_marginLeft="6dp" android:textSize="13dp"></TextView>
             <TextView android:gravity="left" android:layout_width="match_parent" android:layout_weight="1" android:id="@+id/about_text3" android:textColor="@color/LightGrey" android:textStyle="bold" android:text="© heinrich.lauert@web.de" android:layout_height="wrap_content" android:layout_marginLeft="6dp" android:layout_marginTop="12dp" android:textSize="13dp"></TextView>
             <TextView android:gravity="left" android:layout_width="match_parent" android:layout_weight="1" android:id="@+id/about_text4" android:textColor="@color/LightGrey" android:textStyle="bold" android:text="(Johannes Jander)" android:layout_height="wrap_content" android:layout_marginLeft="6dp" android:textSize="13dp"></TextView>
-            <TextView android:gravity="left" android:layout_width="match_parent" android:layout_weight="1" android:id="@+id/about_version" android:textColor="@color/LightGrey" android:textStyle="bold" android:layout_height="wrap_content" android:layout_marginBottom="30dp" android:layout_marginLeft="6dp" android:textSize="13dp"></TextView>
+            <TextView android:gravity="left" android:layout_width="match_parent" android:layout_weight="1" android:id="@+id/about_version" android:textColor="@color/LightGrey" android:textStyle="bold" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:layout_marginLeft="6dp" android:textSize="13dp"></TextView>
+			<TextView
+                android:id="@+id/ip_number_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="@string/ip_number"
+                android:textColor="@color/GreenYellow"
+                android:textStyle="bold"
+                android:layout_marginLeft="6dp" />
+            <EditText
+                android:id="@+id/ip_number"
+                android:layout_width="218dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:ems="10"
+                android:inputType="none"
+                android:textSize="13dp" >
+
+                <requestFocus />
+             </EditText>
+
+             <TextView
+                 android:id="@+id/komtur_code_label"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="6dp"
+                 android:layout_weight="1"
+                 android:gravity="left"
+                 android:text="@string/komtur_code"
+                 android:textColor="@color/GreenYellow"
+                 android:textStyle="bold" />
+
+             <EditText
+                android:id="@+id/komtur_code"
+                android:layout_width="218dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:ems="10"
+                android:inputType="none"
+                android:textSize="13dp" />
+
         </LinearLayout>
     </LinearLayout>
 	

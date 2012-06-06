@@ -30,8 +30,11 @@ import org.apache.http.params.HttpParams;
 
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
+import net.krautchan.android.network.CookieHelper;
 import net.krautchan.android.network.PostVariables;
+import net.krautchan.backend.Cache;
 import net.krautchan.backend.DatabaseHelper;
+import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
@@ -45,17 +48,9 @@ import android.net.NetworkInfo;
 import android.os.Build;
 
 public class Eisenheinrich extends Application {
-	public static class DEFAULTS {
-		public static final String BASE_PATH = "http://krautchan.net/";
-		public static final String FILE_PATH = "http://krautchan.net/files";
-		public static final String SD_DIR = "eisenheinrich";
-		public static final String IMAGE_DIR = "/images";
-		public static final String HOME_PAGE = "http://eisenheinrich.datensalat.net/";
-		public static final String UPDATE_VERSION_URL = "http://eisenheinrich.datensalat.net/version.txt";
-		public static final String UPDATE_PAGE = "http://eisenheinrich.datensalat.net/mobile.html";
-	}
+	public static Defaults DEFAULTS = new Defaults();
+	public static Globals  GLOBALS = new Globals();
 	private List<String> selectedBoards;
-	public String USER_AGENT;
 	public boolean hasImagesDir = false;
 	private static Eisenheinrich sInstance;
 	public DatabaseHelper dbHelper = new DatabaseHelper (this);
@@ -63,24 +58,24 @@ public class Eisenheinrich extends Application {
 	private static ConcurrentLinkedQueue<KCThread> threadQ = new ConcurrentLinkedQueue<KCThread>();
 	private static KODataListener<KCThread> threadListener = new KODataListener<KCThread>() {
 		@Override
-		public void notifyAdded(KCThread item) {
+		public void notifyAdded(KCThread item, Object token) {
 			threadQ.add(item);
 			for (KODataListener<KCThread> listener: tListeners) {
-				listener.notifyAdded(item);
+				listener.notifyAdded(item, token);
 			}
 		}
 
 		@Override
-		public void notifyDone() {
+		public void notifyDone(Object token) {
 			for (KODataListener<KCThread> listener: tListeners) {
-				listener.notifyDone();
+				listener.notifyDone(token);
 			}
 		}
 
 		@Override
-		public void notifyError(Exception ex) {
+		public void notifyError(Exception ex, Object token) {
 			for (KODataListener<KCThread> listener: tListeners) {
-				listener.notifyError(ex);
+				listener.notifyError(ex, token);
 			}
 		}
 	};
@@ -89,24 +84,24 @@ public class Eisenheinrich extends Application {
 	private static ConcurrentLinkedQueue<KCPosting> postQ = new ConcurrentLinkedQueue<KCPosting>();
 	private static KODataListener<KCPosting> postListener = new KODataListener<KCPosting>() {
 		@Override
-		public void notifyAdded(KCPosting item) {
+		public void notifyAdded(KCPosting item, Object token) {
 			//threadQ.add(item);
 			for (KODataListener<KCPosting> listener: pListeners) {
-				listener.notifyAdded(item);
+				listener.notifyAdded(item, token);
 			}
 		}
 
 		@Override
-		public void notifyDone() {
+		public void notifyDone(Object token) {
 			for (KODataListener<KCPosting> listener: pListeners) {
-				listener.notifyDone();
+				listener.notifyDone(token);
 			}
 		}
 
 		@Override
-		public void notifyError(Exception ex) {
+		public void notifyError(Exception ex, Object token) {
 			for (KODataListener<KCPosting> listener: pListeners) {
-				listener.notifyError(ex);
+				listener.notifyError(ex, token);
 			}
 		}
 	};
@@ -128,7 +123,6 @@ public class Eisenheinrich extends Application {
 		public PostVariables getPostVariables() {
 			return vars;
 		}
-		
 	};
 
     public static Eisenheinrich getInstance() {
@@ -140,8 +134,10 @@ public class Eisenheinrich extends Application {
       super.onCreate();  
       sInstance = this;
       sInstance.initializeInstance();
-      USER_AGENT = getUserAgentString ();
+      GLOBALS.BOARD_CACHE = new Cache<KCBoard>();
+      GLOBALS.USER_AGENT = getUserAgentString ();
       hasImagesDir = FileHelpers.createSDDirectory(DEFAULTS.IMAGE_DIR);
+      CookieHelper.getMyIP(DEFAULTS, GLOBALS);
     }
 
     protected void initializeInstance() {
@@ -233,7 +229,7 @@ public class Eisenheinrich extends Application {
     }
     
     
-    public HttpClient getHttpClient () {
+    public DefaultHttpClient getHttpClient () {
 	    HttpParams httpParameters = new BasicHttpParams();
 	    	// Set the timeout in milliseconds until a connection is established.
 	    int timeoutConnection = 3000;
@@ -242,8 +238,8 @@ public class Eisenheinrich extends Application {
 		    // in milliseconds which is the timeout for waiting for data.
 	    int timeoutSocket = 10000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-	    httpParameters.setParameter( "http.useragent", USER_AGENT);
-    	HttpClient httpclient = new DefaultHttpClient(httpParameters);
+	    httpParameters.setParameter( "http.useragent", GLOBALS.USER_AGENT);
+	    DefaultHttpClient httpclient = new DefaultHttpClient(httpParameters);
 		return httpclient;
     }
 }

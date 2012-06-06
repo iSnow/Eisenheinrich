@@ -27,10 +27,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.Globals;
+import net.krautchan.android.network.BanCheck;
+import net.krautchan.backend.Cache;
 import net.krautchan.data.KCBoard;
 import net.krautchan.parser.KCBoardListParser;
 import net.krautchan.parser.KCPageParser;
@@ -58,9 +62,10 @@ public class KCBoardListActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		// TODO Move part of the code into the DatabaseHelper, no need to copy between collection and map all the time
 		boolean gotBoards = false;
+		Eisenheinrich.getInstance();
+		Cache<KCBoard> boardCache = Eisenheinrich.GLOBALS.BOARD_CACHE;
 		try {
 			boards = new LinkedHashMap<String, KCBoard>();
 			Collection<KCBoard> boardL = Eisenheinrich.getInstance().dbHelper.getBoards();
@@ -84,7 +89,6 @@ public class KCBoardListActivity extends ListActivity {
 				r.close();
 				r = null;
 				String nav = builder.toString();
-				
 				boards = KCBoardListParser.getBoardList(nav);
 			} catch (IOException e) {
 				String[] mStrings = new String[] { "Exception", e.getMessage() };
@@ -97,6 +101,10 @@ public class KCBoardListActivity extends ListActivity {
 					}
 				});
 			}
+			
+		}
+		for (Entry<String, KCBoard> boardE: boards.entrySet()) {
+			boardCache.add(boardE.getValue());
 		}
 		setListAdapter(new BoardListAdapter(this, boards));
 	}
@@ -148,16 +156,20 @@ public class KCBoardListActivity extends ListActivity {
 			out.close();
 			boss.close();
 			final KCBoard curBoard = board;
-			Thread t = new Thread (new KCPageParser()
+			Thread t = new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0")
 				.setBasePath("http://krautchan.net/")
-				.setUrl("http://krautchan.net/board/"+curBoard.shortName+"/0")
+				//.setUrl("http://krautchan.net/board/"+curBoard.shortName+"/0")
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
 				);
 			t.start();
+			
+			BanCheck bc = new BanCheck(Eisenheinrich.GLOBALS.BOARD_CACHE.get(curBoard.dbId), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.GLOBALS);
+			bc.check4Ban();
 
 			Bundle b = new Bundle();
 			b.putByteArray("board", boss.toByteArray());
+			b.putLong("boardId", board.dbId);
 
 			Intent intent = new Intent(this, KCThreadListActivity.class);
 			intent.putExtras(b);

@@ -42,9 +42,11 @@ import android.widget.Toast;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.helpers.FileContentProvider;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.backend.HtmlCreator;
+import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
@@ -60,6 +62,7 @@ public class KCThreadViewActivity extends Activity {
 	private String 					boardName = null;
 	private Long 					boardId = null;
 	private KCThread 				thread = null;
+	private String					token;
 	private boolean 				javascriptInterfaceBroken = true;
 	private Handler 				progressHandler = null;
 	private boolean 				visitedPostsCollapsible = true;
@@ -155,24 +158,22 @@ public class KCThreadViewActivity extends Activity {
 			boardId = b.getLong("boardId");
 			visitedPostsCollapsible = b.getBoolean("visitedPostsCollapsible");
 			Assert.assertNotNull(boardId);
-			byte[] threadS = b.getByteArray("thread");
-			ByteArrayInputStream bitch = new ByteArrayInputStream(threadS);
-			ObjectInputStream in;
-			try {
-				in = new ObjectInputStream(bitch);
-				thread = (KCThread) in.readObject();
+			/*TODO since we don't get the live thread object but a different deserialized,
+				transmitting it does not make sense. So we only read the KCnum
+				Once we have a Cache or database backend for threads, transmit the
+				thread db-ID
+			 */
+				thread = new KCThread();
+				thread.kcNummer = b.getLong("threadId");
 				thread.board_id = boardId;
-				this.setTitle("/"+boardName+"/"+thread.kcNummer);
-			} catch (StreamCorruptedException e) {
-				Toast toast = Toast.makeText(this, "WebPageLoader::onCreate failed: " + e.getMessage(), Toast.LENGTH_LONG);
-				toast.show();
-			} catch (IOException e) {
-				Toast toast = Toast.makeText(this, "WebPageLoader::onCreate failed: " + e.getMessage(), Toast.LENGTH_LONG);
-				toast.show();
-			} catch (ClassNotFoundException e) {
-				Toast toast = Toast.makeText(this, "WebPageLoader::onCreate failed: " + e.getMessage(), Toast.LENGTH_LONG);
-				toast.show();
-			}
+				String title = "/"+boardName+"/"+thread.kcNummer;
+				KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(boardId);
+				if (board.banned) {
+					title = title + " ("+this.getString(R.string.banned)+")";
+				}
+				this.setTitle(title);
+				token = "http://krautchan.net/" + boardName + "/thread-" + thread.kcNummer + ".html";
+			
 			if ((null != thread) && (null != pListener)) {
 				Eisenheinrich.getInstance().addPostListener(pListener);
 			}
@@ -246,28 +247,34 @@ public class KCThreadViewActivity extends Activity {
 
 	private final class PostingListener implements KODataListener<KCPosting> {
 		@Override
-		public void notifyAdded(KCPosting item) {
-			thread.addPosting(item);
-			((ProgressBar)findViewById(R.id.threadview_watcher)).incrementProgressBy(5);
+		public void notifyAdded(KCPosting item, Object token) {
+			if (KCThreadViewActivity.this.token.equals(token)) {
+				thread.addPosting(item);
+				((ProgressBar)findViewById(R.id.threadview_watcher)).incrementProgressBy(5);
+			}
 		}
 
 		@Override
-		public void notifyDone() {
-			Message msg = progressHandler.obtainMessage();
-        	msg.arg1 = 0;
-        	progressHandler.sendMessage(msg);
-        	String locTemplate = template;
-        	if (null != thread.previousLastKcNum) {
-        		locTemplate = locTemplate.replace("@@CURPOST@@", thread.previousLastKcNum.toString());
-        	} else {
-        		locTemplate = locTemplate.replace("@@CURPOST@@", "null");
-        	}
-        	renderHtml (HtmlCreator.htmlForThread(thread, locTemplate));
+		public void notifyDone(Object token) {
+			if (KCThreadViewActivity.this.token.equals(token)) {
+				Message msg = progressHandler.obtainMessage();
+	        	msg.arg1 = 0;
+	        	progressHandler.sendMessage(msg);
+	        	String locTemplate = template;
+	        	if (null != thread.previousLastKcNum) {
+	        		locTemplate = locTemplate.replace("@@CURPOST@@", thread.previousLastKcNum.toString());
+	        	} else {
+	        		locTemplate = locTemplate.replace("@@CURPOST@@", "null");
+	        	}
+	        	renderHtml (HtmlCreator.htmlForThread(thread, locTemplate));
+			}
 		}
 
 		@Override
-		public void notifyError(Exception ex) {
-			KCThreadViewActivity.this.finish();
+		public void notifyError(Exception ex, Object token) {
+			if (KCThreadViewActivity.this.token.equals(token)) {
+				KCThreadViewActivity.this.finish();
+			}
 		}
 	}
 
@@ -424,7 +431,13 @@ public class KCThreadViewActivity extends Activity {
 		case R.id.prefs:
 			return true;
 		case R.id.reply: 
-			ActivityHelpers.createThreadMask (thread, boardName, this);
+			KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(boardId);
+			if ((board.banned) && (null == Eisenheinrich.GLOBALS.KOMTUR_CODE)) {
+				new BannedDialog (this).show();
+				Toast.makeText(KCThreadViewActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();
+			} else {
+				ActivityHelpers.createThreadMask (thread, boardName, this);
+			}
 			return true;
 		case R.id.home: 
 			Intent intent = new Intent(KCThreadViewActivity.this, EisenheinrichActivity.class);

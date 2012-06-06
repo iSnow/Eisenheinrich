@@ -31,20 +31,16 @@
 		    android:id="@+id/main_test"
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
-		    android:text="Test"
+		    android:text="@string/test"
 		    android:textSize="16dp"
 		    android:visibility="gone" />
 
-		<Button android:text="Zum Krautkanal"
-		 	android:id="@+id/main_goto_kc" 
-		 	android:layout_height="wrap_content" 
-		 	android:layout_width="match_parent" 
-		 	android:textSize="16dp"/>
-		<Button android:layout_width="match_parent" 
-			android:text="Über Eisenheinrich" 
-			android:id="@+id/about_button" 
-			android:layout_height="wrap_content" 
-			android:textSize="16dp"
-			android:visibility="gone"/>
+		<Button
+		    android:id="@+id/main_goto_kc"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:text="@string/go_to_krautchan"
+		    android:textSize="16dp" />
+
 	</LinearLayout>
 </FrameLayout>

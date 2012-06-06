@@ -50,11 +50,11 @@ public class Prefs extends Activity {
     	  
        }
        */
-       Runnable r = new Runnable () {
+       new Thread (new Runnable () {
 		@Override
 		public void run() {
 			try {
-				Map<String, KCBoard> boards = KCBoardListParser.getBoardList("http://krautchan.net/nav", "http://krautchan.net/", Eisenheinrich.getInstance().USER_AGENT);
+				Map<String, KCBoard> boards = KCBoardListParser.getBoardList("http://krautchan.net/nav", "http://krautchan.net/", Eisenheinrich.GLOBALS.USER_AGENT);
 				ArrayList<KCBoard> boardL = new ArrayList<KCBoard>();
 				
 				for (Entry<String, KCBoard> entry : boards.entrySet()) {
@@ -67,9 +67,7 @@ public class Prefs extends Activity {
 			}
 		}
     	   
-       };
-       Thread t = new Thread (r);
-       t.start();
+       }).start();
        // Restore preferences
        SharedPreferences settings = getPreferences(0);
        disclaimerAck = settings.getBoolean("disclaimerAck", false);

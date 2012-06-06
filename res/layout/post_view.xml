@@ -8,8 +8,7 @@
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" >
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -25,14 +24,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:text="Name"
+                android:text="@string/name"
                 android:textColor="@color/GreenYellow"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_poster_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
 
             <TextView
                 android:id="@+id/posting_title"
@@ -41,14 +41,15 @@
                 android:layout_marginTop="6dp"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:text="Titel"
+                android:text="@string/title"
                 android:textColor="@color/GreenYellow"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_posting_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="textAutoCorrect" />
 
             <TextView
                 android:id="@+id/posting_content"
@@ -57,7 +58,7 @@
                 android:layout_marginTop="6dp"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:text="Inhalt"
+                android:text="@string/content"
                 android:textColor="@color/GreenYellow"
                 android:textStyle="bold" />
 
@@ -65,14 +66,14 @@
                 android:id="@+id/edit_posting_content"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:inputType="textMultiLine" />
+                android:inputType="textAutoCorrect|textMultiLine" />
 
             <CheckBox
                 android:id="@+id/sage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="Säge" />
+                android:text="@string/sage" />
 
             <TextView
                 android:id="@+id/image_area"
@@ -81,9 +82,10 @@
                 android:layout_marginTop="6dp"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:text="Bilder"
+                android:text="@string/images"
                 android:textColor="@color/GreenYellow"
                 android:textStyle="bold" />
+            
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
@@ -96,13 +98,13 @@
                     android:id="@+id/button2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bildersuche" />
+                    android:text="@string/image_search" />
 
                 <Button
                     android:id="@+id/button1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kamera" />
+                    android:text="@string/from_camera" />
             </LinearLayout>
 
             <TableLayout
@@ -111,6 +113,18 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" >
             </TableLayout>
+            
+            
+            <TextView
+                android:id="@+id/banned_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="@string/banned_message"
+                android:textColor="@color/Red"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/linearLayout1"

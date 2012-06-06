@@ -49,27 +49,32 @@ import android.widget.TableLayout.LayoutParams;
 
 public class ActivityHelpers {
 	static final String TAG = "ActivityHelpers";
-	private static float scale;
+	//private static float scale;
 
 	public static void switchToThread(KCThread curThread,
 			String boardShortName, Long boardId, Activity context) {
-		scale = context.getResources().getDisplayMetrics().density;
-		ByteArrayOutputStream boss = new ByteArrayOutputStream();
-		ObjectOutputStream out;
-		try {
-			out = new ObjectOutputStream(boss);
-			out.writeObject(curThread);
+		//scale = context.getResources().getDisplayMetrics().density;
+		/*TODO since we don't get the live thread object but a different deserialized,
+		transmitting it does not make sense. So we only read the KCnum
+		Once we have a Cache or database backend for threads, transmit the
+		thread db-ID
+	 */
+		//ByteArrayOutputStream boss = new ByteArrayOutputStream();
+		//ObjectOutputStream out;
+		//try {
+			/*out = new ObjectOutputStream(boss);
+			out.writeObject(curThread);*/
 			Bundle b = new Bundle();
-			b.putByteArray("thread", boss.toByteArray());
+			//b.putByteArray("thread", boss.toByteArray());
+			b.putLong("threadId", curThread.kcNummer);
 			b.putString("boardName", boardShortName);
 			b.putLong("boardId", boardId);
 			b.putBoolean("visitedPostsCollapsible", false);
 			final Long threadNumber = curThread.kcNummer;
 
-			Thread t = new Thread(new KCPageParser()
+			Thread t = new Thread(new KCPageParser("http://krautchan.net/" + boardShortName + "/thread-" + threadNumber + ".html")
 					.setBasePath("http://krautchan.net/")
-					.setUrl("http://krautchan.net/" + boardShortName
-							+ "/thread-" + threadNumber + ".html")
+					//.setUrl("http://krautchan.net/" + boardShortName + "/thread-" + threadNumber + ".html")
 					.setThreadHandler(
 							Eisenheinrich.getInstance().getThreadListener())
 					.setPostingHandler(
@@ -78,12 +83,12 @@ public class ActivityHelpers {
 
 			Intent intent = new Intent(context, KCThreadViewActivity.class);
 			intent.putExtras(b);
-			out.close();
-			boss.close();
+			//out.close();
+			//boss.close();
 			context.startActivity(intent);
-		} catch (IOException e) {
+		/*} catch (IOException e) {
 			Log.e(TAG, "switchToThread failed", e);
-		}
+		}*/
 	}
 
 	public static void createThreadMask(KCThread curThread, String boardShortName, Activity context) {

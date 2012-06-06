@@ -38,7 +38,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	private final static String	DBASE_NAME 		= "Schlaubernd";
-	private final static int 	VERSION_NUM 	= 2;
+	private final static int 	VERSION_NUM 	= 3;
 	private static final String BOARD_TABLE		= "board";
 	private static final String THREAD_TABLE	= "thread";
 
@@ -62,7 +62,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			try {
 				db.beginTransaction();
 				db.execSQL("DROP TABLE IF EXISTS "+BOARD_TABLE);
+				db.execSQL("DROP TABLE IF EXISTS "+THREAD_TABLE);
 				createBoardTable (db);
+				createThreadTable(db);
+				db.setTransactionSuccessful();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				db.endTransaction();
+			}
+		} else if (oldVersion == 2) {
+			try {
+				db.beginTransaction();
+				db.execSQL("DROP TABLE IF EXISTS "+THREAD_TABLE);
+				createThreadTable(db);
 				db.setTransactionSuccessful();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -104,6 +117,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public void bookmarkThread (KCThread thread) {
+		persistThread (thread, true);
+	}
+	
+	public void persistThread (KCThread thread, boolean asBookmark) {
 		if (null == thread) {
 			return;
 		}
@@ -123,7 +140,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			throw new IllegalArgumentException ("First post time must not be null");
 		}
 		if (getThread (thread.dbId) != null) {
-			//already bookmarked, we are done
+			//already persisted, we are done
+			//TODO if the thread was not hidden, we need to persist it again
+			//TODO if the thread was not bookmarked, we need to persist it again
 			return;
 		}
 		SQLiteDatabase db = getReadableDatabase();
@@ -135,7 +154,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			valHolder.put("url", thread.uri);
 			valHolder.put("digest", thread.digest);
 			valHolder.put("time_inserted", new Date().getTime());
-			valHolder.put("is_bookmarked", 1);
+			valHolder.put("is_bookmarked", asBookmark ? 1 : 0);
+			valHolder.put("is_hidden", thread.hidden ? 1 : 0);
 			db.insert(THREAD_TABLE, null, valHolder);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -148,12 +168,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = retrieveThread(id);
 		c.moveToFirst();
 		while (!c.isAfterLast()) {
-			thread = new KCThread();
-			thread.dbId = c.getLong (c.getColumnIndex("_id")); 
-			thread.kcNummer = c.getLong (c.getColumnIndex("kc_number")); 
-			thread.uri = c.getString(c.getColumnIndex("t_url"));
-			thread.board_id = c.getLong (c.getColumnIndex("b_id")); 
-			thread.digest = c.getString(c.getColumnIndex("digest"));
+			thread = populateThread (c);
 			c.moveToNext();
 		}
 		return thread;
@@ -172,12 +187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = retrieveAllThreads(bookmarksOnly);
 		c.moveToFirst();
 		while (!c.isAfterLast()) {
-			KCThread thread = new KCThread();
-			thread.dbId = c.getLong (c.getColumnIndex("_id")); 
-			thread.kcNummer = c.getLong (c.getColumnIndex("kc_number")); 
-			thread.uri = c.getString(c.getColumnIndex("t_url"));
-			thread.board_id = c.getLong (c.getColumnIndex("b_id")); 
-			thread.digest = c.getString(c.getColumnIndex("digest"));
+			KCThread thread = populateThread (c);
 			threads.add(thread);
 			c.moveToNext();
 		}
@@ -219,6 +229,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			db.execSQL("VACUUM");
 		}
 	}
+	
+	private KCThread populateThread (Cursor c) {
+		KCThread thread = new KCThread();
+		thread.dbId = c.getLong (c.getColumnIndex("_id")); 
+		thread.kcNummer = c.getLong (c.getColumnIndex("kc_number")); 
+		thread.uri = c.getString(c.getColumnIndex("t_url"));
+		thread.board_id = c.getLong (c.getColumnIndex("b_id")); 
+		thread.digest = c.getString(c.getColumnIndex("digest"));
+		thread.hidden = (c.getInt(c.getColumnIndex("is_hidden")) == 1);
+		return thread;
+	}	
 
 	private Cursor retrieveAllBoards() {
 		SQLiteDatabase db = getReadableDatabase();
@@ -244,17 +265,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+" on t.fk_board = b.id  where t.id = ?";
 		return db.rawQuery(query,  new String[]{id.toString()});
 	}
-	
-	/*private Cursor retrieveAllThreads(boolean bookmarksOnly) {
-		SQLiteDatabase db = getReadableDatabase();
-		String query = "select id _id, kc_number, url, fk_board from "
-			+THREAD_TABLE;
-		if (bookmarksOnly) {
-			query += " where is_bookmarked = 1";
-		}
-		return db.rawQuery(query, null);
-	}*/
-	
 
 	private void createBoardTable (SQLiteDatabase db) throws SQLException {
 		db.execSQL("create table "+BOARD_TABLE+" (id integer primary key, shortname text, name text, url text, sort_order integer, show integer)");		

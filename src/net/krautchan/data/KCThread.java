@@ -33,7 +33,9 @@ public class KCThread extends KrautObject {
 	public Long firstPostDate = null;
 	public Long lastPostDate = null;
 	public String digest = null;
+	public boolean hidden = false;
 	public transient Long previousLastKcNum = null;
+	public transient int numPostings = 0;
 	private Map<Long, KCPosting>  postings = new TreeMap<Long, KCPosting>();
 	
 	public synchronized KCPosting getPosting (Long id) {
@@ -68,6 +70,7 @@ public class KCThread extends KrautObject {
 		lastPostDate = posting.created;
 		Long id = posting.dbId;
 		if (!postings.containsKey(id)) {
+			posting.threadId = dbId;
 			postings.put(id, posting);
 		}	
 	}
@@ -87,8 +90,9 @@ public class KCThread extends KrautObject {
 	}
 	
 	private void makeDigest (KCPosting posting) {
-		if ((null == posting) || (null == digest))
-			digest = "";
+		if (null == posting) {
+			return;
+		}
 		digest = posting.content;
 		int len = digest.length();
 		if (len > 250)

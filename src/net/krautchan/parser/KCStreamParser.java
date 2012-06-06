@@ -22,7 +22,7 @@ import net.krautchan.data.KODataListener;
 import net.krautchan.data.KrautObject;
 
 public interface KCStreamParser<T extends KrautObject> {
-	public void 	setHandler (KODataListener<T> handler);
+	public void 	setHandler (KODataListener<T> handler, Object token);
 	public T 		parse (Reader reader) throws Exception;
 	public void		notifyDone ();
 	public char[] 	getFilterMarker ();

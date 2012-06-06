@@ -21,4 +21,5 @@ public class KCBoard extends KrautObject {
 	public String baseUrl;
 	public String shortName;
 	public boolean show = true;
+	public transient boolean banned = false;
 }

@@ -32,6 +32,7 @@ import net.krautchan.data.KODataListener;
 
 public class KCPageParser implements Runnable {
 	private HttpClient client;
+	private Object token;
 	private String resolverPath = null;
 	private KCPostingStreamParser pParser = null;
 	private KCThreadStreamParser tParser = null;
@@ -40,7 +41,9 @@ public class KCPageParser implements Runnable {
 	private String url = null;
 
 	
-	public KCPageParser() {
+	public KCPageParser(String url) {
+		this.url = url;
+		this.token = url;
 		pParser = new KCPostingStreamParser();
 		tParser = new KCThreadStreamParser();
 		tParser.setPostingParser(pParser);
@@ -79,21 +82,21 @@ public class KCPageParser implements Runnable {
 	
 	public KCPageParser setThreadHandler(KODataListener<KCThread> handler) {
 		threadHandler = handler;
-		tParser.setHandler(threadHandler);
+		tParser.setHandler(threadHandler, token); 
 		return this;
 	}
 	
 
 	public KCPageParser setPostingHandler(KODataListener<KCPosting> postListener) {
 		postingHandler = postListener;
-		pParser.setHandler(postListener);
+		pParser.setHandler(postListener, token);
 		return this;
 	}
 	
-	public KCPageParser setUrl(String url) {
+	/*public KCPageParser setUrl(String url) {
 		this.url = url;
 		return this;
-	}
+	}*/
 
 	@Override
 	public void run() {
@@ -103,7 +106,7 @@ public class KCPageParser implements Runnable {
 		if (null == url) {
 			throw new IllegalArgumentException ("Cannot parse a NULL url");
 		}
-		tParser.setHandler(threadHandler);
+		tParser.setHandler(threadHandler, token); 
 		final char[]filter =  tParser.getFilterMarker();
 		client = new DefaultHttpClient();
 		HttpGet request = new HttpGet (url);
@@ -140,7 +143,7 @@ public class KCPageParser implements Runnable {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			threadHandler.notifyError(e);
+			threadHandler.notifyError(e, token);  
 			//FIXME do something for heaven's sake!
 		} finally {
 	        client.getConnectionManager().shutdown(); // Close the instance here

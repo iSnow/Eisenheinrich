@@ -37,6 +37,8 @@ import net.krautchan.android.network.PostVariables;
 import net.krautchan.data.PostActivityParams;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -91,7 +93,7 @@ public class KCPostActivity extends Activity {
 			    	findViewById(R.id.postview_spinner).setVisibility(View.VISIBLE);
 			    	okButton.setEnabled(false);
 			    	((Button)findViewById(R.id.cancel_button)).setEnabled(false);
-			    	HttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
+			    	DefaultHttpClient httpclient = Eisenheinrich.getInstance().getHttpClient();
 			    	List<AsyncPosterPeer> peers = new ArrayList<AsyncPosterPeer>();
 			    	peers.add(Eisenheinrich.posterPeer);
 			    	peers.add(new AsyncPosterPeer() {
@@ -105,16 +107,26 @@ public class KCPostActivity extends Activity {
 						}
 
 						@Override
-						public void notifyDone(boolean successful, String message) {
+						public void notifyDone(boolean successful, final String message) {
 							if (successful) {
 								KCPostActivity.this.finish();
 							} else {
-								Toast.makeText(KCPostActivity.this, message, Toast.LENGTH_LONG).show();
+								KCPostActivity.this.runOnUiThread(new Runnable () {
+									@Override
+									public void run() {	
+										findViewById(R.id.banned_error).setVisibility(View.VISIBLE);
+								    	findViewById(R.id.postview_spinner).setVisibility(View.GONE);
+								    	okButton.setEnabled(true);
+								    	((Button)findViewById(R.id.cancel_button)).setEnabled(true);
+										Toast.makeText(KCPostActivity.this, message, Toast.LENGTH_LONG).show();
+									}
+							    }); 
+								
 							}
 						}
 			    		
 			    	});
-			    	AsyncPoster poster = new AsyncPoster(vars, httpclient, peers);
+			    	AsyncPoster poster = new AsyncPoster(vars, httpclient, Eisenheinrich.DEFAULTS, Eisenheinrich.GLOBALS, peers);
 			    	vars.posterName = ((EditText) KCPostActivity.this
 							.findViewById(R.id.edit_poster_name))
 							.getText().toString();

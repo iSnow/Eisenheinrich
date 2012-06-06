@@ -1,7 +1,10 @@
-package net.krautchan.data;
+package net.krautchan.android;
+
+import net.krautchan.backend.Cache;
+import net.krautchan.data.KCBoard;
 
 /*
-* Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
+* Copyright (C) 2012 Johannes Jander (johannes@jandermail.de)
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,11 +19,10 @@ package net.krautchan.data;
 * limitations under the License.
 */
 
-public interface KODataListener<T extends KrautObject> {
-	public void notifyAdded (T item, Object token);
-	
-	public void notifyDone (Object token);
-	
-	public void notifyError (Exception ex, Object token);
 
+public class Globals {
+	public String 				USER_AGENT = null;
+	public String 				IP_NUMBER = null;
+	public String				KOMTUR_CODE = null;
+	public Cache<KCBoard>  		BOARD_CACHE = null;
 }
