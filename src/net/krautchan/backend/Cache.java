@@ -64,6 +64,11 @@ public class Cache<T extends KrautObject> {
 		return null;
 	}
 	
+	public List<T>getAll () {
+		List<T> retVal = new ArrayList<T>();
+		retVal.addAll(krautObjects);
+		return retVal;
+	}
 	
 	private void trimCache (int numEntriesToRemove) {
 		List<T> sorter = new ArrayList<T>();

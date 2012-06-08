@@ -3,13 +3,8 @@ package net.krautchan.android.dialog;
 import java.io.IOException;
 
 import net.krautchan.R;
-import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.activity.KCBoardListActivity;
-import net.krautchan.android.activity.KCThreadListActivity;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.data.KCBoard;
-import net.krautchan.data.KCThread;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -88,16 +83,13 @@ public class GoToThreadDialog {
 					StatusLine sl = res.getStatusLine();
 					int code = sl.getStatusCode();
 					if ((code == 200) || (code == 304)) {
-			        	final KCThread curThread = new KCThread ();
-			        	curThread.kcNummer = tNum;
-			        	curThread.board_id = board.dbId;
-			        	curThread.uri = url;
+			        	
 			        	parent.runOnUiThread(new Runnable () {
 							@Override
 							public void run() {	
 					        	dlg.dismiss();
 								//switchToThread (curThread);
-								ActivityHelpers.switchToThread (curThread, board.shortName, board.dbId, parent);
+								ActivityHelpers.switchToThread (tNum, board.shortName, board.dbId, parent);
 								dlg.dismiss();
 							}
 			        	});

@@ -193,8 +193,7 @@ public class KCThreadListActivity extends Activity {
 					found = curThread.dbId == id;
 				}
 				if (found) {
-					//curThread.clearPostings();
-					ActivityHelpers.switchToThread (curThread, curBoard.shortName, curBoard.dbId, KCThreadListActivity.this);
+					ActivityHelpers.switchToThread (curThread.kcNummer, curBoard.shortName, curBoard.dbId, KCThreadListActivity.this);
 				}
 			}
 		});

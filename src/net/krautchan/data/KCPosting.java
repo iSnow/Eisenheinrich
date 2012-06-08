@@ -61,47 +61,6 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		CONTENT
 	}
 	
-	/*public void cleanRssContent () {
-		String locContent = content;
-		//locContent = StringEscapeUtils.unescapeHtml4(locContent);
-		locContent = locContent.replaceAll("<p>", "");
-		locContent = locContent.replaceAll("</p>", " ");
-		int delim = locContent.indexOf("<a href=\"http://krautchan.net/download/");
-		if (delim != -1) {
-			String imgSection = locContent.substring(delim).trim();
-			locContent = locContent.substring(0, delim-1).trim();
-			content = "<p><span>"+locContent+"</span></p>";
-			content = content + "<div class=\"image-container\">"+imgSection+"</div>";
-		} else {
-			content = "<p><span>"+locContent+"</span></p>";
-		}
-		//content = content.replaceAll(">>>(\\d+)</a>", "><span class=\"kclnk\">☛</span> $1</a>");
-		content = content.replaceAll(">>>(\\d+)</a>", " class=\"kclnk\" onclick='quoteClick(this); return false;'><span>&gt;&gt;</span> $1</a>");
-		
-		//content = content.replaceAll(">&gt;&gt;(\\d+)</a>", " onclick='fn(this); return false;'><span class=\"kclnk\">&gt;&gt;</span> $1</a>");
-		content = content.replaceAll(">&gt;&gt;(\\d+)</a>", " class=\"kclnk\" onclick='quoteClick(this); return false;'><span>&gt;&gt;</span> $1</a>");
-	
-		delim = title.indexOf(":");
-		String kcNum  = title.substring(0, delim);
-		title = title.replace(kcNum+":", "").trim();
-		kcNummer = Long.parseLong(kcNum);
-		if (title.endsWith("...")) // yeah, I am too dumb to find out how to escape '.' in Java regexp
-			title = title.substring (0, title.length()-3);
-		title = title.replaceAll("<br>", "").trim();
-
-		locContent = locContent.replace("<p>", "");
-		locContent = locContent.replaceAll("<a href=\"/resolve/.+?\">", "");
-		locContent = locContent.replaceAll("</a>", "");
-		//locContent = locContent.replaceAll("<span.*?>", "");
-		//locContent = locContent.replaceAll("</span", "");
-		locContent = locContent.replaceAll("<br>", " ").trim();
-		if ((locContent.trim().length() == 0) || (locContent.startsWith(title))) {
-			title = null;
-		} else if (title.length() > 40) {
-			title = title.substring(0, 40)+"...";
-		}
-	}*/
-	
 	public void sanitizeContent () {
 		String locContent = content;
 		locContent = StringEscapeUtils.unescapeHtml4(locContent);
@@ -111,9 +70,9 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		locContent = locContent.replaceAll("onclick=\"highlightPost\\(\\'\\d+\\'\\);\"", "");		
 		locContent = locContent.replaceAll(">>>(\\d+)</a>", " onclick='quoteClick(this); return false;' class=\"kclink\">&gt;&gt; $1</a>");
 
-		locContent = locContent.replaceAll("<a href=\"/resolve(/.+?)\"\\s*>.+?</a>", "<a href=\"/resolve$1\" class=\"kclink\">&gt;&gt; $1</a>");
+		locContent = locContent.replaceAll("<a href=\"/resolve(/.+?)\"\\s*>.+?</a>", "<a href=\"/resolve$1\" class=\"kclink\" onclick=\"alert('open:kclink:$1');return false;\">&gt;&gt; $1</a>");
 		Matcher m = linkPat.matcher(locContent);
-		CharBuffer buf = CharBuffer.allocate(locContent.length()+400);
+		CharBuffer buf = CharBuffer.allocate(locContent.length()+1000);
 		int end = 0;
 		while (m.find()) {
 			int gc = m.groupCount();
@@ -123,7 +82,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 				String host = m.group(1);
 				String name = host;
 				String styleClass="extlink";
-				if (host.contains("youtube")) {
+				if ((host.contains("youtube")) || (host.contains("youtu.be"))) {
 					styleClass="ytlink";
 					name = "YouTube";
 				} else if (host.contains("krautchan.net")){
@@ -131,7 +90,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 					name = ">>";
 					host = "";
 				}
-				buf.append("<a href=\"http://"+m.group(1)+"/"+m.group(2)+"\" class=\""+styleClass+"\">"+name+"</a>"+m.group(3));
+				buf.append("<a href=\"http://"+m.group(1)+"/"+m.group(2)+"\" class=\""+styleClass+"\" onclick=\"alert('open:"+styleClass+":"+m.group(1)+"/"+m.group(2)+"');return false;\">"+name+"</a>"+m.group(3));
 			}
 		}
 		buf.append(locContent.substring(end, locContent.length()));

@@ -111,20 +111,20 @@ public class KCPostActivity extends Activity {
 							if (successful) {
 								KCPostActivity.this.finish();
 							} else {
-								KCPostActivity.this.runOnUiThread(new Runnable () {
-									@Override
-									public void run() {	
-										findViewById(R.id.banned_error).setVisibility(View.VISIBLE);
-								    	findViewById(R.id.postview_spinner).setVisibility(View.GONE);
-								    	okButton.setEnabled(true);
-								    	((Button)findViewById(R.id.cancel_button)).setEnabled(true);
-										Toast.makeText(KCPostActivity.this, message, Toast.LENGTH_LONG).show();
-									}
-							    }); 
-								
+								if (message.equals(R.string.banned_message)) {
+									KCPostActivity.this.runOnUiThread(new Runnable () {
+										@Override
+										public void run() {	
+											findViewById(R.id.banned_error).setVisibility(View.VISIBLE);
+									    	findViewById(R.id.postview_spinner).setVisibility(View.GONE);
+									    	okButton.setEnabled(true);
+									    	((Button)findViewById(R.id.cancel_button)).setEnabled(true);
+											Toast.makeText(KCPostActivity.this, message, Toast.LENGTH_LONG).show();
+										}
+								    }); 
+								}
 							}
-						}
-			    		
+						} 		
 			    	});
 			    	AsyncPoster poster = new AsyncPoster(vars, httpclient, Eisenheinrich.DEFAULTS, Eisenheinrich.GLOBALS, peers);
 			    	vars.posterName = ((EditText) KCPostActivity.this

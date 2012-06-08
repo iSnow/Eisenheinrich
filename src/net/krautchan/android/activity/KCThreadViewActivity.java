@@ -50,6 +50,7 @@ import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
+import net.krautchan.parser.KCPageParser;
 
 public class KCThreadViewActivity extends Activity {
 	private static final String 	TAG = "KCThreadViewActivity";
@@ -166,13 +167,14 @@ public class KCThreadViewActivity extends Activity {
 				thread = new KCThread();
 				thread.kcNummer = b.getLong("threadId");
 				thread.board_id = boardId;
+				token = "http://krautchan.net/" + boardName + "/thread-" + thread.kcNummer + ".html";
+				thread.uri = token;
 				String title = "/"+boardName+"/"+thread.kcNummer;
 				KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(boardId);
 				if (board.banned) {
 					title = title + " ("+this.getString(R.string.banned)+")";
 				}
 				this.setTitle(title);
-				token = "http://krautchan.net/" + boardName + "/thread-" + thread.kcNummer + ".html";
 			
 			if ((null != thread) && (null != pListener)) {
 				Eisenheinrich.getInstance().addPostListener(pListener);
@@ -360,7 +362,7 @@ public class KCThreadViewActivity extends Activity {
 	 * http://it-ride.blogspot.com/2010/04/android-youtube-intent.html
 	 */
 	private void startVideo(String videoID) {
-		String id = videoID.replace("watch?v=", "");
+		String id = videoID.replace("youtube.com/watch?v=", "");
 		Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:"+ id));
 		List<ResolveInfo> list = getPackageManager().queryIntentActivities(i,
 				PackageManager.MATCH_DEFAULT_ONLY);
@@ -389,12 +391,28 @@ public class KCThreadViewActivity extends Activity {
 			result.confirm();
 			String args[] = message.split(":");
 			if (args[0].equals("open")) {
-				if (args[1].equals("youtube")) {
+				if (args[1].equals("ytlink")) {
 					startVideo(args[2]);
 				} else if (args[1].equals("image")) {
 					viewImage (args[2]);
-				} else if (args[1].equals("ext")) {
+				} else if (args[1].equals("extlink")) {
 					openExternalLink (args[2]);
+				}  else if (args[1].equals("kclink")) {
+					String[] parts = args[2].split("/");
+					List<KCBoard> boards = Eisenheinrich.GLOBALS.BOARD_CACHE.getAll();
+					Iterator<KCBoard> iter = boards.iterator();
+					boolean found = false;
+					KCBoard board = null;
+					while (iter.hasNext() && (!found)) {
+						board = iter.next();
+						if (board.shortName.equals(parts[1])) {
+							found = true;
+						}
+					}
+					if (null != board) {
+						prepareForRerender(board, Long.parseLong(parts[2]));
+						//ActivityHelpers.switchToThread(Long.parseLong(parts[2]), parts[1], board.dbId,  KCThreadViewActivity.this);
+					}
 				}
 			}
 			return true;
@@ -407,6 +425,27 @@ public class KCThreadViewActivity extends Activity {
 		return true;
 	}
 	
+	private void prepareForRerender(KCBoard board, long threadKcNum) {
+		thread.board_id = board.dbId;
+		thread.kcNummer = threadKcNum;
+		boardName = board.shortName;
+		thread.clearPostings();
+		findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
+		String title = "/"+boardName+"/"+thread.kcNummer;
+		if (board.banned) {
+			title = title + " ("+this.getString(R.string.banned)+")";
+		}
+		KCThreadViewActivity.this.setTitle(title);
+		token = "http://krautchan.net/" + board.shortName + "/thread-" + threadKcNum + ".html";
+		Thread t = new Thread(new KCPageParser("http://krautchan.net/" + board.shortName + "/thread-" + threadKcNum + ".html")
+			.setBasePath("http://krautchan.net/")
+			.setThreadHandler(
+					Eisenheinrich.getInstance().getThreadListener())
+			.setPostingHandler(
+					Eisenheinrich.getInstance().getPostListener()));
+		t.start();
+	}
+	
 	private void reload() {
 		if (visitedPostsCollapsible) {
 			findViewById(R.id.show_collapsed).setVisibility(View.VISIBLE);
@@ -415,7 +454,7 @@ public class KCThreadViewActivity extends Activity {
 		findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
 		thread.previousLastKcNum = thread.getLastPosting().kcNummer;		
 		thread.clearPostings();
-		ActivityHelpers.switchToThread(thread, boardName, boardId,  this);
+		ActivityHelpers.switchToThread(thread.kcNummer, boardName, boardId,  this);
 	}
 
 	@Override

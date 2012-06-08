@@ -58,6 +58,7 @@ import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.network.BookmarkCheck;
 import net.krautchan.android.network.BookmarkCheck.BookmarkTesterPeer;
+import net.krautchan.android.network.CookieHelper;
 import net.krautchan.android.network.UpdateCheck;
 import net.krautchan.android.network.UpdateCheck.UpdateCheckPeer;
 import net.krautchan.data.KCBoard;
@@ -81,6 +82,8 @@ public class EisenheinrichActivity extends Activity {
 	    
 	    UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.DEFAULTS.UPDATE_VERSION_URL);
 	    up.checkForUpdate(this);
+	    
+	    CookieHelper.getSessionCookie(Eisenheinrich.GLOBALS);
 	    
 		Prefs prefs = Prefs.getInstance();
 		if (null == prefs) {
@@ -217,7 +220,7 @@ public class EisenheinrichActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			ActivityHelpers.switchToThread (thread, board.shortName, board.dbId, EisenheinrichActivity.this);
+			ActivityHelpers.switchToThread (thread.kcNummer, board.shortName, board.dbId, EisenheinrichActivity.this);
 		}
 	}
 	

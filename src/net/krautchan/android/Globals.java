@@ -1,5 +1,7 @@
 package net.krautchan.android;
 
+import org.apache.http.cookie.Cookie;
+
 import net.krautchan.backend.Cache;
 import net.krautchan.data.KCBoard;
 
@@ -23,6 +25,7 @@ import net.krautchan.data.KCBoard;
 public class Globals {
 	public String 				USER_AGENT = null;
 	public String 				IP_NUMBER = null;
+	public Cookie				SESSION_COOKIE = null;
 	public String				KOMTUR_CODE = null;
 	public Cache<KCBoard>  		BOARD_CACHE = null;
 }
