@@ -32,20 +32,23 @@ import net.krautchan.data.KODataListener;
 
 public class KCPageParser implements Runnable {
 	private HttpClient client;
+	private long boardDbId;
 	private Object token;
 	private String resolverPath = null;
 	private KCPostingStreamParser pParser = null;
 	private KCThreadStreamParser tParser = null;
 	private KODataListener<KCThread> threadHandler = null;
-	private KODataListener<KCPosting> postingHandler = null;
+	//private KODataListener<KCPosting> postingHandler = null;
 	private String url = null;
 
 	
-	public KCPageParser(String url) {
+	public KCPageParser(String url, long boardDbId) {
 		this.url = url;
 		this.token = url;
+		this.boardDbId = boardDbId;
 		pParser = new KCPostingStreamParser();
 		tParser = new KCThreadStreamParser();
+		tParser.setBoardId(boardDbId);
 		tParser.setPostingParser(pParser);
 	}
 
@@ -62,7 +65,9 @@ public class KCPageParser implements Runnable {
 				if (curChar == filter[pos]) {
 					pos++;
 					if (pos == filter.length) {
-						threads.add(parser.parse(reader));
+						KCThread t = parser.parse(reader);
+						t.board_id = boardDbId;
+						threads.add(t);
 						state.curState = StateEnum.START;
 						pos = 0;
 					}
@@ -88,7 +93,7 @@ public class KCPageParser implements Runnable {
 	
 
 	public KCPageParser setPostingHandler(KODataListener<KCPosting> postListener) {
-		postingHandler = postListener;
+		//postingHandler = postListener;
 		pParser.setHandler(postListener, token);
 		return this;
 	}
@@ -103,8 +108,8 @@ public class KCPageParser implements Runnable {
 		if (null == threadHandler) {
 			throw new IllegalArgumentException ("Cannot parse without a handler");
 		}
-		if (null == url) {
-			throw new IllegalArgumentException ("Cannot parse a NULL url");
+		if ((null == url) || (url.length() == 0)) {
+			throw new IllegalArgumentException ("Cannot parse a NULL or empty url");
 		}
 		tParser.setHandler(threadHandler, token); 
 		final char[]filter =  tParser.getFilterMarker();
@@ -123,9 +128,9 @@ public class KCPageParser implements Runnable {
 						pos++;
 						if (pos == filter.length) {
 							tParser.parse(reader);
-							if (null != threadHandler) {
-								//threadHandler.notifyAdded(tParser.parse(reader));
-							}
+							/*if (null != threadHandler) {
+								threadHandler.notifyAdded(tParser.parse(reader));
+							}*/
 							state.curState = StateEnum.START;
 							pos = 0;
 						}

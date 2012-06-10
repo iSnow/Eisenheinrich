@@ -64,7 +64,6 @@ public class BookmarkCheck  {
 						} catch (ConnectTimeoutException e) {
 							results[count] = true; //if we can't reach the network, still show bookmarks
 							e.printStackTrace();
-							return;
 						} catch (ClientProtocolException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

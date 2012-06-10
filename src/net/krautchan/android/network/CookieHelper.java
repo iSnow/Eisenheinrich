@@ -74,7 +74,7 @@ public class CookieHelper {
 			}}, 100);
 	}
 
-	public static void getMyIP(final Defaults defaults, final Globals globs) {
+	public static void getMyIP(final Globals globs) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {

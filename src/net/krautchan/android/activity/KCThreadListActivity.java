@@ -72,7 +72,7 @@ public class KCThreadListActivity extends Activity {
 	//TODO at some point, factor this out into a cache
 	List<KCThread> threads = new CopyOnWriteArrayList<KCThread>();
 	private Timer siteReachableWatchdog = new Timer();
-	private AlertDialog siteDownDialog;
+	//private AlertDialog siteDownDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +88,7 @@ public class KCThreadListActivity extends Activity {
 	    progress = (ProgressBar)findViewById(R.id.threadlist_watcher);
 	    progress.setMax(100);
 	    progress.setProgress(0);
-	    siteDownDialog = new AlertDialog.Builder(KCThreadListActivity.this)
+	    new AlertDialog.Builder(KCThreadListActivity.this)
         .setMessage ("Der Krautkanal ist nicht erreichbar oder dein Netz ist unten")
 		//.setView(myView)
         .setTitle("KC Down")
@@ -241,7 +241,6 @@ public class KCThreadListActivity extends Activity {
 		View v = this.findViewById(item.getItemId());
 		KCThread thread = (KCThread) v.getTag();
 		String title = (String)item.getTitle();
-		String hide = getString(R.string.option_hide);
 		if (title.equals(getString(R.string.option_bookmark))){	       		
 			Eisenheinrich.getInstance().dbHelper.bookmarkThread(thread);
 		} else if (title.equals(getString(R.string.option_hide))){
@@ -422,7 +421,7 @@ public class KCThreadListActivity extends Activity {
 			threads.clear(); 
 			adapter.clear();
 			adapter.notifyDataSetInvalidated();
-			new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0")
+			new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0", curBoard.dbId)
 				.setBasePath("http://krautchan.net/")
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())

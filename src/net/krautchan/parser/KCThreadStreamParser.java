@@ -25,6 +25,7 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 	private String resolverPath = null;
 	private KODataListener<KCThread> handler = null;
 	private Object token;
+	private long boardDbId;
 	private KCPostingStreamParser pParser = null;
 	
 	private char[][] startTags = {
@@ -32,18 +33,10 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 	};
 	private char[] omittedInfo = "<span class=\"omittedinfo\">".toCharArray();
 	
-	/*public enum StateEnum  {
-		START, 
-		START_THREAD,
-		READ_THREAD,
-		START_POST,
-		READ_POST,
-		END
-	}*/
-	
 	@Override
 	public KCThread parse(Reader reader) throws Exception {
 		KCThread thread = new KCThread();
+		thread.board_id = boardDbId;
 		pParser.setBasePath(resolverPath);
 		char threadFilter[] = startTags[0];
 		char postFilter[] =  pParser.getFilterMarker();
@@ -110,6 +103,10 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 
 	public void setBasePath(String resolverPath) {
 		this.resolverPath = resolverPath;
+	}
+	
+	public void setBoardId (long boardDbId) {
+		this.boardDbId = boardDbId;
 	}
 	
 	@Override

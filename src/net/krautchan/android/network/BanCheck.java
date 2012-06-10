@@ -92,6 +92,7 @@ public class BanCheck {
 							}
 							if ((null != location) && (location.startsWith("/banned"))) {
 								BanCheck.this.board.banned = true;
+								CookieHelper.getMyIP(globs);
 							} 
 						}
 						if (response.getEntity() != null ) {

@@ -109,6 +109,13 @@ public class KCPostActivity extends Activity {
 						@Override
 						public void notifyDone(boolean successful, final String message) {
 							if (successful) {
+								final Intent data = KCPostActivity.this.getIntent();
+								if (getParent() == null) {
+								    setResult(Activity.RESULT_OK, data);
+								} else {
+								    getParent().setResult(Activity.RESULT_OK, data);
+								}
+
 								KCPostActivity.this.finish();
 							} else {
 								if (message.equals(R.string.banned_message)) {

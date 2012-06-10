@@ -156,7 +156,7 @@ public class KCBoardListActivity extends ListActivity {
 			out.close();
 			boss.close();
 			final KCBoard curBoard = board;
-			Thread t = new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0")
+			Thread t = new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0", curBoard.dbId)
 				.setBasePath("http://krautchan.net/")
 				//.setUrl("http://krautchan.net/board/"+curBoard.shortName+"/0")
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())

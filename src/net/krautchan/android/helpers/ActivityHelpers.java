@@ -64,7 +64,7 @@ public class ActivityHelpers {
 		b.putLong("boardId", boardId);
 		b.putBoolean("visitedPostsCollapsible", false);
 
-		Thread t = new Thread(new KCPageParser("http://krautchan.net/" + boardShortName + "/thread-" + kcNummer + ".html")
+		Thread t = new Thread(new KCPageParser("http://krautchan.net/" + boardShortName + "/thread-" + kcNummer + ".html", boardId)
 				.setBasePath("http://krautchan.net/")
 				.setThreadHandler(
 						Eisenheinrich.getInstance().getThreadListener())
@@ -94,7 +94,8 @@ public class ActivityHelpers {
 			intent.putExtras(b);
 			out.close();
 			boss.close();
-			context.startActivity(intent);
+			context.startActivityForResult(intent, 0);
+			//context.startActivity(intent);
 		} catch (IOException e) {
 			Log.e(TAG, "createThreadMask failed", e);
 		}

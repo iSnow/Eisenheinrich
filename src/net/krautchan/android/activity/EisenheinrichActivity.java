@@ -20,39 +20,22 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpHead;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Process;
-import android.text.Editable;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TableLayout;
-import android.widget.Toast;
 import android.widget.TableLayout.LayoutParams;
 import android.widget.TableRow;
-import android.widget.TextView;
 import net.krautchan.R; 
 import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.Globals;
+import net.krautchan.android.dialog.AboutDialog;
 import net.krautchan.android.dialog.DisclaimerDialog;
 import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
@@ -115,7 +98,6 @@ public class EisenheinrichActivity extends Activity {
 			bmc.checkBookmarks();
 		}
 	}
-
 
 	@Override
 	public void onBackPressed() {
@@ -235,65 +217,13 @@ public class EisenheinrichActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.main_about:
-			showAboutDialog();
+			new AboutDialog(this).show();
 			return true;
 		case R.id.prefs:
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-	
-	private class AboutDialogOnClickListener implements OnClickListener {
-		private AlertDialog dlg;
-		public AboutDialogOnClickListener() {
-		}
-		
-		public void setDialog (AlertDialog dlg) {
-			this.dlg = dlg;
-		}
-
-		@Override
-		public void onClick(DialogInterface arg0, int arg1) {
-			Globals globs = Eisenheinrich.GLOBALS;
-			
-			globs.KOMTUR_CODE = ((EditText)dlg.findViewById(R.id.komtur_code)).getText().toString();
-		}
-		
-	}
-	
-	private void showAboutDialog () {
-		AlertDialog dlg=null;
-		AboutDialogOnClickListener l = new AboutDialogOnClickListener();
-		Builder builder = new AlertDialog.Builder(EisenheinrichActivity.this)
-        	.setPositiveButton (R.string.ok, l)
-        	.setView(getLayoutInflater().inflate(R.layout.about_dialog, null));
-		dlg = builder.create();
-		l.setDialog(dlg);
-		dlg.show();		 
-		TextView nameLabel = (TextView) dlg.findViewById(R.id.about_headline);
-		Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/juicebold.ttf");
-		if (null == tf) {
-			return;
-		}
-		nameLabel.setTypeface(tf);
-		PackageInfo pinfo;
-		try {
-			PackageManager pm =  getPackageManager();
-			if (null != pm) {
-				pinfo = pm.getPackageInfo(getPackageName(), 0);
-			    String versionName = pinfo.versionName;
-			    TextView t = (TextView)dlg.findViewById(R.id.about_version); 
-			    t.setText("Version: "+versionName+" (beta)");
-			}
-		} catch (NameNotFoundException e) {
-			//dont care
-		}
-		
-		EditText et = (EditText)dlg.findViewById(R.id.ip_number);
-		et.setText(Eisenheinrich.GLOBALS.IP_NUMBER);
-		EditText kt = (EditText)dlg.findViewById(R.id.komtur_code);
-		kt.setText(Eisenheinrich.GLOBALS.KOMTUR_CODE);
 	}
 	
 	private class BookmarkPeer implements BookmarkTesterPeer  {

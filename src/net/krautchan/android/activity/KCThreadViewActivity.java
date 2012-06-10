@@ -425,6 +425,16 @@ public class KCThreadViewActivity extends Activity {
 		return true;
 	}
 	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (0 == requestCode) {
+			reload();
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+
 	private void prepareForRerender(KCBoard board, long threadKcNum) {
 		thread.board_id = board.dbId;
 		thread.kcNummer = threadKcNum;
@@ -437,7 +447,7 @@ public class KCThreadViewActivity extends Activity {
 		}
 		KCThreadViewActivity.this.setTitle(title);
 		token = "http://krautchan.net/" + board.shortName + "/thread-" + threadKcNum + ".html";
-		Thread t = new Thread(new KCPageParser("http://krautchan.net/" + board.shortName + "/thread-" + threadKcNum + ".html")
+		Thread t = new Thread(new KCPageParser("http://krautchan.net/" + board.shortName + "/thread-" + threadKcNum + ".html", board.dbId)
 			.setBasePath("http://krautchan.net/")
 			.setThreadHandler(
 					Eisenheinrich.getInstance().getThreadListener())

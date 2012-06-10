@@ -19,6 +19,7 @@ package net.krautchan.android;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -135,9 +136,9 @@ public class Eisenheinrich extends Application {
       sInstance = this;
       sInstance.initializeInstance();
       GLOBALS.BOARD_CACHE = new Cache<KCBoard>();
+      GLOBALS.BOARD_CACHE.add(dbHelper.getBoards());
       GLOBALS.USER_AGENT = getUserAgentString ();
       hasImagesDir = FileHelpers.createSDDirectory(DEFAULTS.IMAGE_DIR);
-      CookieHelper.getMyIP(DEFAULTS, GLOBALS);
     }
 
     protected void initializeInstance() {
