@@ -31,9 +31,11 @@ import java.util.Set;
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.network.AsyncPoster;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
 import net.krautchan.android.network.PostVariables;
+import net.krautchan.data.KCBoard;
 import net.krautchan.data.PostActivityParams;
 
 import org.apache.http.client.HttpClient;
@@ -71,22 +73,28 @@ public class KCPostActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) { 
 		super.onCreate(savedInstanceState);   
+		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		vars = new PostVariables();
 		vars.files = new Uri[MAX_IMAGES];
 		calculateImageRows();
 		setContentView(R.layout.post_view);
 		Bundle b = getIntent().getExtras();
 	    byte[] arguments = b.getByteArray("threadparams");
+	    String contentPreset = b.getString("contentpreset");
 	    ByteArrayInputStream bitch = new ByteArrayInputStream(arguments);
 	    ObjectInputStream in;
 	    PostActivityParams params = null;
 	    try {
 			in = new ObjectInputStream(bitch);
 		    params = (PostActivityParams)in.readObject();
-		    vars.boardName = params.curBoardName;
+		    KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(params.curBoardDbId);
+		    vars.boardName = board.shortName;
 		    if (null != params.curThreadKCNum) {
 		    	vars.threadNumber = params.curThreadKCNum.toString();
 		    }
+		    final EditText et = (EditText)findViewById(R.id.edit_posting_content);
+		    et.setText(contentPreset);
 		    final Button okButton = (Button)findViewById(R.id.ok_button);
 		    okButton.setOnClickListener(new View.OnClickListener() {
 			    public void onClick(View v) {
@@ -149,6 +157,9 @@ public class KCPostActivity extends Activity {
 			    	poster.postInThread();
 			    }
 		    });
+		    if (Eisenheinrich.GLOBALS.BOARD_CACHE.get(params.curBoardDbId).banned) {
+		    	
+		    }
 		    final Button cancelButton = (Button)findViewById(R.id.cancel_button);
 		    cancelButton.setOnClickListener(new View.OnClickListener() {
 		    	public void onClick(View v) {

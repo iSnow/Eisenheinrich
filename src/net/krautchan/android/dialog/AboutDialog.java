@@ -1,4 +1,19 @@
 package net.krautchan.android.dialog;
+/*
+* Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
@@ -12,6 +27,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Typeface;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -50,11 +66,18 @@ public class AboutDialog {
 		} catch (NameNotFoundException e) {
 			//dont care
 		}
-		
+
 		EditText et = (EditText)dlg.findViewById(R.id.ip_number);
-		et.setText(Eisenheinrich.GLOBALS.IP_NUMBER);
 		EditText kt = (EditText)dlg.findViewById(R.id.komtur_code);
-		kt.setText(Eisenheinrich.GLOBALS.KOMTUR_CODE);
+		if (null != Eisenheinrich.GLOBALS.IP_NUMBER) {
+			et.setText(Eisenheinrich.GLOBALS.IP_NUMBER);
+			kt.setText(Eisenheinrich.GLOBALS.KOMTUR_CODE);
+		} else {
+			et.setVisibility(View.GONE);
+			kt.setVisibility(View.GONE);
+			dlg.findViewById(R.id.ip_number_label).setVisibility(View.GONE);
+			dlg.findViewById(R.id.komtur_code_label).setVisibility(View.GONE);
+		}
 	}
 	
 	private class AboutDialogOnClickListener implements OnClickListener {

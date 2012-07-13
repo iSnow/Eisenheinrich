@@ -16,9 +16,9 @@ package net.krautchan.data;
 */
 
 public class KCBoard extends KrautObject {
+	private static final long serialVersionUID = 706667534559349821L;
 	public int  numPages;
 	public String name;
-	public String baseUrl;
 	public String shortName;
 	public boolean show = true;
 	public transient boolean banned = false;

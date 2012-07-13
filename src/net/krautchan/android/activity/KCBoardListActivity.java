@@ -32,7 +32,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.Globals;
 import net.krautchan.android.network.BanCheck;
 import net.krautchan.backend.Cache;
 import net.krautchan.data.KCBoard;
@@ -89,7 +88,7 @@ public class KCBoardListActivity extends ListActivity {
 				r.close();
 				r = null;
 				String nav = builder.toString();
-				boards = KCBoardListParser.getBoardList(nav);
+				boards = KCBoardListParser.getBoardList(nav, Eisenheinrich.DEFAULTS.BASE_URL);
 			} catch (IOException e) {
 				String[] mStrings = new String[] { "Exception", e.getMessage() };
 				setListAdapter(new ArrayAdapter<String>(this, R.layout.board_list_item, mStrings) {
@@ -156,9 +155,8 @@ public class KCBoardListActivity extends ListActivity {
 			out.close();
 			boss.close();
 			final KCBoard curBoard = board;
-			Thread t = new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0", curBoard.dbId)
-				.setBasePath("http://krautchan.net/")
-				//.setUrl("http://krautchan.net/board/"+curBoard.shortName+"/0")
+			Thread t = new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
+				.setBasePath(Eisenheinrich.DEFAULTS.BASE_URL)
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
 				);

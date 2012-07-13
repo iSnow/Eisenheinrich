@@ -43,7 +43,7 @@ public class KCBoardListParser {
 				Elements links = elem.select("a");
 				if ((null != links) && (null != links.get(0))) {
 					KCBoard board = new KCBoard();
-					board.baseUrl = baseUrl+links.attr("href");
+					board.uri = baseUrl+links.attr("href");
 					String content = links.get(0).ownText();
 					String[] keyVal = content.split("\\s+-\\s+");
 					board.shortName = keyVal[0].trim().replaceAll("/", "");
@@ -68,8 +68,7 @@ public class KCBoardListParser {
 		return getBoardList(doc, baseUrl);
 	}
 		
-	public static Map<String, KCBoard> getBoardList (String html) throws IOException {
-		String baseUrl = "http://krautchan.net/";
+	public static Map<String, KCBoard> getBoardList (String html, String baseUrl) throws IOException {
 		Document doc = Jsoup.parse(html);
 		return getBoardList(doc, baseUrl);
 	}

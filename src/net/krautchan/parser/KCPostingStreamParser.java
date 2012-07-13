@@ -30,7 +30,8 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 		"<input name=\"post_".toCharArray(),                 
 		"<span class=\"postsubject\">".toCharArray(),       
 		"<span class=\"postername\">".toCharArray(),        
-		"<span class=\"postdate\">".toCharArray(),   
+		"<span class=\"postdate\">".toCharArray(),          
+		"<span class=\"postnumber\"".toCharArray(),   
 		"div class=\"file_reply\">".toCharArray(),
 		"div class=\"file_thread\">".toCharArray(),
 		"<p id=\"post_text_".toCharArray()
@@ -41,6 +42,7 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 		KCPosting.Fields.TITLE,
 		KCPosting.Fields.USER,
 		KCPosting.Fields.DATE,
+		KCPosting.Fields.URI,
 		KCPosting.Fields.IMAGES,
 		KCPosting.Fields.IMAGES,
 		KCPosting.Fields.CONTENT
@@ -50,7 +52,8 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 		"\"".toCharArray(),                 
 		"</span>".toCharArray(),       
 		"</span>".toCharArray(),        
-		"</span>".toCharArray(),       
+		"</span>".toCharArray(),   
+		"</span>".toCharArray(), 
 		"<blockquote>".toCharArray(), 
 		"<blockquote>".toCharArray(),
 		"</blockquote>".toCharArray()
@@ -95,8 +98,8 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 						}
 						buf.setLength(buf.length()-endTags[curTag].length);
 						post.setField (fields[curTag], buf.toString());
-						curTag++;
-						if (curTag == startTags.length) {
+						//curTag++;
+						if (curTag == startTags.length-1) {
 							post.dbId = (long)(resolverPath+post.kcNummer).hashCode();
 							if (null != handler) {
 								handler.notifyAdded(post, token);

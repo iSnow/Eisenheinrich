@@ -33,6 +33,7 @@ import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.dialog.GoToThreadDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
@@ -77,6 +78,8 @@ public class KCThreadListActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);         
+		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		setContentView(R.layout.thread_list);
 		list = (ListView)findViewById(R.id.thread_listview);
 		adapter = new ThreadListAdapter(this, this, 0, 0);
@@ -88,9 +91,9 @@ public class KCThreadListActivity extends Activity {
 	    progress = (ProgressBar)findViewById(R.id.threadlist_watcher);
 	    progress.setMax(100);
 	    progress.setProgress(0);
+	    
 	    new AlertDialog.Builder(KCThreadListActivity.this)
         .setMessage ("Der Krautkanal ist nicht erreichbar oder dein Netz ist unten")
-		//.setView(myView)
         .setTitle("KC Down")
         .setPositiveButton (android.R.string.yes, new OnClickListener () {
 			@Override
@@ -98,18 +101,7 @@ public class KCThreadListActivity extends Activity {
 				KCThreadListActivity.this.finish();
 			}})
         .create();
-	    //TODO den Watchdog-Timer auch beim onRestart- und so weiter handler einbauen
-	    /*siteReachableWatchdog.schedule(new TimerTask () {
-			@Override
-			public void run() {
-				KCThreadListActivity.this.runOnUiThread(new Runnable() {
-				    public void run() {
-				    	siteDownDialog.show();
-				    }
-				});
-			}
-	    	
-	    }, 10000);*/
+	    
 	    final Handler progressHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	        	if (0 == msg.arg1) {
@@ -147,7 +139,7 @@ public class KCThreadListActivity extends Activity {
 					// not the UI thread. Therefore, post a runnable to UI thread to handle this
 					runOnUiThread(new Runnable() {
 				        public void run() {
-				        	item.uri = Eisenheinrich.DEFAULTS.BASE_URL+"/"+board.shortName+"/"+item.kcNummer+".html";
+				        	//item.uri = Eisenheinrich.DEFAULTS.BASE_URL+"/"+board.shortName+"/"+item.kcNummer+".html";
 							threads.add(item);
 							adapter.add(item);
 							adapter.notifyDataSetChanged(); 
@@ -193,7 +185,7 @@ public class KCThreadListActivity extends Activity {
 					found = curThread.dbId == id;
 				}
 				if (found) {
-					ActivityHelpers.switchToThread (curThread.kcNummer, curBoard.shortName, curBoard.dbId, KCThreadListActivity.this);
+					ActivityHelpers.switchToThread (curThread, KCThreadListActivity.this);
 				}
 			}
 		});
@@ -421,7 +413,7 @@ public class KCThreadListActivity extends Activity {
 			threads.clear(); 
 			adapter.clear();
 			adapter.notifyDataSetInvalidated();
-			new Thread (new KCPageParser("http://krautchan.net/board/"+curBoard.shortName+"/0", curBoard.dbId)
+			new Thread (new KCPageParser("http://krautchan.net/"+curBoard.shortName+"/0.html", curBoard.dbId)
 				.setBasePath("http://krautchan.net/")
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
@@ -436,7 +428,7 @@ public class KCThreadListActivity extends Activity {
 				new BannedDialog (this).show();
 				Toast.makeText(KCThreadListActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();
 			} else {
-				ActivityHelpers.createThreadMask (null, curBoard.shortName, this);
+				ActivityHelpers.createThreadMask (null, curBoard.dbId, "", this);
 			}
 			return true; 
 		}

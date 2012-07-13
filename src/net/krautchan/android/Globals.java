@@ -23,6 +23,7 @@ import net.krautchan.data.KCBoard;
 
 
 public class Globals {
+	public boolean				DEBUG = true;
 	public String 				USER_AGENT = null;
 	public String 				IP_NUMBER = null;
 	public Cookie				SESSION_COOKIE = null;

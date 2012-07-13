@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 
 public abstract class KrautObject implements Serializable {
-	protected static final String baseUrl = "http://krautchan.net/";
+	//protected String baseUrl = "http://krautchan.net/";
 	/** Krautchan's posting-IDs are not unique across boards, boards have no ID
 	 * so we build our own unique id for every data type we transport.
 	 * 

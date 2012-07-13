@@ -39,6 +39,7 @@ import net.krautchan.android.dialog.AboutDialog;
 import net.krautchan.android.dialog.DisclaimerDialog;
 import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.network.BookmarkCheck;
 import net.krautchan.android.network.BookmarkCheck.BookmarkTesterPeer;
 import net.krautchan.android.network.CookieHelper;
@@ -54,7 +55,13 @@ public class EisenheinrichActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		setContentView(R.layout.main_view);
+		
+		if (Eisenheinrich.GLOBALS.DEBUG) {
+			findViewById (R.id.debug_marker).setVisibility(View.VISIBLE);
+		}
 		
 	    Button goKCButton = (Button)findViewById(R.id.main_goto_kc);
 	    goKCButton.setOnClickListener(new View.OnClickListener() {
@@ -202,7 +209,7 @@ public class EisenheinrichActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			ActivityHelpers.switchToThread (thread.kcNummer, board.shortName, board.dbId, EisenheinrichActivity.this);
+			ActivityHelpers.switchToThread (thread, EisenheinrichActivity.this);
 		}
 	}
 	

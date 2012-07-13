@@ -20,8 +20,10 @@ import java.io.Serializable;
 
 public class PostActivityParams implements Serializable {
 	private static final long serialVersionUID = -2610654738537159502L;
-	public String curBoardName;
+	public Long curThreadDbId;
 	public Long curThreadKCNum;
+	public Long curBoardDbId;
+	public String curBoardName;
 	public boolean createNew;
 
 }

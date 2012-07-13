@@ -31,11 +31,15 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 	private static final SimpleDateFormat df = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
 	// we get the date as: 		EEE, dd MMM yyyy HH:mm:ss z"
 	// we need to write it as: 	2008-07-17T09:24:17Z
-	//private static SimpleDateFormat df = new SimpleDateFormat ("EEE, dd MMM yyyy HH:mm:ss z");
 	private static SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
 	private static SimpleDateFormat dfOut = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss");
-	private static final Pattern imgPat = Pattern.compile("href=\"/download/(\\d+\\..+?)/(.+?)\"");
+	//private static final Pattern imgPat = Pattern.compile("href=\"/download/(\\d+\\..+?)/(.+?)\"");
+	private static final Pattern imgPat = Pattern.compile("a\\s+href=\"/files/(\\d+\\..+?)\".+?src=\"?/thumbnails/(\\d+\\..+?)\\s\"?", Pattern.DOTALL);
 	private static final Pattern linkPat = Pattern.compile("https?://w?w?w?\\.?(.+?)/(.+?)([\"\\s<>\\(\\)])");
+	private static final Pattern kcLinkPat = Pattern.compile("<a href=\".+\">>>(\\d+)</a>");
+	private static final Pattern uriPat = Pattern.compile("href=\"(.+?)\"");
+	private static final Pattern spoilerPat = Pattern.compile("<span class=\"spoiler\">(.+?)</span>", Pattern.DOTALL);
+	private static final Pattern quotePat = Pattern.compile("<span class=\"quote\">(.+?)</span>", Pattern.DOTALL);
 	public Long 	kcNummer;
 	public Long 	threadId;
 	public Long 	threadKcNummer;
@@ -44,6 +48,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 	public String 	creationDate;
 	public String 	creationShortDate;
 	public String 	content;
+	public String	originalContent;
 	public String 	user;
 	public String 	tripCode;
 	public boolean 	sage;
@@ -57,6 +62,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		TITLE,
 		USER,
 		DATE,
+		URI,
 		IMAGES,
 		CONTENT
 	}
@@ -66,13 +72,15 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		locContent = StringEscapeUtils.unescapeHtml4(locContent);
 		locContent = locContent.replaceAll("<p>", "");
 		locContent = locContent.replaceAll("</p>", " ");
+		originalContent = locContent;
 		
 		locContent = locContent.replaceAll("onclick=\"highlightPost\\(\\'\\d+\\'\\);\"", "");		
 		locContent = locContent.replaceAll(">>>(\\d+)</a>", " onclick='quoteClick(this); return false;' class=\"kclink\">&gt;&gt; $1</a>");
 
-		locContent = locContent.replaceAll("<a href=\"/resolve(/.+?)\"\\s*>.+?</a>", "<a href=\"/resolve$1\" class=\"kclink\" onclick=\"alert('open:kclink:$1');return false;\">&gt;&gt; $1</a>");
+		locContent = locContent.replaceAll("<a href=\"/resolve(/.+?)\"\\s*>.+?</a>", "<a href=\"/resolve$1\" class=\"kclink\" onclick=\"Android.openKcLink('$1');return false;\">&gt;&gt; $1</a>");
 		Matcher m = linkPat.matcher(locContent);
-		CharBuffer buf = CharBuffer.allocate(locContent.length()+1000);
+		//CharBuffer buf = CharBuffer.allocate(locContent.length()+1000);
+		StringBuffer buf = new StringBuffer(locContent.length()+1000);
 		int end = 0;
 		while (m.find()) {
 			int gc = m.groupCount();
@@ -82,28 +90,49 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 				String host = m.group(1);
 				String name = host;
 				String styleClass="extlink";
+				String androidFunction = "openExternalLink";
+				String url = m.group(1)+"/"+m.group(2);
 				if ((host.contains("youtube")) || (host.contains("youtu.be"))) {
 					styleClass="ytlink";
 					name = "YouTube";
+					androidFunction = "openYouTubeVideo";
 				} else if (host.contains("krautchan.net")){
 					styleClass="kclink";
 					name = ">>";
 					host = "";
+					androidFunction = "openKcLink";
 				}
-				buf.append("<a href=\"http://"+m.group(1)+"/"+m.group(2)+"\" class=\""+styleClass+"\" onclick=\"alert('open:"+styleClass+":"+m.group(1)+"/"+m.group(2)+"');return false;\">"+name+"</a>"+m.group(3));
+				buf.append("<a href=\"http://"+m.group(1)+"/"+m.group(2)+"\" class=\""+styleClass+"\" onclick=\"Android."+androidFunction+"('"+url+"');return false;\">"+name+"</a>"+m.group(3));
 			}
 		}
 		buf.append(locContent.substring(end, locContent.length()));
-		content = "<p><span>"+buf.rewind().toString().trim()+"</span></p>";
+		content = "<p><span>"+buf.toString().trim()+"</span></p>";
 	}
 	
+	public String getKcStyledContent () {
+		String kcStyledContent = originalContent.replaceAll("<br>", "\n>");
+		Matcher kcMatcher = kcLinkPat.matcher(kcStyledContent);
+		while (kcMatcher.find()) {
+			kcStyledContent = kcMatcher.replaceAll(">>"+kcMatcher.group(1));
+		}
+		Matcher spoilerMatcher = spoilerPat.matcher(kcStyledContent);
+		while (spoilerMatcher.find()) {
+			kcStyledContent = ">>"+spoilerMatcher.replaceAll("[spoiler]"+spoilerMatcher.group(1)+"[/spoiler]");
+		}
+		Matcher quoteMatcher = quotePat.matcher(kcStyledContent);
+		while (quoteMatcher.find()) {
+			kcStyledContent = quoteMatcher.replaceFirst(quoteMatcher.group(1));
+			quoteMatcher = quotePat.matcher(kcStyledContent);
+		}
+		kcStyledContent = ">"+kcStyledContent;
+		return kcStyledContent.trim(); 
+	}
 	
 	public void setField(Fields fields, String arg) throws ParseException {
 		switch (fields) {
 			case KC_NUM: { 
 				if (null != arg) {
 					kcNummer = Long.parseLong(arg);
-					dbId = (long)(baseUrl+threadId+kcNummer).hashCode(); 
 				}
 				break;
 			}
@@ -121,6 +150,14 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 				created = cDate.getTime();
 				creationShortDate = dfShort.format(cDate);
 				creationDate = dfOut.format(cDate);
+				break;
+			}
+			case URI: { 
+				Matcher m = uriPat.matcher(arg);
+				if (m.find()) {
+					uri = m.group(1);
+					dbId = (long)uri.hashCode();
+				}
 				break;
 			}
 			case IMAGES: {

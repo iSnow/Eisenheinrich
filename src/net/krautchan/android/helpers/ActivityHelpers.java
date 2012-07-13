@@ -49,14 +49,29 @@ import android.widget.TableLayout.LayoutParams;
 
 public class ActivityHelpers {
 	static final String TAG = "ActivityHelpers";
-	//private static float scale;
 
+	public static void switchToThread(KCThread thread, Activity context) {
+		Bundle b = new Bundle();
+		b.putString("token", thread.uri);
+		b.putLong("threadId", thread.kcNummer);
+		b.putLong("boardId", thread.board_id);
+		b.putBoolean("visitedPostsCollapsible", false);
+
+		Thread t = new Thread(new KCPageParser(thread.uri, thread.board_id)
+				.setBasePath("http://krautchan.net/")
+				.setThreadHandler(
+						Eisenheinrich.getInstance().getThreadListener())
+				.setPostingHandler(
+						Eisenheinrich.getInstance().getPostListener()));
+		t.start();
+
+		Intent intent = new Intent(context, KCThreadViewActivity.class);
+		intent.putExtras(b);
+		context.startActivity(intent);
+	}
+	
+	@Deprecated
 	public static void switchToThread(long kcNummer, String boardShortName, Long boardId, Activity context) {
-		/*TODO since we don't get the live thread object but a different deserialized,
-		transmitting it does not make sense. So we only read the KCnum
-		Once we have a Cache or database backend for threads, transmit the
-		thread db-ID
-	 */
 		
 		Bundle b = new Bundle();
 		b.putLong("threadId", kcNummer);
@@ -77,10 +92,12 @@ public class ActivityHelpers {
 		context.startActivity(intent);
 	}
 
-	public static void createThreadMask(KCThread curThread, String boardShortName, Activity context) {
+	public static void createThreadMask(KCThread curThread, long boardDbId, String contentPreset, Activity context) {
 		PostActivityParams params = new PostActivityParams();
-		params.curBoardName = boardShortName;
+		//params.curBoardName = boardShortName;
+		params.curBoardDbId = boardDbId;
 		if (null != curThread) {
+			params.curThreadDbId = curThread.dbId;
 			params.curThreadKCNum = curThread.kcNummer;
 		}
 		ByteArrayOutputStream boss = new ByteArrayOutputStream();
@@ -90,6 +107,7 @@ public class ActivityHelpers {
 			out.writeObject(params);
 			Bundle b = new Bundle();
 			b.putByteArray("threadparams", boss.toByteArray());
+			b.putString("contentpreset", contentPreset);
 			Intent intent = new Intent(context, KCPostActivity.class);
 			intent.putExtras(b);
 			out.close();

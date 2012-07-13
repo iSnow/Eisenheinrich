@@ -42,4 +42,8 @@
 <string name="banned">banniert!</string>
 <string name="komtur_code">Komturcode</string>
 <string name="to_ban_page">Zur Bann-Seite</string>
+<string name="debug">Debug-Version</string>
+<string name="could_not_open_image_viewer">Konnte keinen Bildbetrachter starten</string>
+<string name="could_not_open_youtube_viewer">Could not open Youtube player</string>
+<string name="could_not_open_browser">Could not open Browser</string>
 </resources>

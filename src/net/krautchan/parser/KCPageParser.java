@@ -93,15 +93,9 @@ public class KCPageParser implements Runnable {
 	
 
 	public KCPageParser setPostingHandler(KODataListener<KCPosting> postListener) {
-		//postingHandler = postListener;
 		pParser.setHandler(postListener, token);
 		return this;
 	}
-	
-	/*public KCPageParser setUrl(String url) {
-		this.url = url;
-		return this;
-	}*/
 
 	@Override
 	public void run() {
@@ -114,7 +108,12 @@ public class KCPageParser implements Runnable {
 		tParser.setHandler(threadHandler, token); 
 		final char[]filter =  tParser.getFilterMarker();
 		client = new DefaultHttpClient();
-		HttpGet request = new HttpGet (url);
+		HttpGet request;
+		if (url.startsWith("/")) {
+			request = new HttpGet (resolverPath + url.substring(1));
+		} else {
+			request = new HttpGet (url);
+		}
 		try {
 			HttpResponse response = client.execute(request);
 			BufferedReader reader = new BufferedReader (new InputStreamReader (response.getEntity().getContent()));
@@ -149,7 +148,6 @@ public class KCPageParser implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 			threadHandler.notifyError(e, token);  
-			//FIXME do something for heaven's sake!
 		} finally {
 	        client.getConnectionManager().shutdown(); // Close the instance here
 		}

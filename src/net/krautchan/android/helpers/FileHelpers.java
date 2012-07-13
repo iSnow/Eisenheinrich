@@ -37,7 +37,11 @@ public class FileHelpers {
 			return false;
 		try {
 			if (baseDir.canWrite()) {
-				fos = new FileOutputStream(baseDir.getAbsolutePath() + "/" + fileName);
+				File f = new File (baseDir.getAbsolutePath() + "/" + fileName);
+				if (!f.exists()) {
+					f.createNewFile();
+				}
+				fos = new FileOutputStream(f);
 				out = new ObjectOutputStream(fos);
 				out.writeObject(payLoad);
 				out.close();

@@ -25,6 +25,7 @@ import org.apache.http.client.methods.HttpGet;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 
 public class UpdateCheck {
 	private final UpdateCheckPeer peer;
@@ -48,6 +49,7 @@ public class UpdateCheck {
 				@Override
 				public void run() {
 					HttpGet request = new HttpGet (url);
+					request.getParams().setIntParameter("sdk", Build.VERSION.SDK_INT);
 					try {
 						HttpResponse response = httpClient.execute(request);
 						BufferedReader reader = new BufferedReader (new InputStreamReader (response.getEntity().getContent()));

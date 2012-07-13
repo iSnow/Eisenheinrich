@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import junit.framework.Assert;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class KCThread extends KrautObject {
@@ -37,6 +39,9 @@ public class KCThread extends KrautObject {
 	public transient Long previousLastKcNum = null;
 	public transient int numPostings = 0;
 	private Map<Long, KCPosting>  postings = new TreeMap<Long, KCPosting>();
+	
+	public KCThread () {
+	}
 	
 	public synchronized KCPosting getPosting (Long id) {
 		return postings.get(id);
@@ -61,11 +66,20 @@ public class KCThread extends KrautObject {
 	}
 	
 	public synchronized void addPosting (KCPosting posting) {
-		if (postings.size() == 0) {
+		if (null == uri) {
 			kcNummer = posting.kcNummer;
 			firstPostDate = posting.created;
 			makeDigest (posting);
-			dbId = (long)(baseUrl+"board/"+board_id+"/thread/"+kcNummer).hashCode();
+			uri = posting.uri;
+			//Assert.assertFalse(uri.startsWith("#"));
+			//dbId = (long)(baseUrl+"board/"+board_id+"/thread/"+kcNummer).hashCode();
+			if (null != uri) {
+				dbId = (long)uri.hashCode();
+			} 
+			Assert.assertNotNull(dbId);
+		}
+		if (null == digest) {
+			makeDigest (posting);
 		}
 		lastPostDate = posting.created;
 		Long id = posting.dbId;
@@ -73,6 +87,20 @@ public class KCThread extends KrautObject {
 			posting.threadId = dbId;
 			postings.put(id, posting);
 		}	
+	}
+	
+	public void recalc () {
+		KCPosting posting = postings.entrySet().iterator().next().getValue();
+		if (null == digest) {
+			makeDigest (posting);
+		}
+		if (null == firstPostDate) {
+			firstPostDate = posting.created;
+		}
+		if ((null == dbId) && (null != uri)) {
+			dbId = (long)uri.hashCode();
+		} 
+		Assert.assertNotNull(dbId);
 	}
 	
 	public synchronized void clearPostings () {

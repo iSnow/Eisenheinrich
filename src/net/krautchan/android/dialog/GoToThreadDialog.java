@@ -5,6 +5,8 @@ import java.io.IOException;
 import net.krautchan.R;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.data.KCBoard;
+import net.krautchan.data.KCThread;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -77,6 +79,10 @@ public class GoToThreadDialog {
 			@Override
 			public void run() {
 				String url = "http://krautchan.net/"+board.shortName+"/thread-"+tNum+".html";
+				final KCThread newThread = new KCThread();
+				newThread.kcNummer = tNum;
+				newThread.uri = url;
+				newThread.board_id = board.dbId;
 				HttpHead req = new HttpHead(url);
 				try {
 					HttpResponse res = httpClient.execute(req);
@@ -88,9 +94,7 @@ public class GoToThreadDialog {
 							@Override
 							public void run() {	
 					        	dlg.dismiss();
-								//switchToThread (curThread);
-								ActivityHelpers.switchToThread (tNum, board.shortName, board.dbId, parent);
-								dlg.dismiss();
+								ActivityHelpers.switchToThread (newThread, parent);
 							}
 			        	});
 					} else {
