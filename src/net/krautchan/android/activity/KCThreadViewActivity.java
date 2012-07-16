@@ -51,7 +51,7 @@ import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.helpers.FileContentProvider;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.FileHelpers;
-import net.krautchan.backend.HtmlCreator;
+import net.krautchan.android.helpers.HtmlCreator;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
@@ -73,7 +73,8 @@ public class KCThreadViewActivity extends Activity {
 	private String					token;
 	private boolean 				javascriptInterfaceBroken = false;
 	private Handler 				progressHandler = null;
-	private boolean 				visitedPostsCollapsible = true;
+	private boolean					pageFinished = false;
+	private List<KCPosting>			postingBuffer = new ArrayList<KCPosting>();
 	private boolean 				visitedPostsAreCollapsed = true;
 
 	@Override
@@ -124,9 +125,9 @@ public class KCThreadViewActivity extends Activity {
 		 */
 		
 		try {
-			if ((Build.VERSION.SDK_INT == 9) || (Build.VERSION.SDK_INT == 10)) {
+			if ((Build.VERSION.SDK_INT == 9) || (Build.VERSION.SDK_INT == 10)) { //Android 2.3.x
 				javascriptInterfaceBroken = true;
-				visitedPostsCollapsible = false;
+				Eisenheinrich.GLOBALS.setVISITED_POSTS_COLLAPSIBLE(false);
 				webView.setWebChromeClient(new KCWebChromeClient());
 			} else {
 				webView.addJavascriptInterface(new JavaScriptInterface (this), "Android");
@@ -143,11 +144,11 @@ public class KCThreadViewActivity extends Activity {
 			webView.restoreState(bndl);
 			//thread.kcNummer = bndl.getLong("threadId");
 			//renderHtml(bndl.getString("html"));
-			throw new UnsupportedOperationException ("KCThreadViewActivity:onCreate - remove me");
+			//throw new UnsupportedOperationException ("KCThreadViewActivity:onCreate - remove me");
 		} else {
 			Bundle b = getIntent().getExtras();
 			boardId = b.getLong("boardId");
-			visitedPostsCollapsible = b.getBoolean("visitedPostsCollapsible");
+			Eisenheinrich.GLOBALS.setVISITED_POSTS_COLLAPSIBLE(b.getBoolean("visitedPostsCollapsible"));
 			Assert.assertNotNull(boardId);
 			/*TODO since we don't get the live thread object but a different deserialized,
 				transmitting it and reading it here does not make sense. So we only read the KCnum
@@ -160,7 +161,7 @@ public class KCThreadViewActivity extends Activity {
 			token = b.getString("token");
 			//token = "http://krautchan.net/" + boardName + "/thread-" + thread.kcNummer + ".html";
 			thread.uri = token;
-			KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(boardId);
+			KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(boardId);
 			boardName = board.shortName;
 			String title = "/"+boardName+"/"+thread.kcNummer;
 			if (board.banned) {
@@ -174,9 +175,9 @@ public class KCThreadViewActivity extends Activity {
 		}
 		renderHtml(template);
 		if (javascriptInterfaceBroken) {
-			visitedPostsCollapsible = false;
+			Eisenheinrich.GLOBALS.setVISITED_POSTS_COLLAPSIBLE(false);
 		}
-		if (visitedPostsCollapsible) {
+		if (Eisenheinrich.GLOBALS.isVISITED_POSTS_COLLAPSIBLE()) {
 			Button toggleCollapsedButton = (Button)findViewById(R.id.show_collapsed);
 		    toggleCollapsedButton.setOnClickListener(new View.OnClickListener() {
 			    public void onClick(View v) {
@@ -218,16 +219,16 @@ public class KCThreadViewActivity extends Activity {
 			citation = "";
 			//webView.clearHistory();
 		}
-		else*/ if (webView.canGoBack()) {
+		else if (webView.canGoBack()) {
 			webView.goBack();
 			webViewBack = false;
 			//renderHtml(html); 
 			//webView.clearHistory();
-		} else {
+		} else {*/
 			Eisenheinrich.getInstance().removePostListener(pListener);
 			super.onBackPressed();
 			citation = "";
-		}
+		//}
 	}
 
 	@Override
@@ -264,39 +265,42 @@ public class KCThreadViewActivity extends Activity {
 		this.html = html;
 	}
 	
-	public void switchToThread(KCThread thread) {
-		Bundle b = new Bundle();
-		b.putString("token", thread.uri);
-		b.putLong("threadId", thread.kcNummer);
-		b.putLong("boardId", thread.board_id);
-		b.putBoolean("visitedPostsCollapsible", false);
-
-		Thread t = new Thread(new KCPageParser(thread.uri, thread.board_id)
-				.setBasePath("http://krautchan.net/")
-				.setThreadHandler(
-						Eisenheinrich.getInstance().getThreadListener())
-				.setPostingHandler(
-						Eisenheinrich.getInstance().getPostListener()));
-		t.start();
-
-		renderHtml (template);
+	
+	private void renderPosting (KCPosting posting) {
+		String content = HtmlCreator.htmlForPosting(posting, Eisenheinrich.GLOBALS.isSHOW_IMAGES());
+		content = content.replaceAll("'", '\\'+"\\'").replaceAll("[\n\r]", " ").replaceAll("\"", "\\\\\"");
+		webView.loadUrl("javascript:appendPost('"+content+"')");
+	}
+	
+	private void renderPostingBacklog () {
+		for (KCPosting posting: postingBuffer) {
+			renderPosting (posting);
+		}
+		postingBuffer.clear();
 	}
 
 	private final class PostingListener implements KODataListener<KCPosting> {
 		@Override
 		public void notifyAdded(KCPosting item, Object token) {
 			if (KCThreadViewActivity.this.token.equals(token)) {
-				thread.addPosting(item);
 				((ProgressBar)findViewById(R.id.threadview_watcher)).incrementProgressBy(5);
-				String content = HtmlCreator.htmlForPosting(item);
-				content = content.replaceAll("'", '\\'+"\\'").replaceAll("[\n\r]", " ").replaceAll("\"", "\\\\\"");
- 				webView.loadUrl("javascript:appendPost('"+content+"')");
+				if  (!thread.containsPosting(item)) {
+					thread.addPosting(item);
+					if (pageFinished) {
+						renderPostingBacklog ();
+						renderPosting (item);
+					} else {
+						postingBuffer.add(item);
+					}
+				}
 			}
 		}  
 
 		@Override
 		public void notifyDone(Object token) {
 			if (KCThreadViewActivity.this.token.equals(token)) {
+				renderPostingBacklog ();
+				pageFinished = false;
 				Message msg = progressHandler.obtainMessage();
 	        	msg.arg1 = 0;
 	        	progressHandler.sendMessage(msg);
@@ -332,6 +336,7 @@ public class KCThreadViewActivity extends Activity {
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
+			pageFinished = true;
 			stopSpinner ();
 			super.onPageFinished(view, url);
 			//view.loadUrl("javascript:goToPrevLast()");
@@ -426,7 +431,7 @@ public class KCThreadViewActivity extends Activity {
 	
 	private void openKcLink(String url) {
 		String[] parts = url.split("/");
-		List<KCBoard> boards = Eisenheinrich.GLOBALS.BOARD_CACHE.getAll();
+		List<KCBoard> boards = Eisenheinrich.GLOBALS.getBOARD_CACHE().getAll();
 		Iterator<KCBoard> iter = boards.iterator();
 		boolean found = false;
 		KCBoard board = null;
@@ -567,7 +572,7 @@ public class KCThreadViewActivity extends Activity {
 	}
 	
 	private void reload() {
-		if (visitedPostsCollapsible) {
+		if (Eisenheinrich.GLOBALS.isVISITED_POSTS_COLLAPSIBLE()) {
 			findViewById(R.id.show_collapsed).setVisibility(View.VISIBLE);
 			visitedPostsAreCollapsed = true;
 		}
@@ -575,8 +580,7 @@ public class KCThreadViewActivity extends Activity {
 		if (null != thread.getLastPosting()) {
 			thread.previousLastKcNum = thread.getLastPosting().kcNummer;
 		}
-		thread.clearPostings();
-		switchToThread(thread);
+		ActivityHelpers.switchToThread(thread, this);
 	}
 
 	@Override
@@ -591,8 +595,8 @@ public class KCThreadViewActivity extends Activity {
 		case R.id.prefs:
 			return true;
 		case R.id.reply: 
-			KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(boardId);
- 			String cc = Eisenheinrich.GLOBALS.KOMTUR_CODE;
+			KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(boardId);
+ 			String cc = Eisenheinrich.GLOBALS.getKOMTUR_CODE();
 			if ((board.banned) && (null == cc)) {
 				new BannedDialog (this).show();
 				Toast.makeText(KCThreadViewActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();

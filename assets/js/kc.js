@@ -94,7 +94,6 @@ function getRule (ruleName) {
 function appendPost (content) {
 	if (undefined != content) {
 		var d = document.createElement("li");
-		Android.debugString (content);
 		d.innerHTML = content;
 		$('ul.kc-postlist')[0].appendChild (d);
 		$('time.timeago', d).timeago();

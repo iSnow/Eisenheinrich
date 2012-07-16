@@ -19,12 +19,15 @@ package net.krautchan.android;
 
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.http.client.HttpClient;
@@ -57,7 +60,7 @@ import android.os.Build;
 
 public class Eisenheinrich extends Application {
 	public static Defaults DEFAULTS = new Defaults();
-	public static Globals  GLOBALS = new Globals();
+	public static Globals  GLOBALS = null;
 	public static Styles   STYLES; 
 	private List<String> selectedBoards;
 	public boolean hasImagesDir = false;
@@ -141,14 +144,44 @@ public class Eisenheinrich extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();  
+		GLOBALS = new Globals(readSettings());
 		sInstance = this;
 		sInstance.initializeInstance();
 	}
+	
+	private Properties readSettings() {
+		Properties pr = null;
+		Properties defaults = null;
+		try {
+			InputStream is = getAssets().open("settings.txt");
+			defaults = new Properties();
+			defaults.load(is);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (null == defaults) {
+			pr = new Properties ();
+		} else {
+			pr = new Properties (defaults);
+		}
+		try {
+			File globalsFile = FileHelpers.getSDFile ("settings.txt");
+			if (globalsFile.exists()) {
+				InputStream is = null;
+				is = new FileInputStream (globalsFile);
+				pr.load(is);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return pr;
+	}
 
 	protected void initializeInstance() {
-		GLOBALS.BOARD_CACHE = new Cache<KCBoard>();
-		GLOBALS.BOARD_CACHE.add(dbHelper.getBoards());
-		GLOBALS.USER_AGENT = getUserAgentString ();
+		GLOBALS.getBOARD_CACHE().add(dbHelper.getBoards());
+		GLOBALS.setUSER_AGENT(getUserAgentString ());
 		hasImagesDir = FileHelpers.createSDDirectory(DEFAULTS.IMAGE_DIR);
 		STYLES = new Styles(this);
 		/*sessionHandler = new SessionHandler( 
@@ -247,7 +280,7 @@ public class Eisenheinrich extends Application {
 		// in milliseconds which is the timeout for waiting for data.
 		int timeoutSocket = 10000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-		httpParameters.setParameter( "http.useragent", GLOBALS.USER_AGENT);
+		httpParameters.setParameter( "http.useragent", GLOBALS.getUSER_AGENT());
 		DefaultHttpClient httpclient = new DefaultHttpClient(httpParameters);
 		return httpclient;
 	}

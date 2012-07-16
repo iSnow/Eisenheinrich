@@ -115,7 +115,7 @@ public class KCThreadListActivity extends Activity {
 	    };
 		try {
 			long boardId = b.getLong("boardId");
-			final KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(boardId);
+			final KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(boardId);
 			in = new ObjectInputStream(bitch);
 		    curBoard = (KCBoard)in.readObject();
 		    Timer tm = new Timer();
@@ -266,7 +266,7 @@ public class KCThreadListActivity extends Activity {
 	}
 	
 	private void adjustTitle () {
-		KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(curBoard.dbId);
+		KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(curBoard.dbId);
 		title = "/"+curBoard.shortName+"/ - "+curBoard.name;
 	    if (board.banned) {
 	    	this.setTitle(title + " ("+this.getString(R.string.banned)+")");
@@ -423,8 +423,8 @@ public class KCThreadListActivity extends Activity {
 			return true; 
 		}
 		case R.id.new_thread: {
-			KCBoard board = Eisenheinrich.GLOBALS.BOARD_CACHE.get(curBoard.dbId);
-			if ((board.banned) && (null == Eisenheinrich.GLOBALS.KOMTUR_CODE)) {
+			KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(curBoard.dbId);
+			if ((board.banned) && (null == Eisenheinrich.GLOBALS.getKOMTUR_CODE())) {
 				new BannedDialog (this).show();
 				Toast.makeText(KCThreadListActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();
 			} else {

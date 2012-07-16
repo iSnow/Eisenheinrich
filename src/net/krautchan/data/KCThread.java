@@ -53,6 +53,7 @@ public class KCThread extends KrautObject {
 		}
 		return null;
 	}
+	
 	public synchronized KCPosting  getLastPosting() {
 		if (!postings.isEmpty()) {
 			KCPosting p = null;
@@ -63,6 +64,10 @@ public class KCThread extends KrautObject {
 			return p;
 		}
 		return null;
+	}
+	
+	public boolean containsPosting (KCPosting posting) {
+		return postings.containsKey(posting.dbId);
 	}
 	
 	public synchronized void addPosting (KCPosting posting) {

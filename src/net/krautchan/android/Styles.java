@@ -11,6 +11,7 @@ import java.util.List;
 import net.krautchan.android.helpers.FileHelpers;
 
 import android.content.Context;
+import android.os.Build;
 import android.widget.Toast;
 
 import com.osbcp.cssparser.CSSParser;
@@ -59,11 +60,21 @@ public class Styles {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if (null != css2) {
-			try {
-				cssRules = CSSParser.parse(css2);
-			} catch (Exception e) {
+		if (Build.VERSION.SDK_INT <= 9) {
+			styles = css+"\n"+css2;
+		} else {
+			if (null != css2) {
+				try {
+					cssRules = CSSParser.parse(css2);
+				} catch (Exception e) {
+					try {
+						cssRules = CSSParser.parse(css);
+					} catch (Exception e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+				}
+			} else {
 				try {
 					cssRules = CSSParser.parse(css);
 				} catch (Exception e2) {
@@ -71,34 +82,27 @@ public class Styles {
 					e2.printStackTrace();
 				}
 			}
-		} else {
-			try {
-				cssRules = CSSParser.parse(css);
-			} catch (Exception e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-		}
-		StringBuffer buf = new StringBuffer (16000);
-		if (null == cssRules) {
-			Toast.makeText(context, "CSS malformed", Toast.LENGTH_LONG).show();
-		} else {
-			for (Rule r: cssRules) {
-				/*List<Selector> selectors = r.getSelectors();
-				for (Selector s : selectors) {
-					if (s.toString().equals("body")){
-						List<PropertyValue> pvs = r.getPropertyValues();
-						for (PropertyValue pv : pvs) {
-							if (pv.getProperty().equals("background-color")) {
-								this.bodyBGCol = pv.getValue();
+			StringBuffer buf = new StringBuffer (16000);
+			if (null == cssRules) {
+				Toast.makeText(context, "CSS malformed", Toast.LENGTH_LONG).show();
+			} else {
+				for (Rule r: cssRules) {
+					/*List<Selector> selectors = r.getSelectors();
+					for (Selector s : selectors) {
+						if (s.toString().equals("body")){
+							List<PropertyValue> pvs = r.getPropertyValues();
+							for (PropertyValue pv : pvs) {
+								if (pv.getProperty().equals("background-color")) {
+									this.bodyBGCol = pv.getValue();
+								}
 							}
 						}
-					}
-				}*/
-				buf.append(r.toString());
+					}*/
+					buf.append(r.toString());
+				}
 			}
+			styles = buf.toString();
 		}
-		styles = buf.toString();
 	}
 	
 	public String getStyles() {

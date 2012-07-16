@@ -65,7 +65,7 @@ public class BanCheck {
 				    HttpContext localContext = new BasicHttpContext();
 					HttpPost httppost = new HttpPost("http://krautchan.net/post");
 					CookieStore cookieStore = new BasicCookieStore(); 
-					BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.KOMTUR_CODE);
+					BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.getKOMTUR_CODE());
 					cookie.setDomain(Defaults.DOMAIN);
 					cookie.setPath("/");
 					cookieStore.addCookie(cookie); 

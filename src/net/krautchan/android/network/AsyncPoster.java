@@ -77,7 +77,7 @@ public class AsyncPoster {
 				HttpPost httppost = new HttpPost(Defaults.POST_URL);
 				
 				CookieStore cookieStore = new BasicCookieStore(); 
-				BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.KOMTUR_CODE);
+				BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.getKOMTUR_CODE());
 				cookie.setDomain(defaults.DOMAIN);
 				cookie.setPath("/");
 				cookieStore.addCookie(cookie); 

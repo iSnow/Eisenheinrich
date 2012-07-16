@@ -114,6 +114,7 @@ public class KCPageParser implements Runnable {
 		} else {
 			request = new HttpGet (url);
 		}
+		client.getParams().setParameter("Range", "bytes=42000-");
 		try {
 			HttpResponse response = client.execute(request);
 			BufferedReader reader = new BufferedReader (new InputStreamReader (response.getEntity().getContent()));

@@ -40,7 +40,7 @@ import org.jsoup.nodes.Element;
 
 public class CookieHelper {
 	public static void getSessionCookie(final Globals globs) {
-		if (globs.SESSION_COOKIE != null) {
+		if (globs.getSESSION_COOKIE() != null) {
 			return;
 		}
 		new Timer ().schedule(new TimerTask() {
@@ -58,7 +58,7 @@ public class CookieHelper {
 						List<Cookie>cookies = cookieStore.getCookies();
 						for (Cookie c: cookies) {
 							if (c.getName().equals("desuchan.session")) {
-								globs.SESSION_COOKIE = c;
+								globs.setSESSION_COOKIE(c);
 							}
 						}
 					} catch (ClientProtocolException e) {
@@ -81,7 +81,7 @@ public class CookieHelper {
 				Document doc;
 				try {
 					doc = Jsoup.connect("http://checkip.dyndns.org/")
-							.userAgent(globs.USER_AGENT)
+							.userAgent(globs.getUSER_AGENT())
 							.cookie("auth", "token")
 							.timeout(3000)
 							.get();
@@ -95,7 +95,7 @@ public class CookieHelper {
 				}
 				String segments[] = body.text().split("\\s+");
 				if (segments.length > 0) {
-					globs.IP_NUMBER = segments[3];
+					globs.setIP_NUMBER(segments[3]);
 				} else {
 					return;
 				}

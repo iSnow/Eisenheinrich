@@ -1,4 +1,4 @@
-package net.krautchan.backend;
+package net.krautchan.android.helpers;
 
 /*
 * Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
@@ -21,7 +21,7 @@ import net.krautchan.data.*;
 
 public class HtmlCreator {
 
-	public static String htmlForPosting (KCPosting p) {
+	public static String htmlForPosting (KCPosting p, boolean showImages) {
 		String innerHtml = "<div class=\"posthead\">" +
 		"<p class=\"headline\"><b>"+p.kcNummer+"</b><time class='timeago' datetime='"+p.creationDate+"'>"+p.creationDate+"</time></p>";
 		if (null != p.title) {
@@ -30,7 +30,7 @@ public class HtmlCreator {
 		innerHtml += "</div>";
 		//innerHtml += p.content.replaceAll("\"", "&amp;quot;").replaceAll("'", "&amp;quot;");
 		innerHtml += p.content;
-		if (p.imgs.length > 0) {
+		if (showImages && p.imgs.length > 0) {
 			innerHtml += "<div class=\"image-container\">";
 			for (int i = 0; i < p.imgs.length; i++) {
 				if (null != p.imgs[i]) {
@@ -42,7 +42,7 @@ public class HtmlCreator {
 		return "<div id='"+p.kcNummer+"'>"+innerHtml+"</div>";
 	}
 	
-	public static String htmlForThread (KCThread thread, String template) {
+	/*public static String htmlForThread (KCThread thread, String template) {
 		KCPosting p = null;
 		StringBuffer buf = new StringBuffer();
 		Iterator<KCPosting> iter = thread.getSortedPostings().iterator();
@@ -87,36 +87,6 @@ public class HtmlCreator {
 		String html = template.replace("</ul>",buf.toString()+"</ul>"); 
 		//FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
 		return html;
-	}
-	
-	
-	/*public static String addPostings (List<KCPosting> postings, String template) {
-		Collections.sort(postings, new Comparator<KCPosting>() {
-			@Override
-			public int compare(KCPosting p1, KCPosting p2) {
-				return p1.kcNummer.intValue() - p2.kcNummer.intValue();
-			}
-			
-		});
-		String html = template;
-		for (KCPosting post : postings) {
-			String innerHtml = "<p class=\"headline\"><b>"+post.kcNummer+"</b><time class='timeago' datetime='"+post.creationDate+"'>"+post.creationDate+"</time></p>";
-			if (null != post.title) {
-				innerHtml += "<p class=\"topic\">"+post.title+"</p>";
-			}
-			innerHtml += post.content;
-			if (post.imgs.length > 0) {
-				innerHtml += "<div class=\"image-container\">";
-				for (int i = 0; i < post.imgs.length; i++) {
-					if (null != post.imgs[i]) {
-						innerHtml += "<a href=\"/files/"+post.imgs[i]+"\" onclick=\"Android.openImage('"+post.imgs[i]+"');return false;\"><img src=\"/thumbnails/"+post.imgs[i]+"\"></a>";
-					}
-				}
-				innerHtml += "</div>";
-			}
-			html = html.replace("</ul>", "<li id='"+post.dbId+"'><div id='"+post.kcNummer+"'>"+innerHtml+"</div></li></ul>");
-		}
-		//FileHelpers.writeToSDFile("out_"+(new Date().getTime()+".html"), html);
-		return html;
 	}*/
+	
 }

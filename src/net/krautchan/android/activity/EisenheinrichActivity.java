@@ -16,10 +16,16 @@ package net.krautchan.android.activity;
 * limitations under the License.
 */
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Properties;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,6 +46,7 @@ import net.krautchan.android.dialog.DisclaimerDialog;
 import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
+import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.BookmarkCheck;
 import net.krautchan.android.network.BookmarkCheck.BookmarkTesterPeer;
 import net.krautchan.android.network.CookieHelper;
@@ -50,16 +57,43 @@ import net.krautchan.data.KCThread;
 
 public class EisenheinrichActivity extends Activity {
 	public static final String TAG = "EisenheinrichActivity";
+	public static Properties pr = null;
 	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Properties defaults = null;
+		try {
+			InputStream is = getAssets().open("settings.txt");
+			defaults = new Properties();
+			defaults.load(is);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (null == defaults) {
+			pr = new Properties ();
+		} else {
+			pr = new Properties (defaults);
+		}
+		try {
+			File globalsFile = FileHelpers.getSDFile ("settings.txt");
+			if (globalsFile.exists()) {
+				InputStream is = null;
+				is = new FileInputStream (globalsFile);
+				pr.load(is);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		setContentView(R.layout.main_view);
 		
-		if (Eisenheinrich.GLOBALS.DEBUG) {
+		if (Eisenheinrich.GLOBALS.isDEBUG()) {
 			findViewById (R.id.debug_marker).setVisibility(View.VISIBLE);
 		}
 		
