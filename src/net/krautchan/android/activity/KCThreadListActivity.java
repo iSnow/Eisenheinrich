@@ -64,14 +64,15 @@ import android.widget.Toast;
 
 public class KCThreadListActivity extends Activity {
 	protected static final String TAG = "KCThreadListActivity";
-	ListView list = null;
+	private ListView list = null;
 	private Eisenheinrich heini = Eisenheinrich.getInstance();
 	private ProgressBar progress = null;
-	ThreadListAdapter adapter = null;
-	KCBoard curBoard;
+	private ThreadListAdapter adapter = null;
+	private KCBoard curBoard;
+	private String token;
 	private String title;
 	//TODO at some point, factor this out into a cache
-	List<KCThread> threads = new CopyOnWriteArrayList<KCThread>();
+	private List<KCThread> threads = new CopyOnWriteArrayList<KCThread>();
 	private Timer siteReachableWatchdog = new Timer();
 	//private AlertDialog siteDownDialog;
 
@@ -114,6 +115,7 @@ public class KCThreadListActivity extends Activity {
 	        }
 	    };
 		try {
+		    token = b.getString("token");
 			long boardId = b.getLong("boardId");
 			final KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(boardId);
 			in = new ObjectInputStream(bitch);
@@ -134,18 +136,19 @@ public class KCThreadListActivity extends Activity {
 			heini.addThreadListener(new KODataListener<KCThread>() {
 				@Override
 				public void notifyAdded(final KCThread item, Object token) {
-		        	siteReachableWatchdog.cancel();
-					// cannot add to the collection backing the adapter from a thread that is
-					// not the UI thread. Therefore, post a runnable to UI thread to handle this
-					runOnUiThread(new Runnable() {
-				        public void run() {
-				        	//item.uri = Eisenheinrich.DEFAULTS.BASE_URL+"/"+board.shortName+"/"+item.kcNummer+".html";
-							threads.add(item);
-							adapter.add(item);
-							adapter.notifyDataSetChanged(); 
-				        	progress.incrementProgressBy(10);
-				        }
-				    });
+					if (KCThreadListActivity.this.token.equals(token)) {
+			        	siteReachableWatchdog.cancel();
+						// cannot add to the collection backing the adapter from a thread that is
+						// not the UI thread. Therefore, post a runnable to UI thread to handle this
+						runOnUiThread(new Runnable() {
+					        public void run() {
+								threads.add(item);
+								adapter.add(item);
+								adapter.notifyDataSetChanged(); 
+					        	progress.incrementProgressBy(10);
+					        }
+					    });
+					}
 				}
 
 				@Override
@@ -413,7 +416,7 @@ public class KCThreadListActivity extends Activity {
 			threads.clear(); 
 			adapter.clear();
 			adapter.notifyDataSetInvalidated();
-			new Thread (new KCPageParser("http://krautchan.net/"+curBoard.shortName+"/0.html", curBoard.dbId)
+			new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
 				.setBasePath("http://krautchan.net/")
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())

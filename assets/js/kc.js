@@ -21,8 +21,10 @@ function quoteClick (elem) {
 	var segments = href.split("/");
 	var id = segments[segments.length - 1];
 	var div = cloneNode (id, offset.top);
+	Android.debugString ($(div).html())
 	var cButton = $(div).prepend('<p class="closebutton">close</p>');
-	$(div).find(".closebutton").click (function() {
+	$('#quoteoverlay').click (function() {
+		Android.debugString ($(this).html())
 		$('#backdrop').fadeOut();
 		$('#quoteoverlay').css("display", "none")
 		$('body').css("overflow", "visible");
@@ -36,7 +38,7 @@ function quoteClick (elem) {
 		//$('html,body').css("overflow", "hidden");
 	});	
 	$('#backdrop').css("top", $(elem).parents("div").offset().top);
-	return false;
+	return false; 
 }
 
 function cloneNode (id, topOffset) {
@@ -67,17 +69,12 @@ function goToByScroll(id){
 	$('html,body').animate({scrollTop: $("#"+id).offset().top},'slow');		
 }
 
-function toggleCollapsed (show) {
-	//$(".collapsed").css('background', '#333').show();
-	//$(".collapsed").show();
-	/*var rule = getRule (".collapsed");
-		if (rule != undefined) {
-			if (show){
-				rule.style.display = "block";
-			} else {
-				rule.style.display = "none";
-			}
-		}*/
+function showCollapsed (collapse) {
+	if (collapse) {
+		$(".read").hide();
+	} else {
+		$(".read").show();
+	} 
 }
 
 function getRule (ruleName) {
@@ -91,9 +88,15 @@ function getRule (ruleName) {
 	return undefined;
 }
 
-function appendPost (content) {
+function markAllPostingsRead () {
+	$('ul.kc-postlist>li').removeClass('read').removeClass('unread').addClass('read');
+	$('ul.kc-postlist>li.read').hide();
+}
+
+function appendPost (content, className) {
 	if (undefined != content) {
 		var d = document.createElement("li");
+		d.className = d.className + " " + className;
 		d.innerHTML = content;
 		$('ul.kc-postlist')[0].appendChild (d);
 		$('time.timeago', d).timeago();

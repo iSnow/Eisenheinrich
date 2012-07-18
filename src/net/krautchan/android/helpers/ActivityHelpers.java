@@ -55,6 +55,11 @@ public class ActivityHelpers {
 		b.putString("token", thread.uri);
 		b.putLong("threadId", thread.kcNummer);
 		b.putLong("boardId", thread.board_id);
+		int progInc = (thread.numPostings == 0) ? 5 : (100/thread.numPostings);
+		if (progInc == 0) {
+			progInc = 1;
+		}
+		b.putInt("progressIncrement", progInc);
 		b.putBoolean("visitedPostsCollapsible", false);
 
 		Thread t = new Thread(new KCPageParser(thread.uri, thread.board_id)
@@ -70,7 +75,7 @@ public class ActivityHelpers {
 		context.startActivity(intent);
 	}
 	
-	@Deprecated
+	/*@Deprecated
 	public static void switchToThread(long kcNummer, String boardShortName, Long boardId, Activity context) {
 		
 		Bundle b = new Bundle();
@@ -90,11 +95,10 @@ public class ActivityHelpers {
 		Intent intent = new Intent(context, KCThreadViewActivity.class);
 		intent.putExtras(b);
 		context.startActivity(intent);
-	}
+	}*/
 
 	public static void createThreadMask(KCThread curThread, long boardDbId, String contentPreset, Activity context) {
 		PostActivityParams params = new PostActivityParams();
-		//params.curBoardName = boardShortName;
 		params.curBoardDbId = boardDbId;
 		if (null != curThread) {
 			params.curThreadDbId = curThread.dbId;
@@ -113,7 +117,6 @@ public class ActivityHelpers {
 			out.close();
 			boss.close();
 			context.startActivityForResult(intent, 0);
-			//context.startActivity(intent);
 		} catch (IOException e) {
 			Log.e(TAG, "createThreadMask failed", e);
 		}

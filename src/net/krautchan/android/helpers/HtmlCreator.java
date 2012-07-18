@@ -22,6 +22,7 @@ import net.krautchan.data.*;
 public class HtmlCreator {
 
 	public static String htmlForPosting (KCPosting p, boolean showImages) {
+		String classStr = "";	
 		String innerHtml = "<div class=\"posthead\">" +
 		"<p class=\"headline\"><b>"+p.kcNummer+"</b><time class='timeago' datetime='"+p.creationDate+"'>"+p.creationDate+"</time></p>";
 		if (null != p.title) {

@@ -1,4 +1,6 @@
 package net.krautchan.android;
+
+import android.os.Build;
 /*
 * Copyright (C) 2012 Johannes Jander (johannes@jandermail.de)
 *
@@ -24,6 +26,6 @@ public class Defaults {
 	public static final String SD_DIR = "eisenheinrich";
 	public static final String IMAGE_DIR = "/images";
 	public static final String HOME_PAGE = "http://eisenheinrich.datensalat.net/";
-	public static final String UPDATE_VERSION_URL = "http://eisenheinrich.datensalat.net/version.txt";
+	public static final String UPDATE_VERSION_URL = "http://eisenheinrich.datensalat.net/backend/version/sdk/"+Build.VERSION.SDK_INT;
 	public static final String UPDATE_PAGE = "http://eisenheinrich.datensalat.net/mobile.html";
 }

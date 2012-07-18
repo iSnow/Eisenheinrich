@@ -45,37 +45,46 @@ table {
 
 
 
-.kc-listwrapper>ul {
+.kc-listwrapper>ul.kc-postlist {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
 	width: 100%;
 	margin: 0;
 }
 
-.kc-listwrapper>ul>li {
+ul.kc-postlist>li {
 	list-style: none outside none;
 	position: relative;
 	line-height: 25px;
+	font-size: 75%;
 	font-family: 'Droid Sans';
 	font-weight: 500;
 	color: #8cc708;
 	/*border-bottom: 1px solid #3d3f3d;*/
 	margin: 0;
-	padding: 8px 0 8px 0;
-}
-
-
-ul.kc-postlist {
-	display: block;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-}
-
-ul.kc-postlist>li {
-	font-size: 75%;
 	padding: 0 0 0.5em 0;
 }
 
-ul.kc-postlist>li>div>div.posthead {
+ul.kc-postlist>li.unread {
+
+}
+
+ul.kc-postlist>li.read {
+	display: none;
+	background-color: #red;
+}
+
+ul.kc-postlist>li.even {
+	background: transparent;
+}
+
+ul.kc-postlist>li.odd {
+	background: #00080a;
+}
+
+li>div>div.posthead {
 	height: 3.5em;
 	margin-bottom: 0.5em;
 	overflow: hidden;
@@ -99,29 +108,29 @@ ul.kc-postlist>li>div>div.image-container {
 	padding-left: 10px;
 }
 
-ul.kc-postlist>li>div>div.posthead>p.headline {
+p.headline {
 	position: relative;
 	width: 100%;
 	font-weight: 700;
 }
 
-ul.kc-postlist>li>div>div.posthead>p.headline>b {
+p.headline>b {
 	/*display: inline-block;
 	width: 1.5em;*/
 	color: #8cc708;
 }
 
-ul.kc-postlist>li>div>div.posthead>p.headline>i {
+p.headline>i {
 	color: #dfdbdf;
 	float: right;
 }
 
-ul.kc-postlist>li>div>div.posthead>p.headline>time, div.cloned>div.posthead>p.headline>time {
+p.headline>time {
 	color: #dfdbdf;
 	float: right;
 }
 
-ul.kc-postlist>li>div>div.posthead>p.topic {
+p.topic {
 	display: block;
 	font-weight: 700;
 	margin-top: -.7em;
@@ -131,7 +140,7 @@ ul.kc-postlist>li>div>div.posthead>p.topic {
 	width: 100%;
 }
 
-ul.kc-postlist>li>div>p {
+li>div>p {
 	display: inline-block;
 	width: 20em;
 	overflow: hidden;
@@ -142,11 +151,14 @@ ul.kc-postlist>li>div>p {
 	padding-left: 5px;
 }
 
+
 div.cloned {
 	background: #222;
+	z-index: 1001;
 }
 
-ul.kc-postlist>li>div>p a, div.cloned>p a { 
+/* basic styles for links */
+div>p a { 
 	display: inline-block;
 	background: #333;
 	/*font-size: 12px;*/
@@ -157,25 +169,29 @@ ul.kc-postlist>li>div>p a, div.cloned>p a {
 	text-decoration: none;
 }
 
+/* KC-internal links */
 a.kclnk>span {
 	position: relative;
 	top: .2em;
 }
 
-ul.kc-postlist>li>div>p a.kclink, div.cloned>p a.kclink { 
+a.kclink { 
 	/*background: -webkit-gradient(linear, left top, left bottom, from(#4084f4),to(#194fdc));*/
 	background: -webkit-gradient(linear, left top, left bottom, from(#999), to(#111) );
 }
 
-ul.kc-postlist>li>div>p a.ytlink {
+/* youtube links */
+a.ytlink {
 	background: -webkit-gradient(linear, left top, left bottom, from(#f44420), to(#111) );
 }
 
-ul.kc-postlist>li>div>p a.extlink {
+/* links to external sites */
+a.extlink {
 	background: -webkit-gradient(linear, left top, left bottom, from(#2EADF2), to(#111) );
 }
 
-ul.kc-postlist>li>div>p a:active { background: -webkit-gradient(linear, left top, left bottom, from(#111),
+/*link clicked */
+a:active { background: -webkit-gradient(linear, left top, left bottom, from(#111),
 		to(#999) );
 }
 
@@ -186,10 +202,8 @@ ul.kc-postlist>li>div>p a:active { background: -webkit-gradient(linear, left top
     font-weight: bold;
 }
 
-.collapsed {
-	display: block;
-	background-color: #333;
-}
+
+
 
 span.quote {
 	padding-left: 10dp;

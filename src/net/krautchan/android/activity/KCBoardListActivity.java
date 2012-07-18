@@ -168,6 +168,7 @@ public class KCBoardListActivity extends ListActivity {
 			Bundle b = new Bundle();
 			b.putByteArray("board", boss.toByteArray());
 			b.putLong("boardId", board.dbId);
+			b.putString("token", board.uri);
 
 			Intent intent = new Intent(this, KCThreadListActivity.class);
 			intent.putExtras(b);

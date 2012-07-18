@@ -48,8 +48,7 @@ public class UpdateCheck {
 
 				@Override
 				public void run() {
-					HttpGet request = new HttpGet (url);
-					request.getParams().setIntParameter("sdk", Build.VERSION.SDK_INT);
+					HttpGet request = new HttpGet (url); 
 					try {
 						HttpResponse response = httpClient.execute(request);
 						BufferedReader reader = new BufferedReader (new InputStreamReader (response.getEntity().getContent()));
