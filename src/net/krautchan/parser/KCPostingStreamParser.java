@@ -68,7 +68,6 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 	@Override
 	public KCPosting parse(Reader reader) throws Exception {
 		KCPosting post = new KCPosting ();
-		//StringBuffer testBuf = new StringBuffer (200000);
 		int curChar = -1;
 		int[] startPositions = new int[startTags.length];
 		for (int i = 0; i < startPositions.length; i++) {
@@ -98,7 +97,6 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 						}
 						buf.setLength(buf.length()-endTags[curTag].length);
 						post.setField (fields[curTag], buf.toString());
-						//curTag++;
 						if (curTag == startTags.length-1) {
 							post.dbId = (long)(resolverPath+post.kcNummer).hashCode();
 							if (null != handler) {
@@ -114,9 +112,6 @@ public class KCPostingStreamParser implements KCStreamParser<KCPosting> {
 			}
 			curChar = reader.read();
 		} 
-		/*if (curChar == -1) {
-			throw new IllegalStateException ("KCPostingStreamParser missed a field in "+testBuf);
-		}*/
 		if (null != handler) {
 			handler.notifyDone(token);
 		}

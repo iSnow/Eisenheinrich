@@ -61,7 +61,7 @@ public class GoToThreadDialog {
 			.setTitle(R.string.load_thread)
 			.create();
 		dlg.show();
-		Button okButton = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
+		/*Button okButton = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
 		okButton.setOnClickListener(new android.view.View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -70,7 +70,7 @@ public class GoToThreadDialog {
 					startGoToThreadRunner (tNum);
 				}
 			}
-		});
+		});*/
 		return true;
 	}
 	
@@ -78,18 +78,16 @@ public class GoToThreadDialog {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				String url = "http://krautchan.net/"+board.shortName+"/thread-"+tNum+".html";
-				final KCThread newThread = new KCThread();
+				String uri = "http://krautchan.net/"+board.shortName+"/thread-"+tNum+".html";
+				final KCThread newThread = new KCThread(uri);
 				newThread.kcNummer = tNum;
-				newThread.uri = url;
 				newThread.board_id = board.dbId;
-				HttpHead req = new HttpHead(url);
+				HttpHead req = new HttpHead(uri);
 				try {
 					HttpResponse res = httpClient.execute(req);
 					StatusLine sl = res.getStatusLine();
 					int code = sl.getStatusCode();
 					if ((code == 200) || (code == 304)) {
-			        	
 			        	parent.runOnUiThread(new Runnable () {
 							@Override
 							public void run() {	

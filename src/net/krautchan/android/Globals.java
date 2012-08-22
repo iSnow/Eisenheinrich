@@ -10,6 +10,7 @@ import android.os.Build;
 
 import net.krautchan.backend.Cache;
 import net.krautchan.data.KCBoard;
+import net.krautchan.data.KCThread;
 
 /*
 * Copyright (C) 2012 Johannes Jander (johannes@jandermail.de)
@@ -31,6 +32,7 @@ import net.krautchan.data.KCBoard;
 public class Globals {
 	private String 				USER_AGENT = null;
 	private Cache<KCBoard>  	BOARD_CACHE = new Cache<KCBoard>();
+	private Cache<KCThread>  	THREAD_CACHE = new Cache<KCThread>();
 	private boolean				DEBUG = true;
 	
 	private String 				IP_NUMBER = null;
@@ -50,68 +52,76 @@ public class Globals {
 	}
 	
 	
-	public boolean isDEBUG() {
+	public boolean isDebugVersion() {
 		return DEBUG;
 	}
 
-	public String getUSER_AGENT() {
+	public String getUserAgentString() {
 		return USER_AGENT;
 	}
 	
-	public Cache<KCBoard> getBOARD_CACHE() {
+	public Cache<KCBoard> getBoardCache() {
 		return BOARD_CACHE;
 	}
 	
-	public String getIP_NUMBER() {
+	public String getIpNumber() {
 		return IP_NUMBER;
 	}
 
-	public Cookie getSESSION_COOKIE() {
+	public Cookie getSessionCookie() {
 		return SESSION_COOKIE;
 	}
 
-	public String getKOMTUR_CODE() {
+	public String getKomturCode() {
 		return KOMTUR_CODE;
 	}
 
-	public boolean isVISITED_POSTS_COLLAPSIBLE() {
+	public boolean areVisitedPostsCollapible() {
 		return VISITED_POSTS_COLLAPSIBLE;
 	}
 
-	public boolean isSHOW_IMAGES() {
+	public boolean shouldShowImages() {
 		return SHOW_IMAGES;
 	}
 	
-	public void setDEBUG(boolean dEBUG) {
-		DEBUG = dEBUG;
+	public void setDebugVersion (boolean debug) {
+		DEBUG = debug;
 	}
 
-	public void setIP_NUMBER(String iP_NUMBER) {
-		IP_NUMBER = iP_NUMBER;
+	public void setIpNumber(String ipNumber) {
+		IP_NUMBER = ipNumber;
 	}
 
-	public void setSESSION_COOKIE(Cookie sESSION_COOKIE) {
-		SESSION_COOKIE = sESSION_COOKIE;
+	public void setSessionCookie(Cookie cookie) {
+		SESSION_COOKIE = cookie;
 	}
 
-	public void setKOMTUR_CODE(String kOMTUR_CODE) {
-		KOMTUR_CODE = kOMTUR_CODE;
+	public void setKomturCode(String code) {
+		KOMTUR_CODE = code;
 	}
 
-	public void setVISITED_POSTS_COLLAPSIBLE(boolean vISITED_POSTS_COLLAPSIBLE) {
-		VISITED_POSTS_COLLAPSIBLE = vISITED_POSTS_COLLAPSIBLE;
+	public void setVisitedPostsCollapsible(boolean collapsible) {
+		VISITED_POSTS_COLLAPSIBLE = collapsible;
 	}
 
-	public void setSHOW_IMAGES(boolean sHOW_IMAGES) {
-		SHOW_IMAGES = sHOW_IMAGES;
+	public void setShowImages(boolean show) {
+		SHOW_IMAGES = show;
 	}
 
-	public void setUSER_AGENT(String uSER_AGENT) {
-		USER_AGENT = uSER_AGENT;
+	public void setUserAgentString(String userAgent) {
+		USER_AGENT = userAgent;
 	}
 	
-	public void setBOARD_CACHE(Cache<KCBoard> bOARD_CACHE) {
-		BOARD_CACHE = bOARD_CACHE;
+	public void setBoardCache (Cache<KCBoard> cache) {
+		BOARD_CACHE = cache;
+	}
+
+	public Cache<KCThread> getThreadCache() {
+		return THREAD_CACHE;
+	}
+
+	public void setThreadCache(Cache<KCThread> cache) {
+		THREAD_CACHE = cache;
 	}
 
 }

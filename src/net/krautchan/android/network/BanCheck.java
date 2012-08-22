@@ -1,8 +1,11 @@
 package net.krautchan.android.network;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 import net.krautchan.android.Defaults;
+import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.Globals;
 import net.krautchan.data.KCBoard;
 
@@ -20,6 +23,10 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import android.util.Log;
 
@@ -65,7 +72,7 @@ public class BanCheck {
 				    HttpContext localContext = new BasicHttpContext();
 					HttpPost httppost = new HttpPost("http://krautchan.net/post");
 					CookieStore cookieStore = new BasicCookieStore(); 
-					BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.getKOMTUR_CODE());
+					BasicClientCookie cookie = new BasicClientCookie("desuchan.komturcode", globs.getKomturCode());
 					cookie.setDomain(Defaults.DOMAIN);
 					cookie.setPath("/");
 					cookieStore.addCookie(cookie); 

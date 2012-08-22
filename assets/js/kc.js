@@ -1,10 +1,13 @@
 function quoteReply (elem) {
-	var node = elem;
-	while ($(node).prop("tagName") != 'LI') {
-		node = $(node).parent();
+	$(elem).addClass('active');
+	setTimeout(function(){
+		$('.active').removeClass('active');
+	},200);
+	while (!elem.id){
+		elem = elem.parentNode;
 	}
-	if (node != undefined) {
-		Android.citePosting($(node).attr('id'));
+	if (elem != undefined) {
+		Android.citePosting(elem.id);
 	}
 }
 
@@ -89,23 +92,32 @@ function getRule (ruleName) {
 }
 
 function markAllPostingsRead () {
-	$('ul.kc-postlist>li').removeClass('read').removeClass('unread').addClass('read');
-	$('ul.kc-postlist>li.read').hide();
+	$('ul#kc-postlist>li').removeClass('read').removeClass('unread').addClass('read');
+	$('ul#kc-postlist>li#first').removeClass('read');
+	$('ul#kc-postlist>li.read').hide();
 }
 
-function appendPost (content, className) {
-	if (undefined != content) {
+function appendPost (content, className, id) {
+	if (content != undefined) {
 		var d = document.createElement("li");
 		d.className = d.className + " " + className;
 		d.innerHTML = content;
-		$('ul.kc-postlist')[0].appendChild (d);
+		var ul = document.getElementById("kc-postlist");
+		ul.appendChild (d);
+		if (id != undefined) {
+			d.id = id;
+		}
 		$('time.timeago', d).timeago();
 		$('.posthead', d).click(function(){
 			quoteReply(this);
-			$(this).addClass ('active');
-			setTimeout(function(){
-				$('.active').removeClass('active');
-			},200);
+			
 		});
-	}
+		/*console.log (ul.innerHTML);  for some reasons I don't understand,
+			removing this log-command leads to the error:
+			08-04 00:39:42.883: E/Web Console(16668): Uncaught ReferenceError: appendPost is not defined at null:1*/
+	} 
+}
+
+function postingsDone() {
+	console.log (document.documentElement.innerHTML);
 }

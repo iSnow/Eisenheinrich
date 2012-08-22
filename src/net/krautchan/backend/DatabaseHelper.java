@@ -38,7 +38,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	private final static String	DBASE_NAME 		= "Schlaubernd";
-	private final static int 	VERSION_NUM 	=  3;
+	private final static int 	VERSION_NUM 	=  4;
 	private static final String BOARD_TABLE		= "board";
 	private static final String THREAD_TABLE	= "thread";
 
@@ -120,12 +120,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public void bookmarkThread (KCThread thread) {
-		persistThread (thread, true);
+		thread.bookmarked = true;
+		persistThread (thread);
 	}
 	
-	public void persistThread (KCThread thread, boolean asBookmark) {
+	public void persistThread (KCThread thread) {
 		if (null == thread) {
 			return;
+		}
+		if (null == thread.dbId) {
+			throw new IllegalArgumentException ("Thread ID must not be null");
 		}
 		if (null == thread.board_id) {
 			throw new IllegalArgumentException ("Board ID must not be null");
@@ -142,24 +146,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (null == thread.firstPostDate) {
 			throw new IllegalArgumentException ("First post time must not be null");
 		}
-		if (getThread (thread.dbId) != null) {
-			//already persisted, we are done
-			//TODO if the thread was not hidden, we need to persist it again
-			//TODO if the thread was not bookmarked, we need to persist it again
-			return;
-		}
 		SQLiteDatabase db = getReadableDatabase();
 		try{
-			ContentValues valHolder = new ContentValues();
-			valHolder.put("id", thread.dbId);
-			valHolder.put("fk_board", thread.board_id);
-			valHolder.put("kc_number", thread.kcNummer);
-			valHolder.put("url", thread.uri);
-			valHolder.put("digest", thread.digest);
-			valHolder.put("time_inserted", new Date().getTime());
-			valHolder.put("is_bookmarked", asBookmark ? 1 : 0);
-			valHolder.put("is_hidden", thread.hidden ? 1 : 0);
-			db.insert(THREAD_TABLE, null, valHolder);
+			if (getThread (thread.dbId) != null) {
+				String whereClause = "id=" + thread.dbId;
+				ContentValues valHolder = new ContentValues();
+				valHolder.put("fk_board", thread.board_id);
+				valHolder.put("kc_number", thread.kcNummer);
+				valHolder.put("last_kc_number", thread.previousLastKcNum);
+				valHolder.put("url", thread.uri);
+				valHolder.put("digest", thread.digest);
+				valHolder.put("time_inserted", new Date().getTime());
+				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
+				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
+				db.update(THREAD_TABLE, valHolder, whereClause, null);
+			} else {
+				ContentValues valHolder = new ContentValues();
+				valHolder.put("id", thread.dbId);
+				valHolder.put("fk_board", thread.board_id);
+				valHolder.put("kc_number", thread.kcNummer);
+				valHolder.put("last_kc_number", thread.previousLastKcNum);
+				valHolder.put("url", thread.uri);
+				valHolder.put("digest", thread.digest);
+				valHolder.put("time_inserted", new Date().getTime());
+				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
+				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
+				db.insert(THREAD_TABLE, null, valHolder);
+			} 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
@@ -239,10 +252,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			thread = new KCThread();
 			thread.dbId = c.getLong (c.getColumnIndex("_id")); 
 			thread.kcNummer = c.getLong (c.getColumnIndex("kc_number")); 
+			thread.previousLastKcNum = c.getLong (c.getColumnIndex("last_kc_number")); 
 			thread.uri = c.getString(c.getColumnIndex("t_url"));
 			thread.board_id = c.getLong (c.getColumnIndex("b_id")); 
 			thread.digest = c.getString(c.getColumnIndex("digest"));
 			thread.hidden = (c.getInt(c.getColumnIndex("is_hidden")) == 1);
+			thread.bookmarked = (c.getInt(c.getColumnIndex("is_bookmarked")) == 1);
 		} catch (IllegalStateException ex) {
 			System.err.print(ex.getMessage());
 		}
@@ -261,6 +276,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				" t.id _id, " +
 				" b.id b_id, " +
 				" t.kc_number, " +
+				" t.last_kc_number, "+
 				" t.url t_url, " +
 				" t.digest, " +
 				" t.is_bookmarked is_bookmarked, " +
@@ -280,6 +296,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " t.id _id, " 
 				+ " b.id b_id, " 
 				+ " t.kc_number, " 
+				+ " t.last_kc_number, "
 				+ " t.url t_url, "
 				+ " t.digest digest, "
 				+ " t.is_bookmarked is_bookmarked, "
@@ -298,6 +315,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " id integer primary key,"
 				+ " fk_board integer not null, " 
 				+ " kc_number integer not null, "
+				+ " last_kc_number integer, "
 				+ " url text not null, " 
 				+ " digest text not null, " 
 				+ " time_inserted integer not null, " 
@@ -305,6 +323,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " is_hidden integer, "
 				+" FOREIGN KEY(fk_board) REFERENCES "+BOARD_TABLE+"(id))");		
 	}
-	
-
 }

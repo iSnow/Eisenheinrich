@@ -38,9 +38,19 @@ public class KCPageParser implements Runnable {
 	private KCPostingStreamParser pParser = null;
 	private KCThreadStreamParser tParser = null;
 	private KODataListener<KCThread> threadHandler = null;
-	//private KODataListener<KCPosting> postingHandler = null;
 	private String url = null;
+	private KCThread thread;
 
+	public KCPageParser(KCThread thread) {
+		this.thread = thread;
+		this.url = thread.uri;
+		this.token = thread.uri;
+		this.boardDbId = thread.board_id;
+		pParser = new KCPostingStreamParser();
+		tParser = new KCThreadStreamParser();
+		tParser.setBoardId(boardDbId);
+		tParser.setPostingParser(pParser);
+	}
 	
 	public KCPageParser(String url, long boardDbId) {
 		this.url = url;
@@ -127,10 +137,11 @@ public class KCPageParser implements Runnable {
 					if (curChar == filter[pos]) {
 						pos++;
 						if (pos == filter.length) {
-							tParser.parse(reader);
-							/*if (null != threadHandler) {
-								threadHandler.notifyAdded(tParser.parse(reader));
-							}*/
+							if (null != thread) {
+								tParser.parse(reader, thread);
+							} else {
+								tParser.parse(reader);
+							}
 							state.curState = StateEnum.START;
 							pos = 0;
 						}

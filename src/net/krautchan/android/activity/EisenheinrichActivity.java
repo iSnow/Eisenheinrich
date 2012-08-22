@@ -93,7 +93,7 @@ public class EisenheinrichActivity extends Activity {
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		setContentView(R.layout.main_view);
 		
-		if (Eisenheinrich.GLOBALS.isDEBUG()) {
+		if (Eisenheinrich.GLOBALS.isDebugVersion()) {
 			findViewById (R.id.debug_marker).setVisibility(View.VISIBLE);
 		}
 		

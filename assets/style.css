@@ -1,7 +1,7 @@
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td {
 	border: 0;
 	outline: 0;
-	font-size: 103%;
+	font-size: 104%;
 	vertical-align: baseline;
 	background: transparent;
 	margin: 0;
@@ -45,7 +45,7 @@ table {
 
 
 
-.kc-listwrapper>ul.kc-postlist {
+.kc-listwrapper>ul#kc-postlist {
 	display: block;
 	position: absolute;
 	top: 0;
@@ -54,7 +54,7 @@ table {
 	margin: 0;
 }
 
-ul.kc-postlist>li {
+ul#kc-postlist>li {
 	list-style: none outside none;
 	position: relative;
 	line-height: 25px;
@@ -67,20 +67,20 @@ ul.kc-postlist>li {
 	padding: 0 0 0.5em 0;
 }
 
-ul.kc-postlist>li.unread {
+ul#kc-postlist>li.unread {
 
 }
 
-ul.kc-postlist>li.read {
+ul#kc-postlist>li.read {
 	display: none;
 	background-color: #red;
 }
 
-ul.kc-postlist>li.even {
+ul#kc-postlist>li.even {
 	background: transparent;
 }
 
-ul.kc-postlist>li.odd {
+ul#kc-postlist>li.odd {
 	background: #00080a;
 }
 
@@ -95,16 +95,16 @@ li>div>div.posthead {
 }
 
 /* click on postheader to cite posting */
-ul.kc-postlist>li>div>div.posthead.active {
+ul#kc-postlist>li>div>div.posthead.active {
 	background: rgba(140, 199, 8, 0.2);	
 	border: 2px solid #8cc708;	
 }
 
-ul.kc-postlist>li>div>div.posthead>div.img {
+ul#kc-postlist>li>div>div.posthead>div.img {
 	/*background: #000;*/
 }
 
-ul.kc-postlist>li>div>div.image-container {
+ul#kc-postlist>li>div>div.image-container {
 	padding-left: 10px;
 }
 

@@ -33,9 +33,7 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 	};
 	private char[] omittedInfo = "<span class=\"omittedinfo\">".toCharArray();
 	
-	@Override
-	public KCThread parse(Reader reader) throws Exception {
-		KCThread thread = new KCThread();
+	public KCThread parse(Reader reader, KCThread thread) throws Exception {
 		thread.board_id = boardDbId;
 		pParser.setBasePath(resolverPath);
 		char threadFilter[] = startTags[0];
@@ -91,6 +89,11 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 		pParser.notifyDone();
 		handler.notifyAdded(thread, token);
 		return thread;
+	}	
+	
+	@Override
+	public KCThread parse(Reader reader) throws Exception {
+		return parse (reader, new KCThread());
 	}	
 
 	public void setPostingParser(KCPostingStreamParser parser) {

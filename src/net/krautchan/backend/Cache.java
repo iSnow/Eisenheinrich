@@ -27,7 +27,7 @@ import net.krautchan.data.*;
 * limitations under the License.
 */
 
-public class Cache<T extends KrautObject> {
+public class Cache<T extends KrautObject> implements KODataListener<T> {
 	private ConcurrentLinkedQueue<T> krautObjects = new ConcurrentLinkedQueue<T>();
 	private int capacity = 200;
 
@@ -88,6 +88,23 @@ public class Cache<T extends KrautObject> {
 		for (int i = sorter.size()-1; i > numEntriesToRemove; i--) {
 			krautObjects.remove(sorter.get(i));
 		}
+	}
+
+	@Override
+	public void notifyAdded(T item, Object token) {
+		add(item);
+	}
+
+	@Override
+	public void notifyDone(Object token) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notifyError(Exception ex, Object token) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

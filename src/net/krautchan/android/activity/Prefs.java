@@ -54,7 +54,7 @@ public class Prefs extends Activity {
 		@Override
 		public void run() {
 			try {
-				Map<String, KCBoard> boards = KCBoardListParser.getBoardList("http://krautchan.net/nav", "http://krautchan.net/", Eisenheinrich.GLOBALS.getUSER_AGENT());
+				Map<String, KCBoard> boards = KCBoardListParser.getBoardList("http://krautchan.net/nav", "http://krautchan.net/", Eisenheinrich.GLOBALS.getUserAgentString());
 				ArrayList<KCBoard> boardL = new ArrayList<KCBoard>();
 				
 				for (Entry<String, KCBoard> entry : boards.entrySet()) {

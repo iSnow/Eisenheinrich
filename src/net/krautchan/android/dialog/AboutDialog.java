@@ -69,9 +69,9 @@ public class AboutDialog {
 
 		EditText et = (EditText)dlg.findViewById(R.id.ip_number);
 		EditText kt = (EditText)dlg.findViewById(R.id.komtur_code);
-		if (null != Eisenheinrich.GLOBALS.getIP_NUMBER()) {
-			et.setText(Eisenheinrich.GLOBALS.getIP_NUMBER());
-			kt.setText(Eisenheinrich.GLOBALS.getKOMTUR_CODE());
+		if (null != Eisenheinrich.GLOBALS.getIpNumber()) {
+			et.setText(Eisenheinrich.GLOBALS.getIpNumber());
+			kt.setText(Eisenheinrich.GLOBALS.getKomturCode());
 		} else {
 			et.setVisibility(View.GONE);
 			kt.setVisibility(View.GONE);
@@ -91,7 +91,7 @@ public class AboutDialog {
 
 		@Override
 		public void onClick(DialogInterface arg0, int arg1) {
-			Eisenheinrich.GLOBALS.setKOMTUR_CODE(((EditText)dlg.findViewById(R.id.komtur_code)).getText().toString());
+			Eisenheinrich.GLOBALS.setKomturCode(((EditText)dlg.findViewById(R.id.komtur_code)).getText().toString());
 		}
 		
 	}

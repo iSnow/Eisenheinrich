@@ -36,11 +36,17 @@ public class KCThread extends KrautObject {
 	public Long lastPostDate = null;
 	public String digest = null;
 	public boolean hidden = false;
-	public transient Long previousLastKcNum = null;
+	public boolean bookmarked = false;
+	public Long previousLastKcNum = null;
 	public transient int numPostings = 0;
 	private Map<Long, KCPosting>  postings = new TreeMap<Long, KCPosting>();
 	
 	public KCThread () {
+	}
+	
+	public KCThread (String uri) {
+		this.uri = uri;
+		dbId = (long)uri.hashCode();
 	}
 	
 	public synchronized KCPosting getPosting (Long id) {
@@ -71,17 +77,16 @@ public class KCThread extends KrautObject {
 	}
 	
 	public synchronized void addPosting (KCPosting posting) {
-		if (null == uri) {
+		if (null == kcNummer) {
 			kcNummer = posting.kcNummer;
 			firstPostDate = posting.created;
 			makeDigest (posting);
+		}
+		if (null == uri) {
 			uri = posting.uri;
-			//Assert.assertFalse(uri.startsWith("#"));
-			//dbId = (long)(baseUrl+"board/"+board_id+"/thread/"+kcNummer).hashCode();
-			if (null != uri) {
-				dbId = (long)uri.hashCode();
-			} 
-			Assert.assertNotNull(dbId);
+		}
+		if (null == dbId) {
+			dbId = (long)uri.hashCode();
 		}
 		if (null == digest) {
 			makeDigest (posting);
@@ -91,7 +96,11 @@ public class KCThread extends KrautObject {
 		if (!postings.containsKey(id)) {
 			posting.threadId = dbId;
 			postings.put(id, posting);
-		}	
+		}
+		if ((null != previousLastKcNum) && (previousLastKcNum < posting.kcNummer)) {
+			previousLastKcNum = posting.kcNummer;
+		}
+		Assert.assertNotNull(dbId);	
 	}
 	
 	public void recalc () {

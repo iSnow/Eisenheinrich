@@ -64,7 +64,7 @@ public class KCBoardListActivity extends ListActivity {
 		// TODO Move part of the code into the DatabaseHelper, no need to copy between collection and map all the time
 		boolean gotBoards = false;
 		Eisenheinrich.getInstance();
-		Cache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBOARD_CACHE();
+		Cache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
 		try {
 			boards = new LinkedHashMap<String, KCBoard>();
 			Collection<KCBoard> boardL = Eisenheinrich.getInstance().dbHelper.getBoards();
@@ -162,7 +162,7 @@ public class KCBoardListActivity extends ListActivity {
 				);
 			t.start();
 			
-			BanCheck bc = new BanCheck(Eisenheinrich.GLOBALS.getBOARD_CACHE().get(curBoard.dbId), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.GLOBALS);
+			BanCheck bc = new BanCheck(Eisenheinrich.GLOBALS.getBoardCache().get(curBoard.dbId), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.GLOBALS);
 			bc.check4Ban();
 
 			Bundle b = new Bundle();

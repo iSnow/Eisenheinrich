@@ -18,34 +18,24 @@ package net.krautchan.android;
 
 
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import com.osbcp.cssparser.CSSParser;
-import com.osbcp.cssparser.Rule;
-
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
-import net.krautchan.android.network.CookieHelper;
 import net.krautchan.android.network.PostVariables;
-import net.krautchan.backend.Cache;
 import net.krautchan.backend.DatabaseHelper;
-import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
@@ -67,13 +57,12 @@ public class Eisenheinrich extends Application {
 	private static Eisenheinrich sInstance;
 	public DatabaseHelper dbHelper = new DatabaseHelper (this);
 	private static List<KODataListener<KCThread>> tListeners = new ArrayList<KODataListener<KCThread>>();
-	private static ConcurrentLinkedQueue<KCThread> threadQ = new ConcurrentLinkedQueue<KCThread>();
-	private static KODataListener<KCThread> threadListener = new KODataListener<KCThread>() {
+	private KODataListener<KCThread> threadListener = new KODataListener<KCThread>() {
 		@Override
 		public void notifyAdded(KCThread item, Object token) {
-			threadQ.add(item);
 			for (KODataListener<KCThread> listener: tListeners) {
 				listener.notifyAdded(item, token);
+				dbHelper.persistThread(item);
 			}
 		}
 
@@ -97,7 +86,6 @@ public class Eisenheinrich extends Application {
 	private static KODataListener<KCPosting> postListener = new KODataListener<KCPosting>() {
 		@Override
 		public void notifyAdded(KCPosting item, Object token) {
-			//threadQ.add(item);
 			for (KODataListener<KCPosting> listener: pListeners) {
 				listener.notifyAdded(item, token);
 			}
@@ -117,6 +105,7 @@ public class Eisenheinrich extends Application {
 			}
 		}
 	};
+	
 
 	public static AsyncPosterPeer posterPeer = new AsyncPosterPeer() {
 		private PostVariables vars;
@@ -145,6 +134,9 @@ public class Eisenheinrich extends Application {
 	public void onCreate() {
 		super.onCreate();  
 		GLOBALS = new Globals(readSettings());
+		tListeners.add(GLOBALS.getThreadCache());
+		Collection<KCThread> storedThreads = dbHelper.getAllThreads();
+		GLOBALS.getThreadCache().add(storedThreads);
 		sInstance = this;
 		sInstance.initializeInstance();
 	}
@@ -180,8 +172,8 @@ public class Eisenheinrich extends Application {
 	}
 
 	protected void initializeInstance() {
-		GLOBALS.getBOARD_CACHE().add(dbHelper.getBoards());
-		GLOBALS.setUSER_AGENT(getUserAgentString ());
+		GLOBALS.getBoardCache().add(dbHelper.getBoards());
+		GLOBALS.setUserAgentString(getUserAgentString ());
 		hasImagesDir = FileHelpers.createSDDirectory(DEFAULTS.IMAGE_DIR);
 		STYLES = new Styles(this);
 		/*sessionHandler = new SessionHandler( 
@@ -204,10 +196,6 @@ public class Eisenheinrich extends Application {
 			}
 		}
 		return false;
-	}
-
-	public ConcurrentLinkedQueue<KCThread> getThreadQueue () {
-		return threadQ;
 	}
 
 	public KODataListener<KCThread> getThreadListener () {
@@ -280,8 +268,43 @@ public class Eisenheinrich extends Application {
 		// in milliseconds which is the timeout for waiting for data.
 		int timeoutSocket = 10000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-		httpParameters.setParameter( "http.useragent", GLOBALS.getUSER_AGENT());
+		httpParameters.setParameter( "http.useragent", GLOBALS.getUserAgentString());
 		DefaultHttpClient httpclient = new DefaultHttpClient(httpParameters);
 		return httpclient;
 	}
+	
+	/*private class KCThreadListener implements  KODataListener<KCPosting> {
+		private KCThread thread = null;
+		private List<KODataListener<KCPosting>> pListeners;
+		
+		public KCThreadListener(KCThread thread, List<KODataListener<KCPosting>> pListeners) {
+			super();
+			this.thread = thread;
+			this.pListeners = pListeners;
+		}
+
+		@Override
+		public void notifyAdded(KCPosting item, Object token) {
+			for (KODataListener<KCPosting> listener: pListeners) {
+				thread.addPosting(item);
+				listener.notifyAdded(item, token);
+			}
+		}
+
+		@Override
+		public void notifyDone(Object token) {
+			for (KODataListener<KCPosting> listener: pListeners) {
+				thread.recalc();
+				listener.notifyDone(token);
+			}
+		}
+
+		@Override
+		public void notifyError(Exception ex, Object token) {
+			for (KODataListener<KCPosting> listener: pListeners) {
+				listener.notifyError(ex, token);
+			}
+		}
+		
+	}*/
 }

@@ -88,7 +88,7 @@ public class KCPostActivity extends Activity {
 	    try {
 			in = new ObjectInputStream(bitch);
 		    params = (PostActivityParams)in.readObject();
-		    KCBoard board = Eisenheinrich.GLOBALS.getBOARD_CACHE().get(params.curBoardDbId);
+		    KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(params.curBoardDbId);
 		    vars.boardName = board.shortName;
 		    if (null != params.curThreadKCNum) {
 		    	vars.threadNumber = params.curThreadKCNum.toString();
@@ -157,7 +157,7 @@ public class KCPostActivity extends Activity {
 			    	poster.postInThread();
 			    }
 		    });
-		    if (Eisenheinrich.GLOBALS.getBOARD_CACHE().get(params.curBoardDbId).banned) {
+		    if (Eisenheinrich.GLOBALS.getBoardCache().get(params.curBoardDbId).banned) {
 		    	
 		    }
 		    final Button cancelButton = (Button)findViewById(R.id.cancel_button);

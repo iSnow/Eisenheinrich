@@ -53,16 +53,19 @@ public class ActivityHelpers {
 	public static void switchToThread(KCThread thread, Activity context) {
 		Bundle b = new Bundle();
 		b.putString("token", thread.uri);
-		b.putLong("threadId", thread.kcNummer);
+		if (null != thread.dbId) {
+			b.putLong("threadId", thread.dbId);
+		}
+		b.putLong("threadKcNum", thread.kcNummer);
 		b.putLong("boardId", thread.board_id);
 		int progInc = (thread.numPostings == 0) ? 5 : (100/thread.numPostings);
 		if (progInc == 0) {
 			progInc = 1;
 		}
 		b.putInt("progressIncrement", progInc);
-		b.putBoolean("visitedPostsCollapsible", false);
+		b.putBoolean("visitedPostsCollapsible", true);
 
-		Thread t = new Thread(new KCPageParser(thread.uri, thread.board_id)
+		Thread t = new Thread(new KCPageParser(thread)
 				.setBasePath("http://krautchan.net/")
 				.setThreadHandler(
 						Eisenheinrich.getInstance().getThreadListener())
@@ -74,28 +77,6 @@ public class ActivityHelpers {
 		intent.putExtras(b);
 		context.startActivity(intent);
 	}
-	
-	/*@Deprecated
-	public static void switchToThread(long kcNummer, String boardShortName, Long boardId, Activity context) {
-		
-		Bundle b = new Bundle();
-		b.putLong("threadId", kcNummer);
-		b.putString("boardName", boardShortName);
-		b.putLong("boardId", boardId);
-		b.putBoolean("visitedPostsCollapsible", false);
-
-		Thread t = new Thread(new KCPageParser("http://krautchan.net/" + boardShortName + "/thread-" + kcNummer + ".html", boardId)
-				.setBasePath("http://krautchan.net/")
-				.setThreadHandler(
-						Eisenheinrich.getInstance().getThreadListener())
-				.setPostingHandler(
-						Eisenheinrich.getInstance().getPostListener()));
-		t.start();
-
-		Intent intent = new Intent(context, KCThreadViewActivity.class);
-		intent.putExtras(b);
-		context.startActivity(intent);
-	}*/
 
 	public static void createThreadMask(KCThread curThread, long boardDbId, String contentPreset, Activity context) {
 		PostActivityParams params = new PostActivityParams();
@@ -127,13 +108,8 @@ public class ActivityHelpers {
 		ImageButton[] buttons = new ImageButton[numColumns];
 		TableRow row = new TableRow(parent);
 		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		//int dip = (int) (60 * scale + 0.5f);
 		for (int j = 0; j < numColumns; j++) {
 			ImageButton bt = new ImageButton(parent);
-			//RelativeLayout.LayoutParams shareParams = new RelativeLayout.LayoutParams(60, 60);
-			//bt.setLayoutParams(shareParams);
-
-			//bt.setVisibility(View.GONE);
 			buttons[j] = bt;
 			bt.setImageDrawable(parent.getResources().getDrawable(R.drawable.icon));
 			bt.setBackgroundDrawable(parent.getResources().getDrawable(R.drawable.button));

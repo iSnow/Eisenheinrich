@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest package="net.krautchan" 
 	xmlns:android="http://schemas.android.com/apk/res/android" 
-	android:versionName='2.0 "Katzenklavier"' 
+	android:versionName='2.0 "Kuhmagnet"' 
 	android:versionCode="27">
 	<uses-sdk android:minSdkVersion="8" 
 	    android:targetSdkVersion="10"/>
