@@ -116,8 +116,6 @@ public class KCThreadListActivity extends Activity {
 	    };
 		try {
 		    token = b.getString("token");
-			long boardId = b.getLong("boardId");
-			final KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(boardId);
 			in = new ObjectInputStream(bitch);
 		    curBoard = (KCBoard)in.readObject();
 		    Timer tm = new Timer();

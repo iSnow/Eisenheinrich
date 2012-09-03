@@ -19,10 +19,9 @@ package net.krautchan.android.activity;
 import java.io.*;
 import java.util.*;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import junit.framework.Assert;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -51,7 +50,6 @@ import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.helpers.FileContentProvider;
 import net.krautchan.android.helpers.ActivityHelpers;
-import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.helpers.HtmlCreator;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
@@ -59,6 +57,7 @@ import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
 import net.krautchan.parser.KCPageParser;
 
+@SuppressLint("SetJavaScriptEnabled")
 public class KCThreadViewActivity extends Activity {
 	private static final String 	TAG = "KCThreadViewActivity";
 	private PostingListener 		pListener = new PostingListener();
@@ -66,17 +65,13 @@ public class KCThreadViewActivity extends Activity {
 	private static String 			template = null;
 	private int						progressIncrement = 5;
 	private WebView 				webView;
-	private boolean					webViewBack = true;
 	private Handler 				mHandler = new Handler();
 	private String 					boardName = null;
-	//private Long 					boardId = null;
 	private KCThread 				thread = null;
 	private String					token;
 	private boolean 				javascriptInterfaceBroken = false;
 	private Handler 				progressHandler = null;
 	private boolean					pageFinished = false;
-	//private boolean					backlogRendered = false;
-	private boolean					firstPostRendered = false;
 	private boolean 				visitedPostsAreCollapsed = true;
 
 	@Override
@@ -389,7 +384,6 @@ public class KCThreadViewActivity extends Activity {
 			if ((null != thread) && (thread.getSortedPostings().iterator().hasNext())) {
 				KCPosting posting = thread.getSortedPostings().iterator().next();
 				renderPosting (posting, false, false, true);
-				firstPostRendered = true;
 			}
 		}
 	} 

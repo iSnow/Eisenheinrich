@@ -16,11 +16,9 @@ package net.krautchan.data;
 * limitations under the License.
 */
 
-import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

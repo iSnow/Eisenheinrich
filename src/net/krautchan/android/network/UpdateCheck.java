@@ -25,7 +25,6 @@ import org.apache.http.client.methods.HttpGet;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
 
 public class UpdateCheck {
 	private final UpdateCheckPeer peer;

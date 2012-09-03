@@ -15,9 +15,7 @@ import android.os.Build;
 import android.widget.Toast;
 
 import com.osbcp.cssparser.CSSParser;
-import com.osbcp.cssparser.PropertyValue;
 import com.osbcp.cssparser.Rule;
-import com.osbcp.cssparser.Selector;
 
 public class Styles {
 	private List<Rule>  cssRules;

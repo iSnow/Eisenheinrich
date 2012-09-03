@@ -16,7 +16,6 @@ package net.krautchan.android.dialog;
  * limitations under the License.
  */
 
-import java.io.IOException;
 import net.krautchan.R;
 import android.app.Activity;
 import android.app.AlertDialog;

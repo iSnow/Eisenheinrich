@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private final static int 	VERSION_NUM 	=  5;
 	private static final String BOARD_TABLE		= "board";
 	private static final String THREAD_TABLE	= "thread";
+	@SuppressWarnings("unused")
 	private static boolean debug = false;
 
 	public DatabaseHelper(Context context) {
@@ -124,9 +125,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	public void deleteThread(Long dbId) {
 		SQLiteDatabase db = getReadableDatabase();
-		/*String query = "delete from "
-			+THREAD_TABLE+" where id = "+dbId.toString();
-		db.rawQuery(query,  null);*/
 		db.delete(THREAD_TABLE, "ID="+dbId, null);
 	}
 	

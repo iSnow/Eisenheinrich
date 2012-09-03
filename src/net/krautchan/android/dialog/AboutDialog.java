@@ -17,7 +17,6 @@ package net.krautchan.android.dialog;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.Globals;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;

@@ -24,10 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.helpers.ActivityHelpers;
@@ -38,7 +35,6 @@ import net.krautchan.android.network.PostVariables;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.PostActivityParams;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;

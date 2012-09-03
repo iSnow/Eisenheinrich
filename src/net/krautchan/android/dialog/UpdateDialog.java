@@ -1,9 +1,10 @@
 package net.krautchan.android.dialog;
 
 import net.krautchan.R;
-import net.krautchan.android.Eisenheinrich;
-
+import net.krautchan.android.Defaults;
 import android.app.Activity;
+
+
 /*
 * Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
 *
@@ -41,7 +42,7 @@ public class UpdateDialog {
         .setPositiveButton (android.R.string.yes, new OnClickListener () {
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
-				Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(Eisenheinrich.DEFAULTS.UPDATE_PAGE));
+				Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(Defaults.UPDATE_PAGE));
 				try {
 					parent.startActivity(browser);
 				} catch (ActivityNotFoundException ex) {

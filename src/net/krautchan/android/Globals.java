@@ -4,10 +4,6 @@ import java.util.Properties;
 
 import org.apache.http.cookie.Cookie;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
-
 import net.krautchan.backend.Cache;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;

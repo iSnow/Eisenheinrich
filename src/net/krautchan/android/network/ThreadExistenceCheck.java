@@ -16,21 +16,16 @@ package net.krautchan.android.network;
 * limitations under the License.
 */
 
-import java.io.IOException;
 import java.util.Collection;
 
 import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
-import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.util.EntityUtils;
 
 public class ThreadExistenceCheck  {
 	private ThreadExistencePeer peer;
@@ -51,7 +46,6 @@ public class ThreadExistenceCheck  {
 		new Thread(new Runnable() {
 			public void run() {
 				httpClient = Eisenheinrich.getInstance().getHttpClient();
-				boolean[] results = new boolean[threads.size()];
 				int count = 0;
 				for (KCThread thread: threads) {
 					HttpHead req = new HttpHead(Defaults.BASE_URL+thread.uri);
@@ -63,19 +57,13 @@ public class ThreadExistenceCheck  {
 						if (res.getEntity() != null ) {
 							res.getEntity().consumeContent();
 						}
-					} catch (ConnectTimeoutException e) {
-						results[count] = true; //presume thread still exists
-						e.printStackTrace();
-					} catch (ClientProtocolException e) {
-						results[count] = true; //presume thread still exists
-						e.printStackTrace();
-					} catch (IOException e) {
-						results[count] = true; //presume thread still exists
-						e.printStackTrace();
-					}
+					} catch (Exception e) {
+						// if we run into an exception (eg. timeout), assume the 
+						// thread still exists and hope for a successful check next time
+						peer.threadChecked(thread, true);
+					} 
 					count++;
 				}
-				//peer.threadsChecked(results);
 				try {
 					Thread.sleep(delay);
 				} catch (InterruptedException e) {}

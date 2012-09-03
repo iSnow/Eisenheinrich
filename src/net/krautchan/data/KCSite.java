@@ -15,6 +15,7 @@ package net.krautchan.data;
 * limitations under the License.
 */
 public class KCSite extends KrautObject {
+	private static final long serialVersionUID = 7886903218291316265L;
 	public String name;
 	public String baseUrl;
 	

@@ -23,6 +23,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 
 import android.content.ContentProvider;
@@ -51,14 +53,14 @@ public class FileContentProvider extends ContentProvider {
 		String filePath = null;
 		File result = null;
 		try {
-			final String url = Eisenheinrich.DEFAULTS.FILE_PATH + uri.getPath();
+			final String url = Defaults.FILE_PATH + uri.getPath();
 			HttpClient client = Eisenheinrich.getInstance().getHttpClient();
 			HttpGet request = new HttpGet(url); 
 			HttpResponse response = client.execute(request);
 			Log.v(TAG, "GET response: " + response.getStatusLine());
 			HttpEntity responseEntity = response.getEntity();
 			InputStream st = responseEntity.getContent();
-			filePath = Eisenheinrich.DEFAULTS.IMAGE_DIR+"/"+uri.getPath().replace("/", "");
+			filePath = Defaults.IMAGE_DIR+"/"+uri.getPath().replace("/", "");
 			FileHelpers.writeToSDFile(filePath, st) ;
 			st.close(); 
 		} catch (Exception e) {
