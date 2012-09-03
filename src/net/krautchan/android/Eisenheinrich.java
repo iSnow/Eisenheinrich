@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,6 +36,8 @@ import org.apache.http.params.HttpParams;
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
 import net.krautchan.android.network.PostVariables;
+import net.krautchan.android.network.ThreadExistenceCheck;
+import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
 import net.krautchan.backend.DatabaseHelper;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
@@ -47,8 +50,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.util.Log;
 
 public class Eisenheinrich extends Application {
+	private static final String 	TAG = "Eisenheinrich";
 	public static Defaults DEFAULTS = new Defaults();
 	public static Globals  GLOBALS = null;
 	public static Styles   STYLES; 
@@ -132,13 +137,42 @@ public class Eisenheinrich extends Application {
 
 	@Override
 	public void onCreate() {
-		super.onCreate();  
+		super.onCreate(); 
 		GLOBALS = new Globals(readSettings());
+		dbHelper.setDebug(GLOBALS.isDebugVersion());
 		tListeners.add(GLOBALS.getThreadCache());
-		Collection<KCThread> storedThreads = dbHelper.getAllThreads();
+		final Collection<KCThread> storedThreads = dbHelper.getAllThreads();
 		GLOBALS.getThreadCache().add(storedThreads);
 		sInstance = this;
 		sInstance.initializeInstance();
+		ThreadExistenceCheck t = new ThreadExistenceCheck (storedThreads, new ThreadExistencePeer() {
+			
+			/*public void threadsChecked(KCThread thread, boolean valid) {
+				Iterator<KCThread> iter = storedThreads.iterator();
+				for (int i = 0; i < storedThreads.size(); i++) {
+					KCThread curThread = iter.next();
+					if (!valid[i]) {
+						dbHelper.deleteThread(curThread.dbId);
+						if (GLOBALS.isDebugVersion()) {
+							Log.d(TAG+" Deleting ("+i+"): Thread "+curThread.firstPostDate+" - "+curThread.kcNummer+" - "+curThread.uri+" - "+curThread.digest, curThread.dbId+"");
+						}
+					}
+				}
+			}*/
+
+			@Override
+			public void threadChecked(KCThread thread, boolean valid) {
+				if (!valid) {
+					dbHelper.deleteThread(thread.dbId);
+					if (GLOBALS.isDebugVersion()) {
+						Log.d(TAG+" Deleting : Thread "+thread.firstPostDate+" - "+thread.kcNummer+" - "+thread.uri+" - "+thread.digest, thread.dbId+"");
+					}
+				}
+			}
+
+		});
+		t.setDelay(500);
+		t.checkThreads();
 	}
 	
 	private Properties readSettings() {
@@ -174,10 +208,8 @@ public class Eisenheinrich extends Application {
 	protected void initializeInstance() {
 		GLOBALS.getBoardCache().add(dbHelper.getBoards());
 		GLOBALS.setUserAgentString(getUserAgentString ());
-		hasImagesDir = FileHelpers.createSDDirectory(DEFAULTS.IMAGE_DIR);
+		hasImagesDir = FileHelpers.createSDDirectory(Defaults.IMAGE_DIR);
 		STYLES = new Styles(this);
-		/*sessionHandler = new SessionHandler( 
-            this.getSharedPreferences( "PREFS_PRIVATE", Context.MODE_PRIVATE ) );*/
 	}
 
 	public boolean isNetworkAvailable() {
@@ -262,49 +294,14 @@ public class Eisenheinrich extends Application {
 	public DefaultHttpClient getHttpClient () {
 		HttpParams httpParameters = new BasicHttpParams();
 		// Set the timeout in milliseconds until a connection is established.
-		int timeoutConnection = 3000;
+		int timeoutConnection = 10000;
 		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 		// Set the default socket timeout (SO_TIMEOUT) 
 		// in milliseconds which is the timeout for waiting for data.
-		int timeoutSocket = 10000;
+		int timeoutSocket = 20000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 		httpParameters.setParameter( "http.useragent", GLOBALS.getUserAgentString());
 		DefaultHttpClient httpclient = new DefaultHttpClient(httpParameters);
 		return httpclient;
 	}
-	
-	/*private class KCThreadListener implements  KODataListener<KCPosting> {
-		private KCThread thread = null;
-		private List<KODataListener<KCPosting>> pListeners;
-		
-		public KCThreadListener(KCThread thread, List<KODataListener<KCPosting>> pListeners) {
-			super();
-			this.thread = thread;
-			this.pListeners = pListeners;
-		}
-
-		@Override
-		public void notifyAdded(KCPosting item, Object token) {
-			for (KODataListener<KCPosting> listener: pListeners) {
-				thread.addPosting(item);
-				listener.notifyAdded(item, token);
-			}
-		}
-
-		@Override
-		public void notifyDone(Object token) {
-			for (KODataListener<KCPosting> listener: pListeners) {
-				thread.recalc();
-				listener.notifyDone(token);
-			}
-		}
-
-		@Override
-		public void notifyError(Exception ex, Object token) {
-			for (KODataListener<KCPosting> listener: pListeners) {
-				listener.notifyError(ex, token);
-			}
-		}
-		
-	}*/
 }

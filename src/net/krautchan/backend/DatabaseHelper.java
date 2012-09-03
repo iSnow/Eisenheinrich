@@ -35,15 +35,25 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+	private static final String TAG = "DatabaseHelper";
 	private final static String	DBASE_NAME 		= "Schlaubernd";
-	private final static int 	VERSION_NUM 	=  4;
+	private final static int 	VERSION_NUM 	=  5;
 	private static final String BOARD_TABLE		= "board";
 	private static final String THREAD_TABLE	= "thread";
+	private static boolean debug = false;
 
 	public DatabaseHelper(Context context) {
 		super(context, DBASE_NAME, null, VERSION_NUM); 
+	}
+	
+	public void setDebug (boolean debug) {
+		DatabaseHelper.debug = debug;
+		if (debug) {
+			logDbStats();
+		}
 	}
 
 	@Override
@@ -114,9 +124,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	public void deleteThread(Long dbId) {
 		SQLiteDatabase db = getReadableDatabase();
-		String query = "delete from "
-			+THREAD_TABLE+"  where id = ?";
-		db.rawQuery(query,  new String[]{dbId.toString()});
+		/*String query = "delete from "
+			+THREAD_TABLE+" where id = "+dbId.toString();
+		db.rawQuery(query,  null);*/
+		db.delete(THREAD_TABLE, "ID="+dbId, null);
 	}
 	
 	public void bookmarkThread (KCThread thread) {
@@ -155,6 +166,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("kc_number", thread.kcNummer);
 				valHolder.put("last_kc_number", thread.previousLastKcNum);
 				valHolder.put("url", thread.uri);
+				valHolder.put("first_post_date", thread.firstPostDate);
 				valHolder.put("digest", thread.digest);
 				valHolder.put("time_inserted", new Date().getTime());
 				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
@@ -167,6 +179,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("kc_number", thread.kcNummer);
 				valHolder.put("last_kc_number", thread.previousLastKcNum);
 				valHolder.put("url", thread.uri);
+				valHolder.put("first_post_date", thread.firstPostDate);
 				valHolder.put("digest", thread.digest);
 				valHolder.put("time_inserted", new Date().getTime());
 				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
@@ -255,6 +268,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			thread.previousLastKcNum = c.getLong (c.getColumnIndex("last_kc_number")); 
 			thread.uri = c.getString(c.getColumnIndex("t_url"));
 			thread.board_id = c.getLong (c.getColumnIndex("b_id")); 
+			thread.firstPostDate = c.getLong (c.getColumnIndex("first_post_date"));
 			thread.digest = c.getString(c.getColumnIndex("digest"));
 			thread.hidden = (c.getInt(c.getColumnIndex("is_hidden")) == 1);
 			thread.bookmarked = (c.getInt(c.getColumnIndex("is_bookmarked")) == 1);
@@ -279,6 +293,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				" t.last_kc_number, "+
 				" t.url t_url, " +
 				" t.digest, " +
+				" t.first_post_date first_post_date, "+
 				" t.is_bookmarked is_bookmarked, " +
 				" t.is_hidden is_hidden " +
 				" from "
@@ -299,6 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " t.last_kc_number, "
 				+ " t.url t_url, "
 				+ " t.digest digest, "
+				+ " t.first_post_date first_post_date, " 
 				+ " t.is_bookmarked is_bookmarked, "
 				+ " t.is_hidden is_hidden "
 			+"from "+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
@@ -318,9 +334,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " last_kc_number integer, "
 				+ " url text not null, " 
 				+ " digest text not null, " 
+				+ " first_post_date integer not null, " 
 				+ " time_inserted integer not null, " 
 				+ " is_bookmarked integer, " 
 				+ " is_hidden integer, "
-				+" FOREIGN KEY(fk_board) REFERENCES "+BOARD_TABLE+"(id))");		
+				+" FOREIGN KEY(fk_board) REFERENCES "+BOARD_TABLE+"(id))");	
+	}
+	
+	public void logDbStats () {
+		Collection<KCBoard> boards = getBoards ();
+		Log.d(TAG, "Number of Boards: "+boards.size());
+		for (KCBoard board : boards) {
+			Log.d (TAG, " Board "+board.shortName +" - "+board.name);
+		}
+		Collection<KCThread> threads = getAllThreads();
+		for (KCThread thread : threads) {
+			Log.d(TAG, " Thread "+thread.dbId+" - "+thread.kcNummer+" - "+thread.uri+" - "+thread.digest); 
+		}
+		Log.d(TAG, "Number of Threads: "+threads.size());
 	}
 }

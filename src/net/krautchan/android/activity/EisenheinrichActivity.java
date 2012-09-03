@@ -47,8 +47,8 @@ import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.helpers.FileHelpers;
-import net.krautchan.android.network.BookmarkCheck;
-import net.krautchan.android.network.BookmarkCheck.BookmarkTesterPeer;
+import net.krautchan.android.network.ThreadExistenceCheck;
+import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
 import net.krautchan.android.network.CookieHelper;
 import net.krautchan.android.network.UpdateCheck;
 import net.krautchan.android.network.UpdateCheck.UpdateCheckPeer;
@@ -134,17 +134,18 @@ public class EisenheinrichActivity extends Activity {
 		if (null != table) {
 			table.removeAllViews();
 			Collection <KCThread> threads = Eisenheinrich.getInstance().dbHelper.getBookmarks();
-			BookmarkTesterPeer bmp = new BookmarkPeer(threads);
-			BookmarkCheck bmc = new BookmarkCheck(threads, bmp);
-			bmc.checkBookmarks();
+			ThreadExistencePeer bmp = new BookmarkPeer(threads);
+			ThreadExistenceCheck bmc = new ThreadExistenceCheck(threads, bmp);
+			bmc.checkThreads();
 		}
 	}
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+		Process.killProcess(Process.myPid());
+		/*super.onBackPressed();
 		Eisenheinrich.getInstance().dbHelper.close();
-		this.finish();
+		this.finish();*/
 	}
 	
 	public void showBookmarks (Collection <KCThread> bookmarks, boolean[] valid) {
@@ -162,10 +163,14 @@ public class EisenheinrichActivity extends Activity {
 			}
 			count++;
 		}
-		int numThreads = validBookmarks.size();
-		if (numThreads == 0) {
+		showBookmarks (validBookmarks);
+	}
+	
+	public void showBookmarks (Collection <KCThread> validBookmarks) {
+		if (validBookmarks.isEmpty()) {
 			return;
 		}
+		int numThreads = validBookmarks.size();
 		final int maxNumColumns = 3;
 		int numCols = maxNumColumns;
 		// try to get an even distribution of cols and rows
@@ -185,7 +190,6 @@ public class EisenheinrichActivity extends Activity {
 			addBookmarksRow (iter, numCols, table);
 		}
 	}
-	
 	
 	private void addBookmarksRow (Iterator<KCThread> iter, int numColumns, TableLayout table) {
 		if ((null == table)|| (null == iter)){
@@ -267,15 +271,21 @@ public class EisenheinrichActivity extends Activity {
 		}
 	}
 	
-	private class BookmarkPeer implements BookmarkTesterPeer  {
-		private final Collection <KCThread> bookmarks;
+	private class BookmarkPeer implements ThreadExistencePeer  {
+		//private final Collection <KCThread> bookmarks;
+		private Long lastId;
+		private final Collection <KCThread> valids = new HashSet<KCThread>();
 		
 		public BookmarkPeer(Collection<KCThread> bookmarks) {
 			super();
-			this.bookmarks = bookmarks;
+			Iterator<KCThread> iter = bookmarks.iterator();
+			while (iter.hasNext()) {
+				lastId = iter.next().dbId;
+			}
+			//this.bookmarks = bookmarks;
 		}
 
-		@Override
+		/*@Override
 		public void threadsChecked(final boolean[] valid) {
 			EisenheinrichActivity.this.runOnUiThread(new Runnable () {
 				@Override
@@ -284,6 +294,23 @@ public class EisenheinrichActivity extends Activity {
 				}
 		    }); 
 			
+		}*/
+
+		@Override
+		public void threadChecked(KCThread thread, boolean valid) {
+			if (valid) {
+				valids.add(thread);
+			}
+			if (null != lastId) {
+				if (thread.dbId.longValue() == lastId.longValue()) {
+					EisenheinrichActivity.this.runOnUiThread(new Runnable () {
+						@Override
+						public void run() {	
+							showBookmarks (valids);
+						}
+				    }); 
+				}
+			}
 		}
 	};
 	

@@ -3,7 +3,8 @@ function quoteReply (elem) {
 	setTimeout(function(){
 		$('.active').removeClass('active');
 	},200);
-	while (!elem.id){
+	while (elem.nodeName != "LI"){
+		Android.debugString (">>>>TAG "+elem.getTagName);
 		elem = elem.parentNode;
 	}
 	if (elem != undefined) {
@@ -24,7 +25,7 @@ function quoteClick (elem) {
 	var segments = href.split("/");
 	var id = segments[segments.length - 1];
 	var div = cloneNode (id, offset.top);
-	Android.debugString ($(div).html())
+	//Android.debugString ($(div).html());
 	var cButton = $(div).prepend('<p class="closebutton">close</p>');
 	$('#quoteoverlay').click (function() {
 		Android.debugString ($(this).html())
@@ -93,29 +94,31 @@ function getRule (ruleName) {
 
 function markAllPostingsRead () {
 	$('ul#kc-postlist>li').removeClass('read').removeClass('unread').addClass('read');
-	$('ul#kc-postlist>li#first').removeClass('read');
+	$('li#first').removeClass('read');
 	$('ul#kc-postlist>li.read').hide();
 }
 
 function appendPost (content, className, id) {
-	if (content != undefined) {
-		var d = document.createElement("li");
-		d.className = d.className + " " + className;
-		d.innerHTML = content;
-		var ul = document.getElementById("kc-postlist");
-		ul.appendChild (d);
-		if (id != undefined) {
-			d.id = id;
-		}
-		$('time.timeago', d).timeago();
-		$('.posthead', d).click(function(){
-			quoteReply(this);
-			
-		});
-		/*console.log (ul.innerHTML);  for some reasons I don't understand,
-			removing this log-command leads to the error:
-			08-04 00:39:42.883: E/Web Console(16668): Uncaught ReferenceError: appendPost is not defined at null:1*/
-	} 
+	var e = document.getElementById (id);
+	if (e == undefined) {
+		if (content != undefined) {
+			var li = document.createElement("li");
+			li.className = li.className + " " + className;
+			li.innerHTML = content;
+			var ul = document.getElementById("kc-postlist");
+			ul.appendChild (li);
+			if (id != undefined) {
+				li.id = id;
+			}
+			$('time.timeago', li).timeago();
+			$('.posthead', li).click(function(){
+				quoteReply(this);
+				
+			});
+		} 
+	} else {
+		e.innerHTML = content;
+	}
 }
 
 function postingsDone() {

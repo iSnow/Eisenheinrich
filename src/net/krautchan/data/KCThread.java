@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -79,6 +80,8 @@ public class KCThread extends KrautObject {
 	public synchronized void addPosting (KCPosting posting) {
 		if (null == kcNummer) {
 			kcNummer = posting.kcNummer;
+		}
+		if (null == firstPostDate) {
 			firstPostDate = posting.created;
 			makeDigest (posting);
 		}
@@ -104,17 +107,24 @@ public class KCThread extends KrautObject {
 	}
 	
 	public void recalc () {
-		KCPosting posting = postings.entrySet().iterator().next().getValue();
-		if (null == digest) {
-			makeDigest (posting);
+		try {
+			Entry<Long, KCPosting> entry = postings.entrySet().iterator().next();
+			if (null != entry) {
+				KCPosting posting = entry.getValue();
+				if (null == digest) {
+					makeDigest (posting);
+				}
+				if (null == firstPostDate) {
+					firstPostDate = posting.created;
+				}
+			}
+			if ((null == dbId) && (null != uri)) {
+				dbId = (long)uri.hashCode();
+			} 
+			Assert.assertNotNull(dbId);
+		} catch (Exception e) {
+			System.err.println (kcNummer);
 		}
-		if (null == firstPostDate) {
-			firstPostDate = posting.created;
-		}
-		if ((null == dbId) && (null != uri)) {
-			dbId = (long)uri.hashCode();
-		} 
-		Assert.assertNotNull(dbId);
 	}
 	
 	public synchronized void clearPostings () {

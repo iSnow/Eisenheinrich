@@ -32,7 +32,7 @@ import net.krautchan.data.KCThread;
 public class Globals {
 	private String 				USER_AGENT = null;
 	private Cache<KCBoard>  	BOARD_CACHE = new Cache<KCBoard>();
-	private Cache<KCThread>  	THREAD_CACHE = new Cache<KCThread>();
+	private Cache<KCThread>  	THREAD_CACHE = new Cache<KCThread>(500);
 	private boolean				DEBUG = true;
 	
 	private String 				IP_NUMBER = null;

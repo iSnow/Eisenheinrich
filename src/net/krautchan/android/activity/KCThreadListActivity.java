@@ -240,6 +240,8 @@ public class KCThreadListActivity extends Activity {
 			Eisenheinrich.getInstance().dbHelper.bookmarkThread(thread);
 		} else if (title.equals(getString(R.string.option_hide))){
 			adapter.hide(thread);
+			thread.hidden = true;
+			Eisenheinrich.getInstance().dbHelper.persistThread(thread);
 		} else {
 			return false;
 		}

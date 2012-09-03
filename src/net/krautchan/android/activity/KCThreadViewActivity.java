@@ -69,7 +69,7 @@ public class KCThreadViewActivity extends Activity {
 	private boolean					webViewBack = true;
 	private Handler 				mHandler = new Handler();
 	private String 					boardName = null;
-	private Long 					boardId = null;
+	//private Long 					boardId = null;
 	private KCThread 				thread = null;
 	private String					token;
 	private boolean 				javascriptInterfaceBroken = false;
@@ -148,19 +148,18 @@ public class KCThreadViewActivity extends Activity {
 			//throw new UnsupportedOperationException ();
 		} else {
 			Bundle b = getIntent().getExtras();
-			boardId = b.getLong("boardId"); 
 			Long threadId = b.getLong("threadId");
 			thread = Eisenheinrich.GLOBALS.getThreadCache().get(threadId);
+			Assert.assertNotNull("Assertion thread != null failed in KCThreadView::onCreate() "+threadId, thread);
 			if ((null != thread) && (null != pListener)) {
 				Eisenheinrich.getInstance().addPostListener(pListener);
 			}
-			Eisenheinrich.GLOBALS.setVisitedPostsCollapsible(b.getBoolean("visitedPostsCollapsible"));
-			Assert.assertNotNull(boardId);
-			
-			token = b.getString("token");
+			//Eisenheinrich.GLOBALS.setVisitedPostsCollapsible(b.getBoolean("visitedPostsCollapsible"));
+			Assert.assertNotNull("Assertion thread.boardId != null failed in KCThreadView::onCreate() "+threadId, thread.board_id);
+					
+			token = thread.uri;
 			progressIncrement = b.getInt("progressIncrement");
-			thread.uri = token;
-			KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(boardId);
+			KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(thread.board_id);
 			boardName = board.shortName;
 			String title = "/"+boardName+"/"+thread.kcNummer;
 			if (board.banned) {
@@ -192,10 +191,10 @@ public class KCThreadViewActivity extends Activity {
 		runOnUiThread(new Runnable() {
 	        public void run() {
 				Button toggleCollapsedButton = (Button)findViewById(R.id.show_collapsed);
-				if (thread.previousLastKcNum != null) {
-					toggleCollapsedButton.setVisibility(View.VISIBLE);
-				} else {
+				if ((null == thread) || (null == thread.previousLastKcNum)) {
 					toggleCollapsedButton.setVisibility(View.GONE);
+				} else {
+					toggleCollapsedButton.setVisibility(View.VISIBLE);
 				}
 	        }
 		});
@@ -246,24 +245,21 @@ public class KCThreadViewActivity extends Activity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		Log.i("THREADVIEW", "onSaveInstanceState");
+		//Log.i("THREADVIEW", "onSaveInstanceState");
 		webView.saveState(outState);
-		//outState.putString("html", template);
 		outState.putLong("threadId", thread.dbId);
 		outState.putLong("threadKcNum", thread.kcNummer);
 		outState.putLong("boardId", thread.board_id);
 		outState.putString("token", thread.uri);
-		Log.i("THREADVIEW", "onSaveInstanceState done");
+		//Log.i("THREADVIEW", "onSaveInstanceState done");
 	}
 	
 	@Override
 	protected void onRestoreInstanceState(Bundle inState) {
-		Log.i("THREADVIEW", "onRestoreInstanceState");
-		//String html = inState.getString("html");
+		//Log.i("THREADVIEW", "onRestoreInstanceState");
 		webView.restoreState(inState);
 		thread = Eisenheinrich.GLOBALS.getThreadCache().get(inState.getLong("threadId"));
-		//super.onRestoreInstanceState(inState);
-		Log.i("THREADVIEW", "onRestoreInstanceState done");
+		//Log.i("THREADVIEW", "onRestoreInstanceState done");
 	}
 
 	@Override
@@ -287,10 +283,9 @@ public class KCThreadViewActivity extends Activity {
 	        	webView.loadDataWithBaseURL("http://krautchan.net/", html, "text/html", "utf-8", null);
 	        }
 		});
-		//this.html = html;
 	}
 	
-	private void renderPosting (KCPosting posting, boolean read, boolean even, final boolean first) {
+	private void renderPosting (final KCPosting posting, boolean read, boolean even, boolean first) {
 		Log.i("THREADVIEW", "Render Posting: "+posting.kcNummer);
 		String classStr = ""; 
 		if (!first) {
@@ -311,24 +306,15 @@ public class KCThreadViewActivity extends Activity {
 		final String cContent = content; 
 		runOnUiThread(new Runnable() {
 	        public void run() {
-	        	if (first) {
-	        		webView.loadUrl("javascript:appendPost('"+cContent+"', '"+cStr+"', 'first')");
-	        	} else {
+	        	//if (first) {
+	        		webView.loadUrl("javascript:appendPost('"+cContent+"', '"+cStr+"', '"+posting.dbId+"')");
+	        	/*} else {
 	        		webView.loadUrl("javascript:appendPost('"+cContent+"', '"+cStr+"', '')");
-	        	}
+	        	}*/
 	        }
 		});
 	}
 	
-	/*private void renderPostingBacklog () {
-		Log.i("THREADVIEW", "renderPostingBacklog");
-		boolean even = false;
-		for (KCPosting posting: thread.getSortedPostings()) {
-			renderPosting (posting, even);
-			even = !even;
-		}
-		Log.i("THREADVIEW", "renderPostingBacklog done");
-	}*/
 
 	private final class PostingListener implements KODataListener<KCPosting> {
 		private boolean even = false; 
@@ -340,20 +326,16 @@ public class KCThreadViewActivity extends Activity {
 				((ProgressBar)findViewById(R.id.threadview_watcher)).incrementProgressBy(progressIncrement);
 				Log.i("THREADVIEW", "notifyAdded 1: "+item.kcNummer);
 				if (pageFinished) {
-					if (item.kcNummer.longValue() != thread.kcNummer.longValue()) {
-						boolean read = false;
-						if (thread.previousLastKcNum != null) {
-							if (item.kcNummer <= thread.previousLastKcNum) {
-								read = true;
-							}
-						}
-						renderPosting (item, read, even, false);
+					boolean read = false;
+					if (thread.previousLastKcNum != null) {
+						if (item.kcNummer <= thread.previousLastKcNum) {
+							read = true;
+						} 
 					}
-					if (null == thread.previousLastKcNum)  {
+					renderPosting (item, read, even, false);
+					if ((null == thread.previousLastKcNum) || (thread.previousLastKcNum < item.kcNummer)) {
 						thread.previousLastKcNum = item.kcNummer;
-					} else if (thread.previousLastKcNum < item.kcNummer) {
-						thread.previousLastKcNum = item.kcNummer;
-					}
+					} 
 				} 
 			} 
 		}  
@@ -362,15 +344,12 @@ public class KCThreadViewActivity extends Activity {
 		public void notifyDone(Object token) {
 			if (KCThreadViewActivity.this.token.equals(token)) {
 				Log.i("THREADVIEW", "notifyDone");
-				//backlogRendered = false;
 				if (thread.getLastPosting() != null) {
 					thread.previousLastKcNum = thread.getLastPosting().kcNummer;
 				} 
 				Eisenheinrich.getInstance().dbHelper.persistThread(thread);
-				//qpageFinished = false;
 				Message msg = progressHandler.obtainMessage();
 	        	msg.arg1 = 0;
-	        	//webView.loadUrl("javascript:postingsDone()");
 	        	progressHandler.sendMessage(msg);
 	        	//FIXME remove next line and implement thread caching.
 	        	thread.recalc();
@@ -469,7 +448,9 @@ public class KCThreadViewActivity extends Activity {
 		}
 	    
 	    public void debugString(final String str) {
- 	    	System.out.println (str);
+	    	if (null != str) {
+	    		System.out.println (str);
+	    	}
 	    }
 	}
 	
@@ -667,9 +648,6 @@ public class KCThreadViewActivity extends Activity {
 		} 
 		webView.loadUrl("javascript:showCollapsed (true)");
 		findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
-		/*if (null != thread.getLastPosting()) {
-			thread.previousLastKcNum = thread.getLastPosting().kcNummer;
-		}*/
 		
 		Thread t = new Thread(new KCPageParser(thread)
 			.setBasePath("http://krautchan.net/")
@@ -678,8 +656,6 @@ public class KCThreadViewActivity extends Activity {
 			.setPostingHandler(
 				Eisenheinrich.getInstance().getPostListener()));
 		t.start();
-		
-		//ActivityHelpers.switchToThread(thread, this);
 	}
 
 	@Override
@@ -694,13 +670,13 @@ public class KCThreadViewActivity extends Activity {
 		case R.id.prefs:
 			return true;
 		case R.id.reply: 
-			KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(boardId);
+			KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(thread.board_id);
  			String cc = Eisenheinrich.GLOBALS.getKomturCode();
 			if ((board.banned) && (null == cc)) {
 				new BannedDialog (this).show();
 				Toast.makeText(KCThreadViewActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();
 			} else {
-				ActivityHelpers.createThreadMask (thread, boardId, citation, this);
+				ActivityHelpers.createThreadMask (thread, thread.board_id, citation, this);
 			}
 			return true;
 		case R.id.home: 

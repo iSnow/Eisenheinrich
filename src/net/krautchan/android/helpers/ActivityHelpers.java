@@ -52,12 +52,9 @@ public class ActivityHelpers {
 
 	public static void switchToThread(KCThread thread, Activity context) {
 		Bundle b = new Bundle();
-		b.putString("token", thread.uri);
 		if (null != thread.dbId) {
 			b.putLong("threadId", thread.dbId);
 		}
-		b.putLong("threadKcNum", thread.kcNummer);
-		b.putLong("boardId", thread.board_id);
 		int progInc = (thread.numPostings == 0) ? 5 : (100/thread.numPostings);
 		if (progInc == 0) {
 			progInc = 1;
