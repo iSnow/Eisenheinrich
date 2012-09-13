@@ -72,7 +72,7 @@ public class Globals {
 		return KOMTUR_CODE;
 	}
 
-	public boolean areVisitedPostsCollapible() {
+	public boolean areVisitedPostsCollapsible() {
 		return VISITED_POSTS_COLLAPSIBLE;
 	}
 

@@ -1,4 +1,5 @@
 function quoteReply (elem) {
+	Android.debugString (">>>>QUOTEREPLY "+elem);
 	$(elem).addClass('active');
 	setTimeout(function(){
 		$('.active').removeClass('active');
@@ -23,12 +24,13 @@ function quoteClick (elem) {
 	offset.top = getCloneTop ();
 	var href = $(elem).attr('href');
 	var segments = href.split("/");
-	var id = segments[segments.length - 1];
+	var id = segments[segments.length - 1].replace ('#', '');
+	Android.debugString ('>>>>'+id);
 	var div = cloneNode (id, offset.top);
 	//Android.debugString ($(div).html());
 	var cButton = $(div).prepend('<p class="closebutton">close</p>');
 	$('#quoteoverlay').click (function() {
-		Android.debugString ($(this).html())
+		//Android.debugString ($(this).html())
 		$('#backdrop').fadeOut();
 		$('#quoteoverlay').css("display", "none")
 		$('body').css("overflow", "visible");
@@ -94,15 +96,15 @@ function getRule (ruleName) {
 
 function markAllPostingsRead () {
 	$('ul#kc-postlist>li').removeClass('read').removeClass('unread').addClass('read');
-	$('li#first').removeClass('read');
+	$('ul#kc-postlist>li:first-child').removeClass('read');
 	$('ul#kc-postlist>li.read').hide();
 }
 
 function appendPost (content, className, id) {
-	var e = document.getElementById (id);
-	if (e == undefined) {
+	var li = document.getElementById (id);
+	if (li == undefined) {
 		if (content != undefined) {
-			var li = document.createElement("li");
+			li = document.createElement("li");
 			li.className = li.className + " " + className;
 			li.innerHTML = content;
 			var ul = document.getElementById("kc-postlist");
@@ -110,15 +112,15 @@ function appendPost (content, className, id) {
 			if (id != undefined) {
 				li.id = id;
 			}
-			$('time.timeago', li).timeago();
-			$('.posthead', li).click(function(){
-				quoteReply(this);
-				
-			});
 		} 
 	} else {
-		e.innerHTML = content;
+		li.innerHTML = content;
 	}
+	$('time.timeago', li).timeago();
+	$('.posthead', li).click(function(){
+		quoteReply(this);
+		
+	});
 }
 
 function postingsDone() {

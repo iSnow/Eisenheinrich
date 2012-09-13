@@ -41,15 +41,15 @@
 		    android:id="@+id/threadListTitle"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:layout_weight="1.10"
 		    android:gravity="left"
+		    android:layout_weight="20"
 		    android:textSize="15sp" />
 
 		<TextView
 		    android:id="@+id/threadListNumPostings"
-		    android:layout_width="3sp"
+		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:layout_weight="0.49"
+		    android:layout_weight="0.2"
 		    android:gravity="right"
 		    android:textSize="15sp" />
 

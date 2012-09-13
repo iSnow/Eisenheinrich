@@ -167,7 +167,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("first_post_date", thread.firstPostDate);
 				valHolder.put("digest", thread.digest);
 				valHolder.put("time_inserted", new Date().getTime());
-				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
+				if (thread.bookmarked) { // don't overwrite bookmark signal
+					valHolder.put("is_bookmarked", 1);
+				}
 				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
 				db.update(THREAD_TABLE, valHolder, whereClause, null);
 			} else {
@@ -198,6 +200,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			thread = populateThread (c);
 			c.moveToNext();
 		}
+		c.close();
 		return thread;
 	}
 	

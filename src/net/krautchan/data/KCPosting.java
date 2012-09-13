@@ -107,6 +107,26 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		content = "<p><span>"+buf.toString().trim()+"</span></p>";
 	}
 	
+	public String asHtml  (boolean showImages) {
+		String innerHtml = "<div class=\"posthead\">" +
+		"<p class=\"headline\"><b>"+kcNummer+"</b><time class='timeago' datetime='"+creationDate+"'>"+creationDate+"</time></p>";
+		if (null != title) {
+			innerHtml += "<p class=\"topic\">"+title+"</p>";
+		}
+		innerHtml += "</div>";
+		innerHtml += content;
+		if (showImages && imgs.length > 0) {
+			innerHtml += "<div class=\"image-container\">";
+			for (int i = 0; i < imgs.length; i++) {
+				if (null != imgs[i]) {
+					innerHtml += "<a href=\"/files/"+imgs[i]+"\" onclick=\"Android.openImage('"+imgs[i]+"');return false;\"><img src=\"/thumbnails/"+thumbs[i]+"\"></a>";
+				}
+			}
+			innerHtml += "</div>";
+		}
+		return "<div id='"+kcNummer+"'>"+innerHtml+"</div>";
+	}
+	
 	public String getKcStyledContent () {
 		String kcStyledContent = originalContent.replaceAll("<br>", "\n>");
 		Matcher kcMatcher = kcLinkPat.matcher(kcStyledContent);

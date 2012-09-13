@@ -48,6 +48,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -84,10 +85,37 @@ public class KCThreadListActivity extends Activity {
 		setContentView(R.layout.thread_list);
 		list = (ListView)findViewById(R.id.thread_listview);
 		adapter = new ThreadListAdapter(this, this, 0, 0);
-	    Bundle b = getIntent().getExtras();
-	    byte[] boardS = b.getByteArray("board");
-	    ByteArrayInputStream bitch = new ByteArrayInputStream(boardS);
-	    ObjectInputStream in;
+	    Bundle bndl;
+	    if (null != savedInstanceState) {
+	    	bndl = savedInstanceState;
+			curBoard = Eisenheinrich.GLOBALS.getBoardCache().get(bndl.getLong("boardId"));
+			Log.i("THREADLIST", "onCreate. Board: "+curBoard.shortName +" - "+curBoard.name);
+			Thread t = new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
+			.setBasePath(Eisenheinrich.DEFAULTS.BASE_URL)
+			.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
+			.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
+			);
+		t.start();
+	    } else {
+	    	bndl = getIntent().getExtras();
+	    	byte[] boardS = bndl.getByteArray("board");
+		    ByteArrayInputStream bitch = new ByteArrayInputStream(boardS);
+	    	ObjectInputStream in;
+			try {
+				in = new ObjectInputStream(bitch);
+				curBoard = (KCBoard)in.readObject();
+			} catch (StreamCorruptedException e) {
+				Toast toast = Toast.makeText(this, "KCThreadListActivity::onCreate failed: "+e.getMessage(), Toast.LENGTH_LONG);
+				toast.show();
+			} catch (IOException e) {
+				Toast toast = Toast.makeText(this, "KCThreadListActivity::onCreate failed: "+e.getMessage(), Toast.LENGTH_LONG);
+				toast.show();
+			} catch (ClassNotFoundException e) {
+				Toast toast = Toast.makeText(this, "KCThreadListActivity::onCreate failed: "+e.getMessage(), Toast.LENGTH_LONG);
+				toast.show();
+			}
+	    }
+	    
 	    final View progWrapper = findViewById(R.id.threadlist_watcher_wrapper);
 	    progress = (ProgressBar)findViewById(R.id.threadlist_watcher);
 	    progress.setMax(100);
@@ -114,63 +142,52 @@ public class KCThreadListActivity extends Activity {
 	        	}
 	        }
 	    };
-		try {
-		    token = b.getString("token");
-			in = new ObjectInputStream(bitch);
-		    curBoard = (KCBoard)in.readObject();
-		    Timer tm = new Timer();
-			tm.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					KCThreadListActivity.this.runOnUiThread(new Runnable () {
-						@Override
-						public void run() {	
-						    adjustTitle ();
-						}
-				    }); 
-				}
-			}, 5000);
-			list.setAdapter(adapter);
-			heini.addThreadListener(new KODataListener<KCThread>() {
-				@Override
-				public void notifyAdded(final KCThread item, Object token) {
-					if (KCThreadListActivity.this.token.equals(token)) {
-			        	siteReachableWatchdog.cancel();
-						// cannot add to the collection backing the adapter from a thread that is
-						// not the UI thread. Therefore, post a runnable to UI thread to handle this
-						runOnUiThread(new Runnable() {
-					        public void run() {
-								threads.add(item);
-								adapter.add(item);
-								adapter.notifyDataSetChanged(); 
-					        	progress.incrementProgressBy(10);
-					        }
-					    });
+	    token = bndl.getString("token");
+		
+	    Timer tm = new Timer();
+		tm.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				KCThreadListActivity.this.runOnUiThread(new Runnable () {
+					@Override
+					public void run() {	
+					    adjustTitle ();
 					}
+			    }); 
+			}
+		}, 5000);
+		list.setAdapter(adapter);
+		heini.addThreadListener(new KODataListener<KCThread>() {
+			@Override
+			public void notifyAdded(final KCThread item, Object token) {
+				if (KCThreadListActivity.this.token.equals(token)) {
+		        	siteReachableWatchdog.cancel();
+					// cannot add to the collection backing the adapter from a thread that is
+					// not the UI thread. Therefore, post a runnable to UI thread to handle this
+					runOnUiThread(new Runnable() {
+				        public void run() {
+							threads.add(item);
+							adapter.add(item);
+							adapter.notifyDataSetChanged(); 
+				        	progress.incrementProgressBy(10);
+				        }
+				    });
 				}
+			}
 
-				@Override
-				public void notifyDone(Object token) {
-					Message msg = progressHandler.obtainMessage();
-		        	msg.arg1 = 0;
-		        	progressHandler.sendMessage(msg);
-				}
-				
-				@Override
-				public void notifyError(Exception ex, Object token) {
-					KCThreadListActivity.this.finish();
-				}
-			});
-		} catch (StreamCorruptedException e) {
-			Toast toast = Toast.makeText(this, "KCThreadListActivity::onCreate failed: "+e.getMessage(), Toast.LENGTH_LONG);
-			toast.show();
-		} catch (IOException e) {
-			Toast toast = Toast.makeText(this, "KCThreadListActivity::onCreate failed: "+e.getMessage(), Toast.LENGTH_LONG);
-			toast.show();
-		} catch (ClassNotFoundException e) {
-			Toast toast = Toast.makeText(this, "KCThreadListActivity::onCreate failed: "+e.getMessage(), Toast.LENGTH_LONG);
-			toast.show();
-		}
+			@Override
+			public void notifyDone(Object token) {
+				Message msg = progressHandler.obtainMessage();
+	        	msg.arg1 = 0;
+	        	progressHandler.sendMessage(msg);
+			}
+			
+			@Override
+			public void notifyError(Exception ex, Object token) {
+				KCThreadListActivity.this.finish();
+			}
+		});
+		
 
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -268,8 +285,24 @@ public class KCThreadListActivity extends Activity {
 	    adjustTitle ();
 	}
 	
+
+	@Override
+	protected void onRestoreInstanceState(Bundle inState) {
+		super.onRestoreInstanceState(inState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putLong("boardId", curBoard.dbId);
+		outState.putString("token", token);
+	}
+	
 	private void adjustTitle () {
 		KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(curBoard.dbId);
+		if (null == board) {
+			return;
+		}
 		title = "/"+curBoard.shortName+"/ - "+curBoard.name;
 	    if (board.banned) {
 	    	this.setTitle(title + " ("+this.getString(R.string.banned)+")");
@@ -291,7 +324,7 @@ public class KCThreadListActivity extends Activity {
 		
 		@Override
 		public void add(KCThread thread) {
-			if ((!ids.contains(thread.dbId)) && (!hiddenIds.contains(thread.dbId))) {
+			if ((!ids.contains(thread.dbId)) && (!hiddenIds.contains(thread.dbId)) && (!thread.hidden)) {
 				ids.add(thread.dbId);
 				super.add(thread);
 			}
@@ -351,7 +384,7 @@ public class KCThreadListActivity extends Activity {
 						TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
 						contentLabel.setText(thread.digest);
 						TextView numPostsLabel = (TextView) v.findViewById(R.id.threadListNumPostings);
-						numPostsLabel.setText(thread.numPostings+ " Posts");
+						numPostsLabel.setText(" "+thread.numPostings+ " Posts");
 					}
 				}
 			}
@@ -445,4 +478,5 @@ public class KCThreadListActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
 }

@@ -108,8 +108,9 @@ public class KCThread extends KrautObject {
 	
 	public void recalc () {
 		try {
-			Entry<Long, KCPosting> entry = postings.entrySet().iterator().next();
-			if (null != entry) {
+			Iterator<Entry<Long, KCPosting>> iter = postings.entrySet().iterator();
+			if (iter.hasNext()) {
+				Entry<Long, KCPosting> entry = iter.next();
 				KCPosting posting = entry.getValue();
 				if (null == digest) {
 					makeDigest (posting);
@@ -123,7 +124,11 @@ public class KCThread extends KrautObject {
 			} 
 			Assert.assertNotNull(dbId);
 		} catch (Exception e) {
-			System.err.println (kcNummer);
+			String trace = "Exception in KCThread "+kcNummer+" "+e.getClass().getCanonicalName()+"\n";
+			for (StackTraceElement elem : e.getStackTrace()) {
+				trace+= " "+elem.toString()+"\n";
+			}
+			System.err.println (trace);
 		}
 	}
 	

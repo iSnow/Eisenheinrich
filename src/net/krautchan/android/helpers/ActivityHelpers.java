@@ -49,9 +49,7 @@ public class ActivityHelpers {
 
 	public static void switchToThread(KCThread thread, Activity context) {
 		Bundle b = new Bundle();
-		if (null != thread.dbId) {
-			b.putLong("threadId", thread.dbId);
-		}
+		b.putLong("threadId", thread.dbId);
 		int progInc = (thread.numPostings == 0) ? 5 : (100/thread.numPostings);
 		if (progInc == 0) {
 			progInc = 1;
@@ -59,16 +57,17 @@ public class ActivityHelpers {
 		b.putInt("progressIncrement", progInc);
 		b.putBoolean("visitedPostsCollapsible", true);
 
-		Thread t = new Thread(new KCPageParser(thread)
-				.setBasePath("http://krautchan.net/")
-				.setThreadHandler(
-						Eisenheinrich.getInstance().getThreadListener())
-				.setPostingHandler(
-						Eisenheinrich.getInstance().getPostListener()));
-		t.start();
-
 		Intent intent = new Intent(context, KCThreadViewActivity.class);
 		intent.putExtras(b);
+		
+		Thread t = new Thread(new KCPageParser(thread)
+		.setBasePath("http://krautchan.net/")
+		.setThreadHandler(
+				Eisenheinrich.getInstance().getThreadListener())
+		.setPostingHandler(
+				Eisenheinrich.getInstance().getPostListener()));
+		t.start();
+
 		context.startActivity(intent);
 	}
 
