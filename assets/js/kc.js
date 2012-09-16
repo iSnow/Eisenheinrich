@@ -1,11 +1,14 @@
 function quoteReply (elem) {
-	Android.debugString (">>>>QUOTEREPLY "+elem);
+	if (!elem) {
+		return;
+	}
+	//Android.debugString (">>>>QUOTEREPLY "+elem);
 	$(elem).addClass('active');
 	setTimeout(function(){
 		$('.active').removeClass('active');
 	},200);
 	while (elem.nodeName != "LI"){
-		Android.debugString (">>>>TAG "+elem.getTagName);
+		//Android.debugString (">>>>TAG "+elem.getTagName);
 		elem = elem.parentNode;
 	}
 	if (elem != undefined) {

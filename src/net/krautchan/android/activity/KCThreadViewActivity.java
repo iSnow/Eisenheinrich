@@ -99,7 +99,7 @@ public class KCThreadViewActivity extends Activity {
 				    progress.setProgress(0);
 	        	} else if (1 == msg.arg1) {
 		        	progress.incrementProgressBy(progressIncrement);
-	        	} 
+	        	}
 	        }
 	    };
 		webView.setBackgroundColor(Color.BLACK);
