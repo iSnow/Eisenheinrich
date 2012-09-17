@@ -20,9 +20,9 @@ import android.os.Build;
 
 public class Defaults {
 	public static final String DOMAIN = "krautchan.net";
-	public static final String BASE_URL = "http://krautchan.net/";
-	public static final String POST_URL  = "http://krautchan.net/post";
-	public static final String FILE_PATH = "http://krautchan.net/files";
+	public static final String BASE_URL = "https://krautchan.net/";
+	public static final String POST_URL  = "https://krautchan.net/post";
+	public static final String FILE_PATH = "https://krautchan.net/files";
 	public static final String SD_DIR = "eisenheinrich";
 	public static final String IMAGE_DIR = "/images";
 	public static final String HOME_PAGE = "http://eisenheinrich.datensalat.net/";

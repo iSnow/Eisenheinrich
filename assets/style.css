@@ -62,10 +62,10 @@ ul#kc-postlist>li {
 	font-family: 'Droid Sans';
 	font-weight: 500;
 	color: #8cc708;
-	/*border-bottom: 1px solid #3d3f3d;*/
 	margin: 0;
 	padding: 0 0 0.5em 0;
 }
+
 
 ul#kc-postlist>li.unread {
 
@@ -73,7 +73,6 @@ ul#kc-postlist>li.unread {
 
 ul#kc-postlist>li.read {
 	display: none;
-	background-color: #red;
 }
 
 ul#kc-postlist>li.even {

@@ -321,7 +321,9 @@ public class EisenheinrichActivity extends Activity {
 
 				@Override
 				public void run() {
-					new UpdateDialog (EisenheinrichActivity.this).show();
+					if (!isFinishing()) {
+						new UpdateDialog (EisenheinrichActivity.this).show();
+				    }
 				}
 				
 			});
