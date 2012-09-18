@@ -40,7 +40,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String TAG = "DatabaseHelper";
 	private final static String	DBASE_NAME 		= "Schlaubernd";
-	private final static int 	VERSION_NUM 	=  5;
+	private final static int 	VERSION_NUM 	=  7;
 	private static final String BOARD_TABLE		= "board";
 	private static final String THREAD_TABLE	= "thread";
 	@SuppressWarnings("unused")
@@ -69,33 +69,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (oldVersion == 1) {
-			try {
-				db.beginTransaction();
-				db.execSQL("DROP TABLE IF EXISTS "+BOARD_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS "+THREAD_TABLE);
-				createBoardTable (db);
-				createThreadTable(db);
-				db.setTransactionSuccessful();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				db.endTransaction();
-			}
-		} else if (oldVersion <= VERSION_NUM) {
-			try {
-				db.beginTransaction();
-				db.execSQL("DROP TABLE IF EXISTS "+THREAD_TABLE);
-				db.setTransactionSuccessful();
-				db.endTransaction();
-				db.beginTransaction();
-				createThreadTable(db);
-				db.setTransactionSuccessful();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				db.endTransaction();
-			}
+		try { 
+			db.beginTransaction();
+			db.execSQL("DROP TABLE IF EXISTS "+BOARD_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS "+THREAD_TABLE);
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			db.beginTransaction();
+			createBoardTable(db);
+			createThreadTable(db);
+			db.setTransactionSuccessful();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			db.endTransaction();
 		}
 	}
 	 
@@ -324,7 +311,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	private void createBoardTable (SQLiteDatabase db) throws SQLException {
-		db.execSQL("create table "+BOARD_TABLE+" (id integer primary key, shortname text, name text, url text, sort_order integer, show integer)");		
+		db.execSQL("create table "+BOARD_TABLE+" (" +
+				" id integer primary key," +
+				" shortname text," +
+				" name text," +
+				" url text," +
+				" sort_order integer," +
+				" show integer)");		
 	}
 	
 	private void createThreadTable (SQLiteDatabase db) throws SQLException {

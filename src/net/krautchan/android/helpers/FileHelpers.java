@@ -63,7 +63,14 @@ public class FileHelpers {
 			return false;
 		try {
 			if (baseDir.canWrite()) {
-				fos = new FileOutputStream(baseDir.getAbsolutePath() + "/" + fileName);
+				File target = new File (baseDir.getAbsolutePath() + "/" + fileName);
+				if (!target.exists()) {
+					String path = target.getAbsolutePath();
+					int delim = path.lastIndexOf("/");
+					File dir = new File (path.substring(0, delim));
+					dir.mkdirs();
+				}
+				fos = new FileOutputStream(target);
 				int c = input.read();
 				while (c != -1) {
 					fos.write((char)c);

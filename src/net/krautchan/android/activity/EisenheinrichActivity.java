@@ -141,6 +141,8 @@ public class EisenheinrichActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
+		//super.onBackPressed();
+		finish();
 		Process.killProcess(Process.myPid());
 		/*super.onBackPressed();
 		Eisenheinrich.getInstance().dbHelper.close();

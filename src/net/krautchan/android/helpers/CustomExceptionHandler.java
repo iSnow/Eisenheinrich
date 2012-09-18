@@ -36,7 +36,7 @@ public class CustomExceptionHandler implements UncaughtExceptionHandler {
 	private Context context;
 
 	/*
-	 * if any of the first two parameters is null, the respective functionality will not
+	 * if one of the first two parameters is null, the respective functionality will not
 	 * be used
 	 */
 	public CustomExceptionHandler(String localPath, String url, Context context) {
@@ -60,7 +60,9 @@ public class CustomExceptionHandler implements UncaughtExceptionHandler {
 		if (localPath != null) {
 			FileHelpers.writeToSDFile(filename, stacktrace);
 		}
-		defaultUEH.uncaughtException(t, e);
+		if ((null != t) && (null != e)) {
+			defaultUEH.uncaughtException(t, e);
+		}
 	}
 
 	private void sendToServer(final String stacktrace, final String filename) {
@@ -73,7 +75,7 @@ public class CustomExceptionHandler implements UncaughtExceptionHandler {
 				int versionCode = 0;
 				try {
 					PackageManager pm = Eisenheinrich.getInstance().getPackageManager();
-					if (null != pm) {
+					if ((null != pm) && (null != context)) {
 						pinfo = pm.getPackageInfo(context.getPackageName(), 0);
 					    versionName = pinfo.versionName;
 					    versionCode = pinfo.versionCode;

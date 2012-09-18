@@ -32,6 +32,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
 import net.krautchan.android.network.PostVariables;
@@ -137,6 +138,8 @@ public class Eisenheinrich extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate(); 
+		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		GLOBALS = new Globals(readSettings());
 		dbHelper.setDebug(GLOBALS.isDebugVersion());
 		tListeners.add(GLOBALS.getThreadCache());
@@ -145,20 +148,6 @@ public class Eisenheinrich extends Application {
 		sInstance = this;
 		sInstance.initializeInstance();
 		ThreadExistenceCheck t = new ThreadExistenceCheck (storedThreads, new ThreadExistencePeer() {
-			
-			/*public void threadsChecked(KCThread thread, boolean valid) {
-				Iterator<KCThread> iter = storedThreads.iterator();
-				for (int i = 0; i < storedThreads.size(); i++) {
-					KCThread curThread = iter.next();
-					if (!valid[i]) {
-						dbHelper.deleteThread(curThread.dbId);
-						if (GLOBALS.isDebugVersion()) {
-							Log.d(TAG+" Deleting ("+i+"): Thread "+curThread.firstPostDate+" - "+curThread.kcNummer+" - "+curThread.uri+" - "+curThread.digest, curThread.dbId+"");
-						}
-					}
-				}
-			}*/
-
 			@Override
 			public void threadChecked(KCThread thread, boolean valid) {
 				if (!valid) {

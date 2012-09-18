@@ -1,24 +1,29 @@
 package net.krautchan.android.helpers;
 
 /*
-* Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -30,18 +35,20 @@ import net.krautchan.android.Eisenheinrich;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 public class FileContentProvider extends ContentProvider {
-
+	CustomExceptionHandler exceptionHandler = new CustomExceptionHandler("eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", null);
 	public static final String TAG = "FileContentProvider";
 	public static final String URI_PREFIX = "content://net.krautchan.filecontentprovider";
 	public static String[] SUFFIXES = { "gif", "jpg", "jpeg", "png", "psd",
-			"tiff" };
+	"tiff" };
 	public static String[] MIME_TYPES = { "image/gif", "image/jpg",
-			"image/jpg", "image/png", "image/vnd.adobe.photoshop", "image/tiff" };
+		"image/jpg", "image/png", "image/vnd.adobe.photoshop", "image/tiff" };
+
 
 	public static String constructUri(String url) {
 		Uri uri = Uri.parse(url);
@@ -50,24 +57,9 @@ public class FileContentProvider extends ContentProvider {
 
 	@Override
 	public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
-		String filePath = null;
-		File result = null;
-		try {
-			final String url = Defaults.FILE_PATH + uri.getPath();
-			HttpClient client = Eisenheinrich.getInstance().getHttpClient();
-			HttpGet request = new HttpGet(url); 
-			HttpResponse response = client.execute(request);
-			Log.v(TAG, "GET response: " + response.getStatusLine());
-			HttpEntity responseEntity = response.getEntity();
-			InputStream st = responseEntity.getContent();
-			filePath = Defaults.IMAGE_DIR+"/"+uri.getPath().replace("/", "");
-			FileHelpers.writeToSDFile(filePath, st) ;
-			st.close(); 
-		} catch (Exception e) {
-			Log.v(TAG, "EXCEPTION: " + e.getMessage());
-		}
+		String filePath = Defaults.IMAGE_TEMP_DIR+"/"+uri.getPath().replace("/", "");
 		if (null != filePath) {
-			result = FileHelpers.getSDFile (filePath);
+			File result = FileHelpers.getSDFile (filePath);
 			if (null != result) {
 				ParcelFileDescriptor parcel = ParcelFileDescriptor.open(result, ParcelFileDescriptor.MODE_READ_ONLY);
 				return parcel;
@@ -84,14 +76,14 @@ public class FileContentProvider extends ContentProvider {
 	@Override
 	public int delete(Uri uri, String s, String[] as) {
 		throw new UnsupportedOperationException(
-				"Not supported by this provider");
+		"Not supported by this provider");
 	}
 
 	@Override
 	public String getType(Uri uri) {
 		int delim = uri.getLastPathSegment().lastIndexOf('.');
 		String suffix = uri.getLastPathSegment().substring(delim + 1)
-				.toLowerCase();
+		.toLowerCase();
 		for (int i = 0; i < SUFFIXES.length; i++) {
 			if (suffix.equals(SUFFIXES[i])) {
 				return MIME_TYPES[i];
@@ -102,21 +94,64 @@ public class FileContentProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri uri, ContentValues contentvalues) {
-		throw new UnsupportedOperationException(
-				"Not supported by this provider");
+		UnsupportedOperationException e = new  UnsupportedOperationException(
+				"Not supported by this provider: "+uri.toString());
+
+		exceptionHandler.uncaughtException(null, e);
+		throw e;
 	}
+
+	/*@Override
+	public Cursor query(Uri uri, String[] as, String s, String[] as1, String s1) {
+		UnsupportedOperationException e = new  UnsupportedOperationException(
+				"Not supported by this provider: "+uri.toString()+" "+Arrays.toString(as)+" "+s+" "+Arrays.toString(as1)+" "+s1);
+
+		exceptionHandler.uncaughtException(null, e);
+		throw e;
+	}*/
 
 	@Override
 	public Cursor query(Uri uri, String[] as, String s, String[] as1, String s1) {
-		throw new UnsupportedOperationException(
-				"Not supported by this provider");
+		File file = new File(uri.getPath());
+		MatrixCursor cursor = new MatrixCursor(new String[] { "_data", "mime_type" });
+
+		byte[] data = null;
+
+		String filePath = Defaults.IMAGE_TEMP_DIR+"/"+uri.getPath().replace("/", "");
+		if (null != filePath) {
+			File result = FileHelpers.getSDFile (filePath);
+			try {
+				if (null != result) {
+					long size = result.length();
+						// limit the max file size somewhat arbitrarily here to 10Mb
+					if (size < 10 * 1000 * 1000) {
+						data = new byte[(int)size];
+						InputStream is = new BufferedInputStream (new FileInputStream (result));
+						is.read(data);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				exceptionHandler.uncaughtException(null, e);
+			} 
+		}
+		
+		if (null != data) {
+			Log.i("FL", "read " + data.length + " from " + file);
+			cursor.addRow(new Object[] { data, getType(uri) });
+		}
+
+		return cursor;
 	}
 
+
 	@Override
-	public int update(Uri uri, ContentValues contentvalues, String s,
-			String[] as) {
-		throw new UnsupportedOperationException(
-				"Not supported by this provider");
+	public int update(Uri uri, ContentValues contentvalues, String s, String[] as) {
+		UnsupportedOperationException e = new  UnsupportedOperationException(
+				"Not supported by this provider: "+uri.toString()+" "+Arrays.toString(as)+" "+s);
+
+		exceptionHandler.uncaughtException(null, e);
+		throw e;
 	}
 
 }

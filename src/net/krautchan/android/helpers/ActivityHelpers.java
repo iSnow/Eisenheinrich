@@ -18,13 +18,20 @@ package net.krautchan.android.helpers;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+
 import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.activity.KCPostActivity;
 import net.krautchan.android.activity.KCThreadViewActivity;
@@ -36,6 +43,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -111,6 +119,25 @@ public class ActivityHelpers {
 		}
 		table.addView(row);
 		return buttons;
+	}
+	
+	public static String downloadToFile (Uri uri) {
+		String filePath = null;
+		try {
+			final String url = Defaults.FILE_PATH + uri.getPath();
+			HttpClient client = Eisenheinrich.getInstance().getHttpClient();
+			HttpGet request = new HttpGet(url); 
+			HttpResponse response = client.execute(request);
+			Log.v(TAG, "GET response: " + response.getStatusLine());
+			HttpEntity responseEntity = response.getEntity();
+			InputStream st = responseEntity.getContent();
+			filePath = Defaults.IMAGE_TEMP_DIR+"/"+uri.getPath().replace("/", "");
+			FileHelpers.writeToSDFile(filePath, st) ;
+			st.close(); 
+		} catch (Exception e) {
+			Log.v(TAG, "EXCEPTION: " + e.getMessage());
+		}
+		return filePath;
 	}
 
 	public static Bitmap loadBitmap(URL url) {

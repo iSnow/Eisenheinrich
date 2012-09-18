@@ -45,6 +45,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.helpers.CustomExceptionHandler;
@@ -513,8 +514,17 @@ public class KCThreadViewActivity extends Activity {
 	
 	private void openImage (String fileName) {
 		try {
-			Uri uri = Uri.parse(FileContentProvider.URI_PREFIX+"/"+fileName);
-			startActivity(new Intent(Intent.ACTION_VIEW, uri));
+			final Uri uri = Uri.parse(FileContentProvider.URI_PREFIX+"/"+fileName);
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					String filePath = ActivityHelpers.downloadToFile(uri);
+					if (null != filePath) {
+						startActivity(new Intent(Intent.ACTION_VIEW, uri));
+					}
+				}
+				
+			}).start();
 		} catch (ActivityNotFoundException ex) {
 			Toast.makeText(getApplicationContext(), this.getText(R.string.could_not_open_image_viewer), Toast.LENGTH_LONG).show();
 		}
