@@ -32,6 +32,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.network.BanCheck;
 import net.krautchan.backend.Cache;
 import net.krautchan.data.KCBoard;
@@ -60,11 +61,16 @@ public class KCBoardListActivity extends ListActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
+		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
+
 		// TODO Move part of the code into the DatabaseHelper, no need to copy between collection and map all the time
 		boolean gotBoards = false;
 		Eisenheinrich.getInstance();
 		Cache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+		
+		
 		try {
 			boards = new LinkedHashMap<String, KCBoard>();
 			Collection<KCBoard> boardL = Eisenheinrich.getInstance().dbHelper.getBoards();
@@ -75,7 +81,6 @@ public class KCBoardListActivity extends ListActivity {
 		} catch (Exception ex) {
 			gotBoards = false;
 		}
-		
 		if (!gotBoards) {
 			try {
 				InputStream is = this.getAssets().open("nav.html");

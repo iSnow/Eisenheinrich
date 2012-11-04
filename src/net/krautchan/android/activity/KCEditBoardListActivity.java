@@ -36,6 +36,7 @@ import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.activity.KCBoardListActivity.BoardListAdapter;
 import net.krautchan.android.activity.KCThreadListActivity.ThreadListAdapter;
 import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.widget.CheckableLinearLayout;
 import net.krautchan.android.widget.InertCheckBox;
 import net.krautchan.data.KCBoard;
@@ -81,6 +82,9 @@ public class KCEditBoardListActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
+
 		this.setContentView(R.layout.edit_board_list_view);
 		list = getListView();
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);

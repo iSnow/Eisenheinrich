@@ -25,6 +25,8 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import junit.framework.Assert;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -57,6 +59,7 @@ public class ActivityHelpers {
 
 	public static void switchToThread(KCThread thread, Activity context) {
 		Bundle b = new Bundle();
+		Assert.assertNotNull("Assertion threadBbId != null failed in ActivityHelpers::switchToThread() ", thread.dbId);
 		b.putLong("threadId", thread.dbId);
 		int progInc = (thread.numPostings == 0) ? 5 : (100/thread.numPostings);
 		if (progInc == 0) {

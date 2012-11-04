@@ -16,11 +16,27 @@ package net.krautchan.android.activity;
 * limitations under the License.
 */
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
-
+import net.krautchan.R;
+import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.dialog.BannedDialog;
+import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.helpers.CustomExceptionHandler;
+import net.krautchan.android.helpers.FileContentProvider;
+import net.krautchan.data.KCBoard;
+import net.krautchan.data.KCPosting;
+import net.krautchan.data.KCThread;
+import net.krautchan.data.KODataListener;
+import net.krautchan.parser.KCPageParser;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -34,28 +50,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.*;
+import android.webkit.ConsoleMessage;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebStorage.QuotaUpdater;
-import android.util.Log;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import net.krautchan.R;
-import net.krautchan.android.Defaults;
-import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.dialog.BannedDialog;
-import net.krautchan.android.helpers.CustomExceptionHandler;
-import net.krautchan.android.helpers.FileContentProvider;
-import net.krautchan.android.helpers.ActivityHelpers;
-import net.krautchan.data.KCBoard;
-import net.krautchan.data.KCPosting;
-import net.krautchan.data.KCThread;
-import net.krautchan.data.KODataListener;
-import net.krautchan.parser.KCPageParser;
 
 @SuppressLint("SetJavaScriptEnabled") 
 public class KCThreadViewActivity extends Activity {
@@ -507,7 +515,12 @@ public class KCThreadViewActivity extends Activity {
 			}
 		}
 		if (null != board) {
-			prepareForRerender(board, Long.parseLong(parts[2]));
+			try {
+			Long id = Long.parseLong(parts[2]);
+			prepareForRerender(board, id);
+			} catch (NumberFormatException ex) {
+				openExternalLink (url);
+			}
 			//ActivityHelpers.switchToThread(Long.parseLong(parts[2]), parts[1], board.dbId,  KCThreadViewActivity.this);
 		}
 	}

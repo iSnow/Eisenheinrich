@@ -18,6 +18,8 @@ package net.krautchan.android.activity;
 
 import java.io.File;
 
+import net.krautchan.android.helpers.CustomExceptionHandler;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -34,6 +36,9 @@ public class KCFileChooserActivity extends FileChooserActivity {
 	    @Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
+			Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+			        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
+
 	        // We must check to ensure that the calling Intent is not Intent.ACTION_GET_INTENT
 	        if (Intent.ACTION_MAIN.equals(getIntent().getAction())) {
 	            // Display the file chooser with all file types

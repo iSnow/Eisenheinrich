@@ -79,6 +79,10 @@ public class CustomExceptionHandler implements UncaughtExceptionHandler {
 						pinfo = pm.getPackageInfo(context.getPackageName(), 0);
 					    versionName = pinfo.versionName;
 					    versionCode = pinfo.versionCode;
+					} else {
+						pinfo = Eisenheinrich.getInstance().getVersionInfo();
+					    versionName = pinfo.versionName;
+					    versionCode = pinfo.versionCode;
 					}
 				} catch (NameNotFoundException e) {
 					//dont care
@@ -95,7 +99,7 @@ public class CustomExceptionHandler implements UncaughtExceptionHandler {
 						"App Version Code: "+versionCode;
 				try {
 					 MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, null, cs);
-					entity.addPart("date", new StringBody(df.format(new Date()), cs)); 
+					entity.addPart("date", new StringBody("Timestamp: "+df.format(new Date()), cs)); 
 					entity.addPart("filename", new StringBody(filename, cs)); 
 
 					entity.addPart("appinfo", new StringBody(appInfoStr, cs));
