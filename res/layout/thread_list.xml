@@ -2,8 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/thread_list"
 	android:orientation="vertical" 
+		android:background="@color/LightBG"
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:weightSum="1" android:gravity="top">
+	android:layout_height="fill_parent" 
+	android:weightSum="1" 
+	android:gravity="top">
     <FrameLayout 
         android:id="@+id/threadlist_watcher_wrapper" 
     	android:layout_width="match_parent" 

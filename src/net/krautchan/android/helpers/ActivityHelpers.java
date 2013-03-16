@@ -18,7 +18,6 @@ package net.krautchan.android.helpers;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -26,12 +25,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import junit.framework.Assert;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-
 import net.krautchan.R;
 import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
@@ -40,19 +33,32 @@ import net.krautchan.android.activity.KCThreadViewActivity;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.PostActivityParams;
 import net.krautchan.parser.KCPageParser;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TableLayout.LayoutParams;
+import android.widget.TableRow;
 
 public class ActivityHelpers {
 	static final String TAG = "ActivityHelpers";
@@ -105,6 +111,29 @@ public class ActivityHelpers {
 		} catch (IOException e) {
 			Log.e(TAG, "createThreadMask failed", e);
 		}
+	}
+	
+	public static Drawable generateViewHeanderBackground(final int viewHeight) {
+		ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
+		    @Override
+		    public Shader resize(int width, int height) {
+		    	Resources res = Eisenheinrich.getInstance().getResources();
+		        LinearGradient lg = new LinearGradient(0, 0, 0, viewHeight,
+		            new int[] { 
+		        		res.getColor(R.color.Greengradient3a), 
+		        		res.getColor(R.color.Greengradient3b), 
+		        		res.getColor(R.color.Greengradient3c), 
+		        		res.getColor(R.color.Greengradient3d) },
+		            new float[] {
+		                0, 0.45f, 0.55f, 1 },
+		            Shader.TileMode.REPEAT);
+		         return lg;
+		    }
+		};
+		PaintDrawable p = new PaintDrawable();
+		p.setShape(new RectShape());
+		p.setShaderFactory(sf);
+		return p;
 	}
 
 	public static ImageButton[] addImageButtonRow(int numColumns,

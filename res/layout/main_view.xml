@@ -45,7 +45,7 @@
 		    android:layout_height="wrap_content"
 		    android:text="@string/test"
 		    android:textSize="16dp"
-		    android:visibility="gone" />
+		    />
 
 		<Button
 		    android:id="@+id/main_goto_kc"

@@ -3,6 +3,7 @@
     android:id="@+id/postview_wrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/Charcoal"
     android:layout_gravity="top" >
 
     <ScrollView
@@ -73,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="false"
+                android:textColor="@color/GreenYellow"
                 android:text="@string/sage" />
 
             <TextView

@@ -27,21 +27,24 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-
 import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
 import net.krautchan.android.network.PostVariables;
 import net.krautchan.android.network.ThreadExistenceCheck;
 import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
+import net.krautchan.backend.KCCache;
+import net.krautchan.backend.KCCache.CachePersister;
 import net.krautchan.backend.DatabaseHelper;
+import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
+
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import android.app.Application;
 import android.content.Context;
@@ -145,6 +148,30 @@ public class Eisenheinrich extends Application {
 		tListeners.add(GLOBALS.getThreadCache());
 		final Collection<KCThread> storedThreads = dbHelper.getAllThreads();
 		GLOBALS.getThreadCache().add(storedThreads);
+		KCCache<KCBoard> boardCache = GLOBALS.getBoardCache();
+		boardCache.setPersister(new CachePersister<KCBoard>() {
+
+			@Override
+			public void persist(KCBoard obj) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public KCBoard retrieve(Long dbId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void persist(Collection<KCBoard> boards) {
+				dbHelper.persistBoards(boards);
+			}
+
+			@Override
+			public Collection<KCBoard> retrieveAll() {
+				return dbHelper.getBoards();
+			}});
+		boardCache.thaw();
 		sInstance = this;
 		sInstance.initializeInstance();
 		ThreadExistenceCheck t = new ThreadExistenceCheck (storedThreads, new ThreadExistencePeer() {
@@ -194,7 +221,6 @@ public class Eisenheinrich extends Application {
 	}
 
 	protected void initializeInstance() {
-		GLOBALS.getBoardCache().add(dbHelper.getBoards());
 		GLOBALS.setUserAgentString(getUserAgentString ());
 		hasImagesDir = FileHelpers.createSDDirectory(Defaults.IMAGE_DIR);
 		STYLES = new Styles(this);

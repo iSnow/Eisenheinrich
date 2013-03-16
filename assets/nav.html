@@ -1,7 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-      <link rel="stylesheet" type="text/css" href="nav_files/style.css">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+   <head>
+      <link rel="stylesheet" type="text/css" href="/css/style.css?1">
       <title>Navigation</title>
 
       <style type="text/css">
@@ -67,10 +68,10 @@
       </style>
       <![endif]-->
 
-      <script type="text/javascript" src="nav_files/prototype.js"></script>
-      <script type="text/javascript" src="nav_files/scriptaculous.js"></script>
-      <script type="text/javascript" src="nav_files/webtoolkit.js"></script>
-      <script type="text/javascript" src="nav_files/common.js"></script>
+      <script type="text/javascript" src="/js/prototype.js"></script>
+      <script type="text/javascript" src="/js/scriptaculous/scriptaculous.js?load=effects,builder"></script>
+      <script type="text/javascript" src="/js/webtoolkit.js"></script>
+      <script type="text/javascript" src="/js/common.js"></script>
 
       <script type="text/javascript">
          var msgIRCUsers = new Template("(#{users} User)");
@@ -281,9 +282,6 @@
             deleteOldHiddenThreads();
 
             
-            showAppealsReminder(response.responseJSON.data.appeals.open_appeals,
-               response.responseJSON.data.appeals.own_appeals);
-            
          }
 
          function updateRadioStats(radio)
@@ -394,28 +392,28 @@
    </head>
 
    <body>
-      <script type="text/javascript" src="nav_files/wz_tooltip.js"></script>
+      <script type="text/javascript" src="/js/tooltip/wz_tooltip.js"></script>
 
       <div class="menu_title">KRAUTCHAN</div>
       <ul class="boardlist">
-      <li><a href="http://krautchan.net/news" target="main">News</a></li>
+      <li><a href="/news" target="main">News</a></li>
       <li><a href="irc://irc.inn.at.euirc.net/#krautchan">IRC <i><span id="ircstats"></span></i></a></li>
-      <li><a href="http://krautchan.net/pjirc/irc.html" target="_blank">IRC-Applet</a></li>
-      <li><a href="http://krautchan.net/regeln.html" target="main">Regeln</a></li>
-      <li><a href="http://krautchan.net/faq.html" target="main">FAQ</a></li>
-      <li><a href="http://krautchan.net/rss/global-threads" target="main">RSS</a></li>
-      <li><a href="http://krautchan.net/donations" target="main">Spenden / Donations</a></li>
+      <li><a href="/pjirc/irc.html" target="_blank">IRC-Applet</a></li>
+      <li><a href="/regeln.html" target="main">Regeln</a></li>
+      <li><a href="/faq.html" target="main">FAQ</a></li>
+      <li><a href="/rss/global-threads" target="main">RSS</a></li>
+      <li><a href="/donations" target="main">Spenden / Donations</a></li>
       </ul>
 
       
       <script type="text/javascript">
           $('ircstats').innerHTML = msgIRCUsers.evaluate(
-            { users: 67 });
+            { users: 96 });
       </script>
       
 
       
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, 'radio');">−</span><span id="radio_label">Radio</span></h2>
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, 'radio');">&minus;</span><span id="radio_label">Radio</span></h2>
       <div id="nav_radio">
       
       <div id="radio_status_box" class="radio_idle">
@@ -427,9 +425,11 @@
          <div id="radio_time" class="radio_smalltext"></div>
       </div>
       <div>
-      <a href="http://radio.krautchan.net:8000/radio.mp3.m3u">MP3</a>
-      <a href="http://radio.krautchan.net:8000/radio.ogg.m3u">OGG</a>
-      <a href="http://radio.krautchan.net:8000/radiohq.ogg.m3u">OGG-HQ</a>
+      <a href="http://radio.krautchan.net/listen.php?stream=1">MP3</a>
+      <a href="http://radio.krautchan.net/listen.php?stream=2">OGG</a>
+      <a href="http://radio.krautchan.net/listen.php?stream=4">OGG-HQ</a>
+      <a href="http://radio.krautchan.net/listen.php?stream=5">AACP</a>
+      <a href="http://radio.krautchan.net/player5/" onclick="javascript:window.open('http://radio.krautchan.net/player5/','name','width=500,height=130', 'resizeable=no'); return false;" >HTML5</a>
       </div>
       <ul class="boardlist">
          <li><a href="http://radio.krautchan.net/" target="main">Website</a></li>
@@ -437,254 +437,244 @@
       </div>
 
       
-      
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, 'admin');">−</span>Administration</h2>
-      <div id="nav_admin">
-      
-      <ul class="boardlist">
-         <li><a href="http://krautchan.net/login" target="main">Login/Logout</a></li>
-
-         
-
-         
-
-         
-
-         
-
-         
-            <li><a href="http://krautchan.net/admin/bans" target="main">Sperrungen</a></li>
-         
-
-         
-
-         
-
-         
-      </ul>
-      </div>
-
-      <p id="appeals_reminder" style="display: none">
-         <a href="http://krautchan.net/admin/bans" target="main">
-            <img src="nav_files/admin-icon-banappeal.png" id="appeals_icon_normal">
-            <img src="nav_files/admin-icon-banappeal.png" id="appeals_icon_blink">
-         </a>
-      </p>
-
-      <script type="text/javascript">
-         var msgAppeals = "{n} Sperrung(en) mit unbearbeiteten Einspr&uuml;chen.";
-         var msgOwnAppeals = "{n} davon f&uuml;r von dir erstellte Sperrungen.";
-
-         function showAppealsReminder(appeals, ownAppeals)
-         {
-            var s;
-            var icon;
-
-            if (appeals == 0)
-            {
-               $('appeals_reminder').hide();
-               return;
-            }
-
-            s = msgAppeals.replace(/\{n\}/, appeals);
-
-            if (ownAppeals > 0)
-               s += " " + msgOwnAppeals.replace(/\{n\}/, ownAppeals);
-
-            $('appeals_reminder').show();
-
-            if (ownAppeals > 0)
-            {
-               $('appeals_icon_normal').hide();
-               icon = $('appeals_icon_blink');
-               icon.show();
-               icon.pulsate({ duration: 30.0, pulses: 60 });
-            }
-
-            else
-            {
-               $('appeals_icon_blink').hide();
-               icon = $('appeals_icon_normal');
-               icon.show();
-            }
-
-            icon.onmouseover = function() { helpTip(s); };
-            icon.onmouseout = function() { UnTip(); };
-         }
-
-         showAppealsReminder(0, 0);
-      </script>
-      
 
       
       
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2056');">−</span>VIP</h2>
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2056');">&minus;</span>VIP</h2>
       <div id="nav_2056">
       
       <ul class="boardlist">
          
             
-            <li id="board_b" class="board_newposts"><a href="http://krautchan.net/b/" target="main">/b/ - Breivik Geofarm</a></li>
+            
+            <li id="board_b" class="board_newposts"><a href="/b/" target="main">/b/ - very informative and well designed</a></li>
             
          
             
-            <li id="board_int" class="board_newposts"><a href="http://krautchan.net/int/" target="main">/int/ - International</a></li>
+            
+            <li id="board_int" class="board_newposts"><a href="/int/" target="main">/int/ - International</a></li>
             
          
             
-            <li id="board_vip" class="board_newposts"><a href="http://krautchan.net/vip/" target="main">/vip/ - Beste der Besten</a></li>
+            
+            
+            <li id="board_vip" class="board_newposts"><a href="/vip/" target="main">/vip/ - Beste der Besten</a></li>
             
          
       </ul>
       </div>
       
       
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2057');">−</span>Allgemein</h2>
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2057');">&minus;</span>Allgemein</h2>
       <div id="nav_2057">
       
       <ul class="boardlist">
          
             
-            <li id="board_a" class="board_newposts"><a href="http://krautchan.net/a/" target="main">/a/ - Anime &amp; Manga</a></li>
+            
+            <li id="board_a" class="board_newposts"><a href="/a/" target="main">/a/ - Anime & Manga</a></li>
             
          
             
-            <li id="board_c" class="board_newposts"><a href="http://krautchan.net/c/" target="main">/c/ - Computer</a></li>
+            
+            <li id="board_c" class="board_newposts"><a href="/c/" target="main">/c/ - Computer</a></li>
             
          
             
-            <li id="board_d" class="board_newposts"><a href="http://krautchan.net/d/" target="main">/d/ - Drogen</a></li>
+            
+            <li id="board_co" class="board_newposts"><a href="/co/" target="main">/co/ - Comics & Cartoons</a></li>
             
          
             
-            <li id="board_e" class="board_newposts"><a href="http://krautchan.net/e/" target="main">/e/ - Essen &amp; Trinken</a></li>
+            
+            <li id="board_d" class="board_newposts"><a href="/d/" target="main">/d/ - Drogen</a></li>
             
          
             
-            <li id="board_f" class="board_newposts"><a href="http://krautchan.net/f/" target="main">/f/ - Fahrzeuge</a></li>
+            
+            <li id="board_e" class="board_newposts"><a href="/e/" target="main">/e/ - Essen & Trinken</a></li>
             
          
             
-            <li id="board_fb" class="board_newposts"><a href="http://krautchan.net/fb/" target="main">/fb/ - Frag Bernd</a></li>
+            
+            <li id="board_f" class="board_newposts"><a href="/f/" target="main">/f/ - Fahrzeuge</a></li>
             
          
             
-            <li id="board_fit" class="board_newposts"><a href="http://krautchan.net/fit/" target="main">/fit/ - Fitness</a></li>
+            
+            <li id="board_fb" class="board_newposts"><a href="/fb/" target="main">/fb/ - Frag Bernd</a></li>
             
          
             
-            <li id="board_jp" class="board_newposts"><a href="http://krautchan.net/jp/" target="main">/jp/ - Otakuhimmel</a></li>
+            
+            <li id="board_fit" class="board_newposts"><a href="/fit/" target="main">/fit/ - Fitness</a></li>
             
          
             
-            <li id="board_k" class="board_newposts"><a href="http://krautchan.net/k/" target="main">/k/ - Kreatives</a></li>
+            
+            <li id="board_jp" class="board_newposts"><a href="/jp/" target="main">/jp/ - Otakuhimmel</a></li>
             
          
             
-            <li id="board_l" class="board_newposts"><a href="http://krautchan.net/l/" target="main">/l/ - Literatur</a></li>
+            
+            <li id="board_k" class="board_newposts"><a href="/k/" target="main">/k/ - Kreatives</a></li>
             
          
             
-            <li id="board_li" class="board_newposts"><a href="http://krautchan.net/li/" target="main">/li/ - Lifestyle</a></li>
+            
+            <li id="board_l" class="board_newposts"><a href="/l/" target="main">/l/ - Literatur</a></li>
             
          
             
-            <li id="board_m" class="board_newposts"><a href="http://krautchan.net/m/" target="main">/m/ - Musik</a></li>
+            
+            <li id="board_li" class="board_newposts"><a href="/li/" target="main">/li/ - Lifestyle</a></li>
             
          
             
-            <li id="board_p" class="board_newposts"><a href="http://krautchan.net/p/" target="main">/p/ - Politik &amp; News</a></li>
+            
+            <li id="board_m" class="board_newposts"><a href="/m/" target="main">/m/ - Musik</a></li>
             
          
             
-            <li id="board_ph" class="board_newposts"><a href="http://krautchan.net/ph/" target="main">/ph/ - Philosophie</a></li>
+            
+            <li id="board_n" class="board_newposts"><a href="/n/" target="main">/n/ - Natur & Tierwelt</a></li>
             
          
             
-            <li id="board_sp" class="board_newposts"><a href="http://krautchan.net/sp/" target="main">/sp/ - Spielzeug</a></li>
+            
+            <li id="board_p" class="board_newposts"><a href="/p/" target="main">/p/ - Politik & News</a></li>
             
          
             
-            <li id="board_t" class="board_newposts"><a href="http://krautchan.net/t/" target="main">/t/ - Technik</a></li>
+            
+            <li id="board_ph" class="board_newposts"><a href="/ph/" target="main">/ph/ - Philosophie</a></li>
             
          
             
-            <li id="board_tv" class="board_newposts"><a href="http://krautchan.net/tv/" target="main">/tv/ - Film &amp; Fernsehen</a></li>
+            
+            <li id="board_sp" class="board_newposts"><a href="/sp/" target="main">/sp/ - Spielzeug</a></li>
             
          
             
-            <li id="board_v" class="board_newposts"><a href="http://krautchan.net/v/" target="main">/v/ - Videospiele</a></li>
+            
+            <li id="board_t" class="board_newposts"><a href="/t/" target="main">/t/ - Technik</a></li>
             
          
             
-            <li id="board_w" class="board_newposts"><a href="http://krautchan.net/w/" target="main">/w/ - Wissenschaft</a></li>
+            
+            <li id="board_tv" class="board_newposts"><a href="/tv/" target="main">/tv/ - Film & Fernsehen</a></li>
             
          
             
-            <li id="board_we" class="board_newposts"><a href="http://krautchan.net/board/we/" target="main">/we/ - Weltschmerz</a></li>
+            
+            <li id="board_v" class="board_newposts"><a href="/v/" target="main">/v/ - Videospiele</a></li>
             
          
             
-            <li id="board_wp" class="board_newposts"><a href="http://krautchan.net/wp/" target="main">/wp/ - Wallpaper</a></li>
+            
+            <li id="board_w" class="board_newposts"><a href="/w/" target="main">/w/ - Wissenschaft</a></li>
             
          
             
-            <li id="board_x" class="board_newposts"><a href="http://krautchan.net/x/" target="main">/x/ - Paranormales</a></li>
+            
+            <li id="board_we" class="board_newposts"><a href="/we/" target="main">/we/ - Weltschmerz</a></li>
+            
+         
+            
+            
+            <li id="board_wp" class="board_newposts"><a href="/wp/" target="main">/wp/ - Wallpaper</a></li>
+            
+         
+            
+            
+            <li id="board_x" class="board_newposts"><a href="/x/" target="main">/x/ - Paranormales</a></li>
+            
+         
+            
+            
+            <li id="board_z" class="board_newposts"><a href="/z/" target="main">/z/ - Zeichnen</a></li>
+            
+         
+            
+            
+            <li id="board_zp" class="board_newposts"><a href="/zp/" target="main">/zp/ - MS Paint</a></li>
             
          
       </ul>
       </div>
       
       
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, '3588215');">−</span>Trial</h2>
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '3588215');">&minus;</span>Trial</h2>
       <div id="nav_3588215">
       
       <ul class="boardlist">
          
             
-            <li id="board_n" class="board_newposts"><a href="http://krautchan.net/n/" target="main">/n/ - Natur &amp; Tierwelt</a></li>
+            
+            <li id="board_fe" class="board_newposts"><a href="/fe/" target="main">/fe/ - Fahrräder und Ecchi</a></li>
             
          
             
-            <li id="board_rfk" class="board_newposts"><a href="http://krautchan.net/rfk/" target="main">/rfk/ - Radio Freies Krautchan</a></li>
+            
+            <li id="board_ng" class="board_newposts"><a href="/ng/" target="main">/ng/ - Geld & Finanz</a></li>
             
          
             
-            <li id="board_z" class="board_newposts"><a href="http://krautchan.net/z/" target="main">/z/ - Zeichnen</a></li>
+            
+            <li id="board_prog" class="board_newposts"><a href="/prog/" target="main">/prog/ - /prog/</a></li>
             
          
             
-            <li id="board_zp" class="board_newposts"><a href="http://krautchan.net/zp/" target="main">/zp/ - MS Paint</a></li>
+            
+            <li id="board_trv" class="board_newposts"><a href="/trv/" target="main">/trv/ - Travel</a></li>
+            
+         
+            
+            
+            <li id="board_tu" class="board_newposts"><a href="/tu/" target="main">/tu/ - Turingvollständigkeit</a></li>
+            
+         
+            
+            
+            <li id="board_wk" class="board_newposts"><a href="/wk/" target="main">/wk/ - Waffen & Krieg</a></li>
             
          
       </ul>
       </div>
       
       
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2058');">−</span>Wichsvorlagen</h2>
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2058');">&minus;</span>Wichsvorlagen</h2>
       <div id="nav_2058">
       
       <ul class="boardlist">
          
             
-            <li id="board_h" class="board_newposts"><a href="http://krautchan.net/h/" target="main">/h/ - Hentai</a></li>
+            
+            <li id="board_h" class="board_newposts"><a href="/h/" target="main">/h/ - Hentai</a></li>
             
          
             
-            <li id="board_s" class="board_newposts"><a href="http://krautchan.net/s/" target="main">/s/ - Sexy Frauen</a></li>
+            
+            <li id="board_s" class="board_newposts"><a href="/s/" target="main">/s/ - Sexy Frauen</a></li>
             
          
       </ul>
       </div>
       
       
-      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2085');">−</span>Sonstiges</h2>
+      <h2><span class="nav_group_button" onclick="toggleMenu(this, '2085');">&minus;</span>Sonstiges</h2>
       <div id="nav_2085">
       
       <ul class="boardlist">
          
             
-            <li id="board_kc" class="board_newposts"><a href="http://krautchan.net/kc/" target="main">/kc/ - Krautchan</a></li>
+            
+            <li id="board_kc" class="board_newposts"><a href="/kc/" target="main">/kc/ - Krautchan</a></li>
+            
+         
+            
+            
+            <li id="board_rfk" class="board_newposts"><a href="/rfk/" target="main">/rfk/ - Radio Freies Krautchan</a></li>
             
          
       </ul>
@@ -692,155 +682,183 @@
       
 
       <p>
-      <span class="board_newposts"><b>Markierte</b></span> Boards enthalten neue Posts.
+      <span class=board_newposts><b>Markierte</b></span> Boards enthalten neue Posts.
       </p>
       <p>
-      <img src="nav_files/button-refresh.gif" onclick="buttonReload();" alt="Aktualisieren" style="cursor: pointer;" id="button_reload">
+      <img src="/images/button-refresh.gif" onclick="buttonReload();"
+         alt="Aktualisieren"
+         style="cursor: pointer" id="button_reload">
          Aktualisieren<br>
-      <img src="nav_files/button-checkmark.gif" onclick="buttonMarkRead();" alt="Alle gelesen" style="cursor: pointer;" id="button_markread">
+      <img src="/images/button-checkmark.gif" onclick="buttonMarkRead();"
+         alt="Alle gelesen"
+         style="cursor: pointer" id="button_markread">
          Alle gelesen
       </p>
 
-      
-      <p>
-      <b>[ provisorium ]</b>
-      </p>
       
 
       <script type="text/javascript">
          last_post_stats = {
          
             a:
-               { newest_posttime: 1311819832,
-                 oldest_postnumber: 82670 },
+               { newest_posttime: 1363206707,
+                 oldest_postnumber: 95202 },
          
             b:
-               { newest_posttime: 1311836229,
-                 oldest_postnumber: 3289069 },
+               { newest_posttime: 1363207179,
+                 oldest_postnumber: 5835682 },
          
             c:
-               { newest_posttime: 1311835795,
-                 oldest_postnumber: 132616 },
+               { newest_posttime: 1363206599,
+                 oldest_postnumber: 167372 },
+         
+            co:
+               { newest_posttime: 1363204766,
+                 oldest_postnumber: 3679 },
          
             d:
-               { newest_posttime: 1311825964,
+               { newest_posttime: 1363206169,
                  oldest_postnumber: 36000 },
          
             e:
-               { newest_posttime: 1311822275,
-                 oldest_postnumber: 21883 },
+               { newest_posttime: 1363202458,
+                 oldest_postnumber: 31280 },
          
             f:
-               { newest_posttime: 1311807961,
-                 oldest_postnumber: 7385 },
+               { newest_posttime: 1363203867,
+                 oldest_postnumber: 16499 },
          
             fb:
-               { newest_posttime: 1311835740,
+               { newest_posttime: 1363200000,
                  oldest_postnumber: 22999 },
          
+            fe:
+               { newest_posttime: 1363201619,
+                 oldest_postnumber: 1 },
+         
             fit:
-               { newest_posttime: 1311831148,
-                 oldest_postnumber: 18610 },
+               { newest_posttime: 1363206167,
+                 oldest_postnumber: 28159 },
          
             h:
-               { newest_posttime: 1311813008,
-                 oldest_postnumber: 13396 },
+               { newest_posttime: 1363201394,
+                 oldest_postnumber: 15598 },
          
             int:
-               { newest_posttime: 1311836233,
-                 oldest_postnumber: 6106609 },
+               { newest_posttime: 1363207184,
+                 oldest_postnumber: 16231623 },
          
             jp:
-               { newest_posttime: 1311818833,
-                 oldest_postnumber: 16889 },
+               { newest_posttime: 1363198176,
+                 oldest_postnumber: 28230 },
          
             k:
-               { newest_posttime: 1311808416,
-                 oldest_postnumber: 14174 },
+               { newest_posttime: 1363188768,
+                 oldest_postnumber: 17058 },
          
             kc:
-               { newest_posttime: 1311827394,
+               { newest_posttime: 1363205475,
                  oldest_postnumber: 18298 },
          
             l:
-               { newest_posttime: 1311798573,
-                 oldest_postnumber: 13978 },
+               { newest_posttime: 1363199241,
+                 oldest_postnumber: 17713 },
          
             li:
-               { newest_posttime: 1311812407,
-                 oldest_postnumber: 4411 },
+               { newest_posttime: 1363204947,
+                 oldest_postnumber: 10860 },
          
             m:
-               { newest_posttime: 1311813900,
-                 oldest_postnumber: 42125 },
+               { newest_posttime: 1363188690,
+                 oldest_postnumber: 48057 },
          
             n:
-               { newest_posttime: 1311771950,
-                 oldest_postnumber: 507 },
+               { newest_posttime: 1363202150,
+                 oldest_postnumber: 2434 },
+         
+            ng:
+               { newest_posttime: 1363206595,
+                 oldest_postnumber: 109 },
          
             p:
-               { newest_posttime: 1311832514,
-                 oldest_postnumber: 53327 },
+               { newest_posttime: 1363207051,
+                 oldest_postnumber: 76007 },
          
             ph:
-               { newest_posttime: 1311809660,
-                 oldest_postnumber: 4553 },
+               { newest_posttime: 1363176344,
+                 oldest_postnumber: 6869 },
+         
+            prog:
+               { newest_posttime: 1363180739,
+                 oldest_postnumber: 1569 },
          
             rfk:
-               { newest_posttime: 1311787656,
-                 oldest_postnumber: 85 },
+               { newest_posttime: 1363177551,
+                 oldest_postnumber: 3238 },
          
             s:
-               { newest_posttime: 1311814273,
-                 oldest_postnumber: 35116 },
+               { newest_posttime: 1363167041,
+                 oldest_postnumber: 44414 },
          
             sp:
-               { newest_posttime: 1311822893,
-                 oldest_postnumber: 2726 },
+               { newest_posttime: 1363198742,
+                 oldest_postnumber: 3973 },
          
             t:
-               { newest_posttime: 1311817358,
+               { newest_posttime: 1363201651,
                  oldest_postnumber: 15046 },
          
+            trv:
+               { newest_posttime: 1363194870,
+                 oldest_postnumber: 1 },
+         
+            tu:
+               { newest_posttime: 1363206198,
+                 oldest_postnumber: 1 },
+         
             tv:
-               { newest_posttime: 1311826549,
-                 oldest_postnumber: 30217 },
+               { newest_posttime: 1363181776,
+                 oldest_postnumber: 41260 },
          
             v:
-               { newest_posttime: 1311835921,
-                 oldest_postnumber: 17191 },
+               { newest_posttime: 1363205179,
+                 oldest_postnumber: 67123 },
          
             vip:
-               { newest_posttime: 1311827454,
-                 oldest_postnumber: 6436 },
+               { newest_posttime: 1363185719,
+                 oldest_postnumber: 12130 },
          
             w:
-               { newest_posttime: 1311798149,
-                 oldest_postnumber: 7036 },
+               { newest_posttime: 1363206789,
+                 oldest_postnumber: 12137 },
          
             we:
-               { newest_posttime: 1311800921,
+               { newest_posttime: 1363199573,
                  oldest_postnumber: 28221 },
          
+            wk:
+               { newest_posttime: 1363181939,
+                 oldest_postnumber: 4470 },
+         
             wp:
-               { newest_posttime: 1311802805,
-                 oldest_postnumber: 6137 },
+               { newest_posttime: 1363108747,
+                 oldest_postnumber: 7737 },
          
             x:
-               { newest_posttime: 1311817525,
-                 oldest_postnumber: 3264 },
+               { newest_posttime: 1363206512,
+                 oldest_postnumber: 5805 },
          
             z:
-               { newest_posttime: 1311790873,
-                 oldest_postnumber: 542 },
+               { newest_posttime: 1363205395,
+                 oldest_postnumber: 2419 },
          
             zp:
-               { newest_posttime: 1311813804,
-                 oldest_postnumber: 1 },
+               { newest_posttime: 1363178024,
+                 oldest_postnumber: 49 },
          
          };
 
-         var initial_radio_stats = {"last_update":"1311836221","nextshow":{"dj":"asd","show":"m","begin":"1312941600","id":"4730","description":"mmm","end":"1312950600"},"active":0};
+         var initial_radio_stats = {"last_update":"1363207163","nextshow":{"dj":"bsbernd","show":"Dschungel","begin":"1363208400","id":"12634","description":"rave on!","end":"1363212000"},"active":0};
 
          updateRadioStats(initial_radio_stats);
          deleteOldHiddenThreads();
@@ -850,6 +868,5 @@
       <div class="desuchan_version">
          <span class="desu">Desu</span><span class="chan">Chan</span> 0.80
       </div>
-   
-
-</body></html>
+   </body>
+</html>

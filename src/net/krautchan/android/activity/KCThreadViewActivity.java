@@ -85,7 +85,7 @@ public class KCThreadViewActivity extends Activity {
 	Set<KCPosting> 					postings;
 
 	@Override
-	public void onCreate(Bundle bndl) { 
+	public void onCreate(Bundle bndl) {
 		super.onCreate(bndl);
 		missedPostings = false;
 		postings = new LinkedHashSet<KCPosting>();
@@ -230,7 +230,7 @@ public class KCThreadViewActivity extends Activity {
 	
 	public void onBackPressed () {
 			super.onBackPressed();
-			if (thread.getLastPosting() != null) {
+			if ((null != thread) && (thread.getLastPosting() != null)) {
 				thread.previousLastKcNum = thread.getLastPosting().kcNummer;
 			} 
 
@@ -482,7 +482,7 @@ public class KCThreadViewActivity extends Activity {
     		if (null == post) {
     			return;
     		}
-    		citation += ">>"+post.kcNummer+" :\n"+post.getKcStyledContent()+"\n";
+    		citation += ">>"+post.kcNummer+":\n"+post.getKcStyledContent()+"\n";
     		
     	} catch (Exception ex) {
     		Log.e(TAG, "citePosting failed: "+ex.getMessage());
@@ -620,6 +620,7 @@ public class KCThreadViewActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		citation = "";
 		if (0 == requestCode) {
 			reload();
 		} else {

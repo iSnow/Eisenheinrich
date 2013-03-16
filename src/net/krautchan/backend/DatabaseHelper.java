@@ -16,6 +16,10 @@ package net.krautchan.backend;
 * limitations under the License.
 */
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -25,24 +29,24 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import junit.framework.Assert;
-
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String TAG = "DatabaseHelper";
 	private final static String	DBASE_NAME 		= "Schlaubernd";
-	private final static int 	VERSION_NUM 	=  7;
+	private final static int 	VERSION_NUM 	=  13;
 	private static final String BOARD_TABLE		= "board";
 	private static final String THREAD_TABLE	= "thread";
+	private static final String POST_TABLE		= "posting";
 	@SuppressWarnings("unused")
 	private static boolean debug = false;
 
@@ -54,6 +58,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		DatabaseHelper.debug = debug;
 		if (debug) {
 			logDbStats();
+			try {
+                File sd = Environment.getExternalStorageDirectory();
+
+                if (sd.canWrite()) {
+                    String currentDBPath = getReadableDatabase().getPath();
+                    //"//data//"+ Eisenheinrich.getInstance().getPackageName() +"//databases//"+DBASE_NAME;
+                    File currentDB = new File(currentDBPath);
+                    File backupDB = new File(sd, DBASE_NAME+".db");
+
+                        FileChannel src = new FileInputStream(currentDB).getChannel();
+                        FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                        dst.transferFrom(src, 0, src.size());
+                        src.close();
+                        dst.close();
+
+                }
+            } catch (Exception e) {
+            	Log.e (TAG, e.getMessage());
+            }
 		}
 	}
 
@@ -62,6 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		try {
 			createBoardTable (db);
 			createThreadTable (db);
+			createPostingable (db);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -69,15 +93,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		try { 
+		try {  
 			db.beginTransaction();
 			db.execSQL("DROP TABLE IF EXISTS "+BOARD_TABLE);
 			db.execSQL("DROP TABLE IF EXISTS "+THREAD_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS "+POST_TABLE);
 			db.setTransactionSuccessful();
 			db.endTransaction();
 			db.beginTransaction();
 			createBoardTable(db);
 			createThreadTable(db);
+			createPostingable (db);
 			db.setTransactionSuccessful();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -154,6 +180,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("first_post_date", thread.firstPostDate);
 				valHolder.put("digest", thread.digest);
 				valHolder.put("time_inserted", new Date().getTime());
+				valHolder.put("offset", 0);
 				if (thread.bookmarked) { // don't overwrite bookmark signal
 					valHolder.put("is_bookmarked", 1);
 				}
@@ -169,11 +196,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("first_post_date", thread.firstPostDate);
 				valHolder.put("digest", thread.digest);
 				valHolder.put("time_inserted", new Date().getTime());
+				valHolder.put("offset", 0);
 				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
 				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
 				db.insert(THREAD_TABLE, null, valHolder);
 			} 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 	}
@@ -305,9 +333,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " t.first_post_date first_post_date, " 
 				+ " t.is_bookmarked is_bookmarked, "
 				+ " t.is_hidden is_hidden "
-			+"from "+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
-			+" on t.fk_board = b.id  where t.id = ?";
-		return db.rawQuery(query,  new String[]{id.toString()});
+			+" from "+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
+			+" on t.fk_board = b.id  where t.id = CAST(? AS INTEGER)" ;
+		return db.rawQuery(query,  new String[]{String.valueOf(id)});
 	}
 
 	private void createBoardTable (SQLiteDatabase db) throws SQLException {
@@ -330,9 +358,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " digest text not null, " 
 				+ " first_post_date integer not null, " 
 				+ " time_inserted integer not null, " 
+				+ " offset integer not null, " 
 				+ " is_bookmarked integer, " 
 				+ " is_hidden integer, "
 				+" FOREIGN KEY(fk_board) REFERENCES "+BOARD_TABLE+"(id))");	
+	}
+	
+	private void createPostingable (SQLiteDatabase db) throws SQLException {
+		db.execSQL("create table "+POST_TABLE+" (" 
+				+ " id integer primary key,"
+				+ " fk_thread integer not null, " 
+				+ " kc_number integer not null, "
+				+ " post_date integer not null, " 
+				+ " html text not null, " 
+				+ " img0 text, " 
+				+ " img1 text, " 
+				+ " img2 text, " 
+				+ " img3 text, " 
+				+" FOREIGN KEY(fk_thread) REFERENCES "+THREAD_TABLE+"(id))");	
 	}
 	
 	public void logDbStats () {

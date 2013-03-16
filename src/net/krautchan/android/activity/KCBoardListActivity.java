@@ -22,27 +22,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.network.BanCheck;
-import net.krautchan.backend.Cache;
+import net.krautchan.backend.KCCache;
 import net.krautchan.data.KCBoard;
 import net.krautchan.parser.KCBoardListParser;
 import net.krautchan.parser.KCPageParser;
-import net.krautchan.R;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.graphics.drawable.PaintDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,31 +62,62 @@ import android.widget.Toast;
 
 public class KCBoardListActivity extends ListActivity {
 	protected static final String TAG = "KCBoardListActivity";
-	private Map<String, KCBoard> boards = null;
-
+	private ListView list = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
 		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 
-		// TODO Move part of the code into the DatabaseHelper, no need to copy between collection and map all the time
-		boolean gotBoards = false;
-		Eisenheinrich.getInstance();
-		Cache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+		KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();	
+
+		this.setContentView(R.layout.board_list);
+		list = getListView();
 		
-		
-		try {
-			boards = new LinkedHashMap<String, KCBoard>();
-			Collection<KCBoard> boardL = Eisenheinrich.getInstance().dbHelper.getBoards();
-			for (KCBoard board : boardL) {
-				boards.put(board.shortName, board);
+		TextView history = (TextView) findViewById(R.id.board_list_history);
+		history.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf"));
+		history.setClickable(true);
+		history.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				System.out.println ("CLACK");
 			}
-			gotBoards = boards.size() > 0;
-		} catch (Exception ex) {
-			gotBoards = false;
-		}
-		if (!gotBoards) {
+			
+		});
+		
+		final View viewHeader = (View)findViewById(R.id.board_list_watcher_wrapper);
+		ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
+		    @Override
+		    public Shader resize(int width, int height) {
+		        LinearGradient lg = new LinearGradient(0, 0, 0, viewHeader.getHeight(),
+		            new int[] { 
+		        		getResources().getColor(R.color.Greengradient3a), 
+		        		getResources().getColor(R.color.Greengradient3b), 
+		                getResources().getColor(R.color.Greengradient3c), 
+		                getResources().getColor(R.color.Greengradient3d), 
+		                getResources().getColor(R.color.Greendarkborder) },
+		            new float[] {
+		                0, 0.45f, 0.55f, 0.98f, 1 },
+		            Shader.TileMode.REPEAT);
+		         return lg;
+		    }
+		};
+		PaintDrawable p = new PaintDrawable();
+		p.setShape(new RectShape());
+		p.setShaderFactory(sf);
+		viewHeader.setBackgroundDrawable(p);
+		
+		//viewHeader.setBackgroundDrawable(ActivityHelpers.generateViewHeanderBackground(viewHeader.getHeight()));
+
+
+		
+		
+		
+		
+		
+		if (boardCache.size() == 0) {
 			try {
 				InputStream is = this.getAssets().open("nav.html");
 				BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -93,7 +129,15 @@ public class KCBoardListActivity extends ListActivity {
 				r.close();
 				r = null;
 				String nav = builder.toString();
-				boards = KCBoardListParser.getBoardList(nav, Eisenheinrich.DEFAULTS.BASE_URL);
+				Map<String, KCBoard> boards = KCBoardListParser.getBoardList(nav, Defaults.BASE_URL);
+				for (Entry<String, KCBoard> boardE: boards.entrySet()) {
+					KCBoard oldBoard = boardCache.get(boardE.getValue().dbId);
+					KCBoard newBoard = boardE.getValue();
+					if (oldBoard != null) {
+						newBoard.show = oldBoard.show;
+					} 
+					boardCache.add(newBoard);
+				}
 			} catch (IOException e) {
 				String[] mStrings = new String[] { "Exception", e.getMessage() };
 				setListAdapter(new ArrayAdapter<String>(this, R.layout.board_list_item, mStrings) {
@@ -107,10 +151,8 @@ public class KCBoardListActivity extends ListActivity {
 			}
 			
 		}
-		for (Entry<String, KCBoard> boardE: boards.entrySet()) {
-			boardCache.add(boardE.getValue());
-		}
-		setListAdapter(new BoardListAdapter(this, boards));
+
+		setListAdapter(new BoardListAdapter(this, boardCache.getAll()));
 	}
 	
 	@Override
@@ -127,7 +169,8 @@ public class KCBoardListActivity extends ListActivity {
 	protected void onRestart() {
 	    super.onRestart();
 	    setFilteredBoards();
-		Eisenheinrich.getInstance().dbHelper.persistBoards(boards);
+		KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+		Eisenheinrich.getInstance().dbHelper.persistBoards(boardCache.getAll());
 	    checkNetwork();
 	}
 
@@ -136,8 +179,16 @@ public class KCBoardListActivity extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 		setFilteredBoards();
-		Eisenheinrich.getInstance().dbHelper.persistBoards(boards);
+		Eisenheinrich.GLOBALS.getBoardCache();
+		//Eisenheinrich.getInstance().dbHelper.persistBoards(boardCache.getAll());
 		checkNetwork();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+		Eisenheinrich.getInstance().dbHelper.persistBoards(boardCache.getAll());
 	}
 
 	@Override
@@ -147,21 +198,20 @@ public class KCBoardListActivity extends ListActivity {
 		try {
 			out = new ObjectOutputStream(boss);
 
-			Iterator<String> iter = boards.keySet().iterator();
-			String key = null;
-			KCBoard board = null;
-			boolean found = false;
-			while (iter.hasNext() && !found) {
-				key = iter.next();
-				board = boards.get(key);
-				found = board.dbId == id;
+			KCBoard curBoard = null;
+			KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+			for (KCBoard board : boardCache.getAll()) {
+				if (board.dbId == id) {
+					curBoard = board;
+					break;
+				}
 			}
-			out.writeObject(board);
+			
+			out.writeObject(curBoard);
 			out.close();
 			boss.close();
-			final KCBoard curBoard = board;
 			Thread t = new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
-				.setBasePath(Eisenheinrich.DEFAULTS.BASE_URL)
+				.setBasePath(Defaults.BASE_URL)
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
 				);
@@ -172,8 +222,8 @@ public class KCBoardListActivity extends ListActivity {
 
 			Bundle b = new Bundle();
 			b.putByteArray("board", boss.toByteArray());
-			b.putLong("boardId", board.dbId);
-			b.putString("token", board.uri);
+			b.putLong("boardId", curBoard.dbId);
+			b.putString("token", curBoard.uri);
 
 			Intent intent = new Intent(this, KCThreadListActivity.class);
 			intent.putExtras(b);
@@ -187,12 +237,13 @@ public class KCBoardListActivity extends ListActivity {
 	private void setFilteredBoards () {
 		List<String> selectedBoards = Eisenheinrich.getInstance().getSelectedBoards();
 	    if (null != selectedBoards) {
-		    LinkedHashMap<String, KCBoard> newBoards = new LinkedHashMap<String, KCBoard>();
-		    for (String key: boards.keySet()) {
-		    	KCBoard board = boards.get(key);
+		    List<KCBoard> newBoards = new ArrayList<KCBoard>();
+		    KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+		    boardCache.getAll();
+		    for (KCBoard board : boardCache.getAll()) {
 		    	if (selectedBoards.contains(board.shortName)) {
 		    		board.show = true;
-		    		newBoards.put(key, board);
+		    		newBoards.add(board);
 		    	} else {
 		    		board.show = false;
 		    	}
@@ -220,8 +271,69 @@ public class KCBoardListActivity extends ListActivity {
 				}, 1000);
 		    }
 	}
-
+	
 	protected class BoardListAdapter extends ArrayAdapter<String> {
+		private final static int viewId = R.layout.board_list_item;
+		private LayoutInflater inflater;
+		List<KCBoard> rowVals;
+
+		public BoardListAdapter(ListActivity context, Collection<KCBoard> boards) {
+			super(context, viewId);
+			this.inflater = context.getLayoutInflater();
+			setBoards (boards);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View v = null;
+			if (null == convertView) {
+				v = inflater.inflate(R.layout.board_list_item, null);
+				TextView shortLabel = (TextView) v.findViewById(R.id.boardlist_shortname);
+				TextView longLabel = (TextView) v.findViewById(R.id.boardlist_longname);
+				shortLabel.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/juicebold.ttf"));
+				longLabel.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/juiceregular.ttf"));
+			} else {
+				v = convertView;
+			}
+
+			TextView shortLabel = (TextView) v.findViewById(R.id.boardlist_shortname);
+			shortLabel.setText(getShortName(position));
+
+			TextView longLabel = (TextView) v.findViewById(R.id.boardlist_longname);
+			longLabel.setText(rowVals.get(position).name);
+			return v;
+		}
+
+
+		@Override
+		public int getCount() {
+			return rowVals.size();
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return rowVals.get(position).dbId;
+		}
+
+		private String getShortName(int position) {
+			if (position > rowVals.size()) {
+				throw new IllegalArgumentException(
+				"BoardListAdapter:: getShortName -> position > rowVals");
+			}
+			return rowVals.get(position).shortName;
+		}
+		
+		public void setBoards (Collection<KCBoard> boards) {
+			rowVals = new ArrayList<KCBoard>();
+			for (KCBoard b: boards) {
+				if (b.show) {
+					rowVals.add(b);
+				}
+			}
+		}
+	}
+
+/*	protected class BoardListAdapter extends ArrayAdapter<String> {
 		private final static int viewId = R.layout.board_list_item;
 		private LayoutInflater inflater;
 		Map<String, KCBoard> rowVals;
@@ -288,7 +400,7 @@ public class KCBoardListActivity extends ListActivity {
 		public void setBoards (Map<String, KCBoard> boards) {
 			this.rowVals = boards;
 		}
-	}
+	}*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

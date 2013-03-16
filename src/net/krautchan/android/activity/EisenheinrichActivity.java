@@ -25,6 +25,21 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 
+import net.krautchan.R;
+import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.dialog.AboutDialog;
+import net.krautchan.android.dialog.DisclaimerDialog;
+import net.krautchan.android.dialog.UpdateDialog;
+import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.helpers.CustomExceptionHandler;
+import net.krautchan.android.helpers.FileHelpers;
+import net.krautchan.android.network.CookieHelper;
+import net.krautchan.android.network.ThreadExistenceCheck;
+import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
+import net.krautchan.android.network.UpdateCheck;
+import net.krautchan.android.network.UpdateCheck.UpdateCheckPeer;
+import net.krautchan.data.KCBoard;
+import net.krautchan.data.KCThread;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,21 +53,6 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableLayout.LayoutParams;
 import android.widget.TableRow;
-import net.krautchan.R; 
-import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.dialog.AboutDialog;
-import net.krautchan.android.dialog.DisclaimerDialog;
-import net.krautchan.android.dialog.UpdateDialog;
-import net.krautchan.android.helpers.ActivityHelpers;
-import net.krautchan.android.helpers.CustomExceptionHandler;
-import net.krautchan.android.helpers.FileHelpers;
-import net.krautchan.android.network.ThreadExistenceCheck;
-import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
-import net.krautchan.android.network.CookieHelper;
-import net.krautchan.android.network.UpdateCheck;
-import net.krautchan.android.network.UpdateCheck.UpdateCheckPeer;
-import net.krautchan.data.KCBoard;
-import net.krautchan.data.KCThread;
 
 public class EisenheinrichActivity extends Activity {
 	public static final String TAG = "EisenheinrichActivity";
@@ -102,6 +102,13 @@ public class EisenheinrichActivity extends Activity {
 	    goKCButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
 				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, KCBoardListActivity.class));
+		    }
+	    });
+	    
+	    Button testButton = (Button)findViewById(R.id.main_test);
+	    testButton.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, SpinnerActivity.class));
 		    }
 	    });
 	    

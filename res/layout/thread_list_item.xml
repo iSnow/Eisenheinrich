@@ -13,7 +13,7 @@
 			android:layout_width="0dp" 
 			android:layout_weight="1"
 			android:textSize="14sp" 
-			android:textColor="@color/GreenYellow" 
+			android:textColor="@color/TextGreen" 
 			android:textStyle="bold"
 			android:gravity="left" />
 		<TextView android:id="@+id/threadListAuthor"
@@ -60,5 +60,9 @@
 		android:layout_width="match_parent" 
 		android:layout_weight="1"
 		android:textSize="16sp" 
-		android:gravity="left"/>
+		android:gravity="left"
+		android:paddingTop="3sp"
+		android:paddingRight="6sp"
+		android:paddingBottom="6sp"
+		android:paddingLeft="6sp"/>
 </LinearLayout>

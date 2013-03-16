@@ -203,6 +203,7 @@ public class KCThreadListActivity extends Activity {
 					found = curThread.dbId == id;
 				}
 				if (found) {
+					Eisenheinrich.GLOBALS.getHistory().addThread(curThread);
 					ActivityHelpers.switchToThread (curThread, KCThreadListActivity.this); 
 				}
 			}
@@ -275,6 +276,7 @@ public class KCThreadListActivity extends Activity {
 	protected void onStop() {
 	    super.onStop();
 	    list.setVisibility(View.GONE);
+		Eisenheinrich.getInstance().GLOBALS.getThreadCache().freeze();
 	}
 
 	@Override
@@ -296,6 +298,7 @@ public class KCThreadListActivity extends Activity {
 		super.onSaveInstanceState(outState);
 		outState.putLong("boardId", curBoard.dbId);
 		outState.putString("token", token);
+		Eisenheinrich.getInstance().GLOBALS.getThreadCache().freeze();
 	}
 	
 	private void adjustTitle () {

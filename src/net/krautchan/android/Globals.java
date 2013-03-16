@@ -2,11 +2,12 @@ package net.krautchan.android;
 
 import java.util.Properties;
 
-import org.apache.http.cookie.Cookie;
-
-import net.krautchan.backend.Cache;
+import net.krautchan.backend.KCCache;
+import net.krautchan.backend.ThreadHistory;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
+
+import org.apache.http.cookie.Cookie;
 
 /*
 * Copyright (C) 2012 Johannes Jander (johannes@jandermail.de)
@@ -27,8 +28,9 @@ import net.krautchan.data.KCThread;
 
 public class Globals {
 	private String 				USER_AGENT = null;
-	private Cache<KCBoard>  	BOARD_CACHE = new Cache<KCBoard>();
-	private Cache<KCThread>  	THREAD_CACHE = new Cache<KCThread>(500);
+	private KCCache<KCBoard>  	BOARD_CACHE = new KCCache<KCBoard>();
+	private KCCache<KCThread>  	THREAD_CACHE = new KCCache<KCThread>(500);
+	private ThreadHistory	  	HISTORY = new ThreadHistory();
 	private boolean				DEBUG = true;
 	
 	private String 				IP_NUMBER = null;
@@ -56,7 +58,7 @@ public class Globals {
 		return USER_AGENT;
 	}
 	
-	public Cache<KCBoard> getBoardCache() {
+	public KCCache<KCBoard> getBoardCache() {
 		return BOARD_CACHE;
 	}
 	
@@ -72,12 +74,20 @@ public class Globals {
 		return KOMTUR_CODE;
 	}
 
+	public ThreadHistory getHistory() {
+		return HISTORY;
+	}
+	
 	public boolean areVisitedPostsCollapsible() {
 		return VISITED_POSTS_COLLAPSIBLE;
 	}
 
 	public boolean shouldShowImages() {
 		return SHOW_IMAGES;
+	}
+
+	public void setHistory(ThreadHistory hISTORY) {
+		HISTORY = hISTORY;
 	}
 	
 	public void setDebugVersion (boolean debug) {
@@ -108,15 +118,15 @@ public class Globals {
 		USER_AGENT = userAgent;
 	}
 	
-	public void setBoardCache (Cache<KCBoard> cache) {
+	public void setBoardCache (KCCache<KCBoard> cache) {
 		BOARD_CACHE = cache;
 	}
 
-	public Cache<KCThread> getThreadCache() {
+	public KCCache<KCThread> getThreadCache() {
 		return THREAD_CACHE;
 	}
 
-	public void setThreadCache(Cache<KCThread> cache) {
+	public void setThreadCache(KCCache<KCThread> cache) {
 		THREAD_CACHE = cache;
 	}
 

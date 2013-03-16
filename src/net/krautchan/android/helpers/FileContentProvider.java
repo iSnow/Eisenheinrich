@@ -20,18 +20,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-
 import net.krautchan.android.Defaults;
-import net.krautchan.android.Eisenheinrich;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -57,15 +49,17 @@ public class FileContentProvider extends ContentProvider {
 
 	@Override
 	public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
+		ParcelFileDescriptor parcel = null;
 		String filePath = Defaults.IMAGE_TEMP_DIR+"/"+uri.getPath().replace("/", "");
 		if (null != filePath) {
 			File result = FileHelpers.getSDFile (filePath);
 			if (null != result) {
-				ParcelFileDescriptor parcel = ParcelFileDescriptor.open(result, ParcelFileDescriptor.MODE_READ_ONLY);
-				return parcel;
+				parcel = ParcelFileDescriptor.open(result, ParcelFileDescriptor.MODE_READ_ONLY);
+			} else {
+				throw new FileNotFoundException (uri.toString());
 			}
-		}
-		return null;
+		} 
+		return parcel;
 	}
 
 	@Override
@@ -90,6 +84,20 @@ public class FileContentProvider extends ContentProvider {
 			}
 		}
 		return null;
+	}
+	
+
+	public String[] getStreamTypes (Uri uri, String mimeTypeFilter) {
+		String[] types = new String[1];
+		int delim = uri.getLastPathSegment().lastIndexOf('.');
+		String suffix = uri.getLastPathSegment().substring(delim + 1)
+		.toLowerCase();
+		for (int i = 0; i < SUFFIXES.length; i++) {
+			if (suffix.equals(SUFFIXES[i])) {
+				types[0] =  MIME_TYPES[i];
+			}
+		}
+		return types;
 	}
 
 	@Override

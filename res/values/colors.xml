@@ -5,4 +5,40 @@
 <color name="Blue">#2f2fff</color>
 <color name="White">#ffffff</color>
 <color name="LightGrey">#dfdbdf</color>
+<color name="DarkGreenYellow">#83bf27</color>
+<color name="DarkerGreenYellow">#538409</color>
+<color name="DarkerGreen">#5e9607</color>
+<color name="DarkGreen">#219102</color>
+
+<color name="LightBG">#fbf9f7</color>
+
+<color name="Charcoal">#303030</color>
+
+<color name="BGgradient1a">#aaaaaa</color>
+<color name="BGgradient1b">#cccccc</color>
+<color name="BGgradient1c">#cccccc</color>
+<color name="BGgradient1d">#eeeeee</color>
+
+<color name="TextGreen">#629d09</color>
+
+
+<color name="Greengradient1a">#00c838</color>
+<color name="Greengradient1b">#00a626</color>
+<color name="Greengradient1c">#00a500</color>
+<color name="Greengradient1d">#008900</color>
+
+<color name="Greengradient2a">#8ece2b</color>
+<color name="Greengradient2b">#7db920</color>
+<color name="Greengradient2c">#74ac1d</color>
+<color name="Greengradient2d">#68a012</color>
+
+<color name="Greengradient3a">#79b51c</color>
+<color name="Greengradient3b">#6fa51b</color>
+<color name="Greengradient3c">#68a012</color>
+<color name="Greengradient3d">#5a8f08</color>
+<color name="Greendarkborder">#37510e</color>
+
+
+
+<color name="DarkGreen">#219102</color>
 </resources>

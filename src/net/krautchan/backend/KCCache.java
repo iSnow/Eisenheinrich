@@ -8,37 +8,32 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import net.krautchan.data.*;
-/*
-* Copyright (C) 2012 Johannes Jander (johannes@jandermail.de)
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 
-public class Cache<T extends KrautObject> implements KODataListener<T> {
+import net.krautchan.data.KODataListener;
+import net.krautchan.data.KrautObject;
+
+public class KCCache<T extends KrautObject> implements KODataListener<T> {
+	private CachePersister<T> persister;
 	private ConcurrentLinkedQueue<T> krautObjects = new ConcurrentLinkedQueue<T>();
 	private int capacity = 200;
 
-	public Cache() {
+	public KCCache() {
 		super();
 	}
 	
-	public Cache(int capacity) {
+	public KCCache(int capacity) {
 		this.capacity = capacity;
+	}
+	
+	public void setPersister(CachePersister<T> persister) {
+		this.persister = persister;
 	}
 
 	public void add (T obj) {
 		obj.cachedTime = new Date().getTime();
+		if (krautObjects.contains(obj)) {
+			krautObjects.remove(obj);
+		}
 		krautObjects.add(obj);
 		if (krautObjects.size() > capacity) {
 			trimCache (krautObjects.size() - capacity);
@@ -83,9 +78,35 @@ public class Cache<T extends KrautObject> implements KODataListener<T> {
 				return (int) (arg0.cachedTime - arg1.cachedTime);
 			}
 		});
+		List<T> removed = new ArrayList<T>();
 		for (int i = sorter.size()-1; i > numEntriesToRemove; i--) {
 			krautObjects.remove(sorter.get(i));
+			removed.add(sorter.get(i));
 		}
+		if (null != persister) {
+			persister.persist(removed);
+		}
+	}
+	
+	public void freeze() {
+		if (null != persister) {
+			persister.persist(krautObjects);
+		}
+	}
+	
+	public void thaw() {
+		if (null != persister) {
+			krautObjects.clear();
+			krautObjects.addAll(persister.retrieveAll());
+		}
+	}
+	
+	public int size() {
+		return krautObjects.size();
+	}
+	
+	public void clear() {
+		krautObjects.clear();
 	}
 
 	@Override
@@ -102,6 +123,13 @@ public class Cache<T extends KrautObject> implements KODataListener<T> {
 	@Override
 	public void notifyError(Exception ex, Object token) {
 		// TODO Auto-generated method stub
+	}
+	
+	public interface CachePersister<T extends KrautObject> {
+		public void persist(T obj);
+		public void persist(Collection<T> objects);
+		public T retrieve(Long dbId);
+		public Collection<T> retrieveAll();
 		
 	}
 

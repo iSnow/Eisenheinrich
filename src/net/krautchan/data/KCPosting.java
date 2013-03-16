@@ -197,6 +197,10 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 				throw new IllegalStateException ("Illegal State in KCPosting:setField");
 		}
 	}
+	
+	public String toString() {
+		return "Post: "+kcNummer+" - "+content.substring(0, 40);
+	}
 
 	@Override
 	public int compareTo(KCPosting arg0) {

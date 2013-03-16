@@ -17,10 +17,14 @@ package net.krautchan.parser;
 */
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import net.krautchan.data.KCBoard;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,10 +36,11 @@ public class KCBoardListParser {
 	 * this is not a stream parser, but uses JSoup for simplicity 
 	 */
 
-	private static Map<String, KCBoard> getBoardList(Document doc, String baseUrl) {
+	private static Map<String, KCBoard> getBoardList(Document doc, String baseUrl) throws MalformedURLException {
 		Map<String, KCBoard> boards = new LinkedHashMap<String, KCBoard>();
 		Elements boardlist = doc.select(".boardlist li");
 		Iterator<Element> iter = boardlist.iterator();
+		URL base = new URL(baseUrl);
 		while (iter.hasNext()) {
 			Element elem = iter.next();
 			String idStr = elem.id();
@@ -43,7 +48,7 @@ public class KCBoardListParser {
 				Elements links = elem.select("a");
 				if ((null != links) && (null != links.get(0))) {
 					KCBoard board = new KCBoard();
-					board.uri = baseUrl+links.attr("href");
+					board.uri = new URL(base, links.attr("href")).toExternalForm();
 					String content = links.get(0).ownText();
 					String[] keyVal = content.split("\\s+-\\s+");
 					board.shortName = keyVal[0].trim().replaceAll("/", "");
