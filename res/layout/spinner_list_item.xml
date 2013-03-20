@@ -1,0 +1,75 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+	android:id="@+id/threadSpinnerLayout1" 
+	android:layout_height="wrap_content" 
+	android:layout_width="match_parent"
+	android:background="@color/Charcoal"
+	android:orientation="vertical"
+	android:paddingTop="3sp"
+	android:paddingRight="6sp"
+	android:paddingBottom="6sp"
+	android:paddingLeft="6sp">
+	<LinearLayout android:id="@+id/threadSpinnerLayout2"
+		android:layout_width="match_parent" 
+		android:layout_height="wrap_content"
+		android:gravity="left" >
+		<TextView android:id="@+id/threadSpinnerListNumber"
+			android:layout_height="wrap_content"
+			android:layout_width="0dp" 
+			android:layout_weight="1"
+			android:textSize="14sp" 
+			android:textColor="@color/TextGreen" 
+			android:textStyle="bold"
+			android:gravity="left" />
+		<TextView android:id="@+id/threadSpinnerListAuthor"
+			android:layout_height="wrap_content" 
+			android:layout_width="0dp" 
+			android:layout_weight="2"
+			android:textColor="@color/LightGrey"
+			android:textSize="15sp" 
+			android:gravity="left" 
+		/>
+		<TextView android:id="@+id/threadSpinnerListDate"
+			android:layout_height="wrap_content" 
+			android:layout_width="0dp" 
+			android:layout_weight="1"
+			android:textColor="@color/LightGrey"
+			android:textSize="14sp" 
+			android:gravity="left" 
+		/>
+	</LinearLayout>
+
+	<LinearLayout android:id="@+id/linearLayout3"
+		android:layout_width="match_parent" 
+		android:layout_height="wrap_content"
+		android:gravity="left" >
+
+		<TextView
+		    android:id="@+id/threadSpinnerListTitle"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:gravity="left"
+			android:textColor="@color/LightGrey"
+		    android:layout_weight="20"
+		    android:textSize="15sp" />
+
+		<TextView
+		    android:id="@+id/threadSpinnerListNumPostings"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="0.2"
+			android:textColor="@color/LightGrey"
+		    android:gravity="right"
+		    android:textSize="15sp" />
+
+	</LinearLayout>
+
+	<TextView android:id="@+id/threadSpinnerListContent"
+		android:layout_height="wrap_content" 
+		android:layout_width="match_parent" 
+		android:layout_weight="1"
+		android:textSize="16sp" 
+		android:textColor="@color/LightGrey"
+		android:gravity="left"
+		/>
+</LinearLayout>

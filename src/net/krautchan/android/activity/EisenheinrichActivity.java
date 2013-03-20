@@ -29,6 +29,7 @@ import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.AboutDialog;
 import net.krautchan.android.dialog.DisclaimerDialog;
+import net.krautchan.android.dialog.ThreadHistoryDialog;
 import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
@@ -108,7 +109,10 @@ public class EisenheinrichActivity extends Activity {
 	    Button testButton = (Button)findViewById(R.id.main_test);
 	    testButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
-				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, SpinnerActivity.class));
+		    	ThreadHistoryDialog dlg = new ThreadHistoryDialog (EisenheinrichActivity.this);
+		    	//dlg.show();
+		    	
+				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, ThreadSpinnerActivity.class));
 		    }
 	    });
 	    
@@ -292,19 +296,8 @@ public class EisenheinrichActivity extends Activity {
 			while (iter.hasNext()) {
 				lastId = iter.next().dbId;
 			}
-			//this.bookmarks = bookmarks;
-		}
-
-		/*@Override
-		public void threadsChecked(final boolean[] valid) {
-			EisenheinrichActivity.this.runOnUiThread(new Runnable () {
-				@Override
-				public void run() {	
-					showBookmarks (bookmarks, valid);
-				}
-		    }); 
 			
-		}*/
+		}
 
 		@Override
 		public void threadChecked(KCThread thread, boolean valid) {

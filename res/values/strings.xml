@@ -16,6 +16,7 @@
 <string name="test">Test</string>
 <string name="load_thread">Faden laden</string>
 <string name="new_thread">Neuer Faden</string>
+<string name="thread_history">Besuchte Fäden</string>
 <string name="edit">Edit</string>
 <string name="about">Über Eisenheinrich</string>
 <string name="cancel">Cancel ;_;</string>
@@ -44,8 +45,8 @@
 <string name="to_ban_page">Zur Bann-Seite</string>
 <string name="debug">Debug-Version</string>
 <string name="could_not_open_image_viewer">Konnte keinen Bildbetrachter starten</string>
-<string name="could_not_open_youtube_viewer">Could not open Youtube player</string>
-<string name="could_not_open_browser">Could not open Browser</string>
+<string name="could_not_open_youtube_viewer">Konnte Youtube nicht öffnen</string>
+<string name="could_not_open_browser">Konnte Browser nicht öffnen</string>
 <string name="boardlist_headline">Bretter</string>
 <string name="icon_cog"></string>
 </resources>

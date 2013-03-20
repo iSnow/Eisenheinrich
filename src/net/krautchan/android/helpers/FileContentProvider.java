@@ -90,8 +90,7 @@ public class FileContentProvider extends ContentProvider {
 	public String[] getStreamTypes (Uri uri, String mimeTypeFilter) {
 		String[] types = new String[1];
 		int delim = uri.getLastPathSegment().lastIndexOf('.');
-		String suffix = uri.getLastPathSegment().substring(delim + 1)
-		.toLowerCase();
+		String suffix = uri.getLastPathSegment().substring(delim + 1).toLowerCase();
 		for (int i = 0; i < SUFFIXES.length; i++) {
 			if (suffix.equals(SUFFIXES[i])) {
 				types[0] =  MIME_TYPES[i];

@@ -203,7 +203,6 @@ public class KCThreadListActivity extends Activity {
 					found = curThread.dbId == id;
 				}
 				if (found) {
-					Eisenheinrich.GLOBALS.getHistory().addThread(curThread);
 					ActivityHelpers.switchToThread (curThread, KCThreadListActivity.this); 
 				}
 			}

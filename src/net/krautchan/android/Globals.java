@@ -3,7 +3,6 @@ package net.krautchan.android;
 import java.util.Properties;
 
 import net.krautchan.backend.KCCache;
-import net.krautchan.backend.ThreadHistory;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
 
@@ -30,7 +29,7 @@ public class Globals {
 	private String 				USER_AGENT = null;
 	private KCCache<KCBoard>  	BOARD_CACHE = new KCCache<KCBoard>();
 	private KCCache<KCThread>  	THREAD_CACHE = new KCCache<KCThread>(500);
-	private ThreadHistory	  	HISTORY = new ThreadHistory();
+	//private ThreadHistory	  	HISTORY = new ThreadHistory();
 	private boolean				DEBUG = true;
 	
 	private String 				IP_NUMBER = null;
@@ -73,10 +72,6 @@ public class Globals {
 	public String getKomturCode() {
 		return KOMTUR_CODE;
 	}
-
-	public ThreadHistory getHistory() {
-		return HISTORY;
-	}
 	
 	public boolean areVisitedPostsCollapsible() {
 		return VISITED_POSTS_COLLAPSIBLE;
@@ -86,10 +81,6 @@ public class Globals {
 		return SHOW_IMAGES;
 	}
 
-	public void setHistory(ThreadHistory hISTORY) {
-		HISTORY = hISTORY;
-	}
-	
 	public void setDebugVersion (boolean debug) {
 		DEBUG = debug;
 	}

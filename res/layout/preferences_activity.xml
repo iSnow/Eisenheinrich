@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/ip_number_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_weight="1"
+        android:gravity="left"
+        android:text="@string/ip_number"
+        android:textColor="@color/GreenYellow"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/ip_number"
+        android:layout_width="218dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:ems="10"
+        android:inputType="none"
+        android:textSize="13dp" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/komtur_code_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_weight="1"
+        android:gravity="left"
+        android:text="@string/komtur_code"
+        android:textColor="@color/GreenYellow"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/komtur_code"
+        android:layout_width="218dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:ems="10"
+        android:inputType="none"
+        android:textSize="13dp" />
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/debug" />
+
+</LinearLayout>

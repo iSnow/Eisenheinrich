@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest package="net.krautchan" 
 	xmlns:android="http://schemas.android.com/apk/res/android" 
-	android:versionName='2.0.6 "Kuhmagnet"' 
-	android:versionCode="33">
+	android:versionName='2.1 "Kuhmagnet"' 
+	android:versionCode="34">
 	<uses-sdk android:minSdkVersion="8" 
-	    android:targetSdkVersion="10"/>
+	    android:targetSdkVersion="14"/>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -65,5 +65,6 @@
 		<activity android:name=".android.activity.KCPostActivity"></activity>
 		<activity android:name=".android.activity.KCEditBoardListActivity"></activity>
 		<activity android:name=".android.activity.SpinnerActivity"></activity>
+		<activity android:name=".android.activity.ThreadSpinnerActivity"></activity>
 	</application>
 </manifest>
