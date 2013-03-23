@@ -16,16 +16,13 @@ package net.krautchan.android.activity;
 * limitations under the License.
 */
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Properties;
 
 import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.AboutDialog;
 import net.krautchan.android.dialog.DisclaimerDialog;
@@ -33,7 +30,6 @@ import net.krautchan.android.dialog.ThreadHistoryDialog;
 import net.krautchan.android.dialog.UpdateDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
-import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.CookieHelper;
 import net.krautchan.android.network.ThreadExistenceCheck;
 import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
@@ -57,7 +53,6 @@ import android.widget.TableRow;
 
 public class EisenheinrichActivity extends Activity {
 	public static final String TAG = "EisenheinrichActivity";
-	public static Properties pr = null;
 	
 
 	@Override
@@ -65,34 +60,7 @@ public class EisenheinrichActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
-		Properties defaults = null;
-		try {
-			InputStream is = getAssets().open("settings.txt");
-			defaults = new Properties();
-			defaults.load(is);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (null == defaults) {
-			pr = new Properties ();
-		} else {
-			pr = new Properties (defaults);
-		}
-		try {
-			File globalsFile = FileHelpers.getSDFile ("settings.txt");
-			if (globalsFile.exists()) {
-				InputStream is = null;
-				is = new FileInputStream (globalsFile);
-				pr.load(is);
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
-		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
+
 		setContentView(R.layout.main_view);
 		
 		if (Eisenheinrich.GLOBALS.isDebugVersion()) {
@@ -110,13 +78,13 @@ public class EisenheinrichActivity extends Activity {
 	    testButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
 		    	ThreadHistoryDialog dlg = new ThreadHistoryDialog (EisenheinrichActivity.this);
-		    	//dlg.show();
+		    	dlg.show();
 		    	
-				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, ThreadSpinnerActivity.class));
+				//EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, ThreadSpinnerActivity.class));
 		    }
 	    });
 	    
-	    UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Eisenheinrich.DEFAULTS.UPDATE_VERSION_URL);
+	    UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Defaults.UPDATE_VERSION_URL);
 	    up.checkForUpdate(this);
 	    
 	    CookieHelper.getSessionCookie(Eisenheinrich.GLOBALS);

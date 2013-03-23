@@ -150,7 +150,7 @@ public class KCThreadViewActivity extends Activity {
 		Long threadId = bndl.getLong("threadId");
 		thread = Eisenheinrich.GLOBALS.getThreadCache().get(threadId);
 		Assert.assertNotNull("Assertion thread != null failed in KCThreadView::onCreate() "+threadId, thread);
-		if ((null != thread) && (null != pListener)) {
+		if (null != pListener) {
 			Eisenheinrich.getInstance().addPostListener(pListener);
 		}
 		Assert.assertNotNull("Assertion thread.boardId != null failed in KCThreadView::onCreate() "+threadId, thread.board_id);
@@ -262,16 +262,13 @@ public class KCThreadViewActivity extends Activity {
 		webView.restoreState(inState);
 		thread = Eisenheinrich.GLOBALS.getThreadCache().get(inState.getLong("threadId"));
 		Log.i("THREADVIEW", "onRestoreInstanceState done. Thread: "+thread.dbId);
-		if (null != thread) {
-			Thread t = new Thread(new KCPageParser(thread)
-			.setBasePath("http://krautchan.net/")
-			.setThreadHandler(
-				Eisenheinrich.getInstance().getThreadListener())
-			.setPostingHandler(
-				Eisenheinrich.getInstance().getPostListener()));
-			t.start();
-		}
-		
+		Thread t = new Thread(new KCPageParser(thread)
+		.setBasePath("http://krautchan.net/")
+		.setThreadHandler(
+			Eisenheinrich.getInstance().getThreadListener())
+		.setPostingHandler(
+			Eisenheinrich.getInstance().getPostListener()));
+		t.start();
 	}
 
 	@Override

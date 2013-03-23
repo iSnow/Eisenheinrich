@@ -16,43 +16,20 @@ package net.krautchan.android.activity;
 * limitations under the License.
 */
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimerTask;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
-import net.krautchan.android.activity.KCBoardListActivity.BoardListAdapter;
-import net.krautchan.android.activity.KCThreadListActivity.ThreadListAdapter;
-import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
-import net.krautchan.android.widget.CheckableLinearLayout;
-import net.krautchan.android.widget.InertCheckBox;
 import net.krautchan.data.KCBoard;
-import net.krautchan.data.KCThread;
-import net.krautchan.data.KODataListener;
-import net.krautchan.parser.KCBoardListParser;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,12 +37,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Activity class for hiding and showing boards from the KCBoardListActivity
@@ -82,6 +55,7 @@ public class KCEditBoardListActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 

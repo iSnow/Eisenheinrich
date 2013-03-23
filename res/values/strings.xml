@@ -49,4 +49,5 @@
 <string name="could_not_open_browser">Konnte Browser nicht öffnen</string>
 <string name="boardlist_headline">Bretter</string>
 <string name="icon_cog"></string>
+<string name="icon_options">J</string>
 </resources>

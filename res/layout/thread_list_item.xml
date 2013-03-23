@@ -30,6 +30,13 @@
 			android:textSize="14sp" 
 			android:gravity="left" 
 		/>
+		<TextView android:id="@+id/threadListBoard"
+			android:layout_height="wrap_content" 
+			android:layout_width="0dp" 
+			android:layout_weight="1"
+			android:textSize="18sp" 
+			android:gravity="left" 
+		/>
 	</LinearLayout>
 
 	<LinearLayout android:id="@+id/linearLayout3"

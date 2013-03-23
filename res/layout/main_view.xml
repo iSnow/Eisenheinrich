@@ -24,7 +24,13 @@
 		android:orientation="vertical" 
 		android:layout_height="match_parent" 
 		android:gravity="bottom">
-
+    
+	<net.krautchan.android.widget.CommandBar
+	            android:id="@+id/command_bar"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:background="@color/Red"/>
+        
 		<ScrollView
 		    android:id="@+id/main_buttons_scrollview"
 		    android:layout_width="match_parent"

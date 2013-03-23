@@ -33,9 +33,9 @@ import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
 import net.krautchan.android.network.PostVariables;
 import net.krautchan.android.network.ThreadExistenceCheck;
 import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
+import net.krautchan.backend.DatabaseHelper;
 import net.krautchan.backend.KCCache;
 import net.krautchan.backend.KCCache.CachePersister;
-import net.krautchan.backend.DatabaseHelper;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
@@ -208,7 +208,7 @@ public class Eisenheinrich extends Application {
 		}
 		try {
 			File globalsFile = FileHelpers.getSDFile ("settings.txt");
-			if (globalsFile.exists()) {
+			if ((null != globalsFile) && (globalsFile.exists())) {
 				InputStream is = null;
 				is = new FileInputStream (globalsFile);
 				pr.load(is);
