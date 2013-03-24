@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-         <declare-styleable name="net.krautchan.android.widget.ThreadHistoryWidget">
-        <attr name="text" format="string" />
-        <attr name="textColor" format="color" />
-        <attr name="textSize" format="dimension" />
-    </declare-styleable>
     
+	<declare-styleable name="CommandBar">
+       <attr name="show_progress" format="boolean" />
+	</declare-styleable>
+	
 </resources>

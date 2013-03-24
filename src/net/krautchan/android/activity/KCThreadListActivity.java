@@ -20,8 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
@@ -34,14 +32,14 @@ import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.dialog.GoToThreadDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
+import net.krautchan.android.widget.CommandBar;
+import net.krautchan.android.widget.ThreadListAdapter;
 import net.krautchan.data.KCBoard;
-import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
 import net.krautchan.parser.KCPageParser;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
@@ -55,19 +53,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-public class KCThreadListActivity extends Activity {
+public class KCThreadListActivity extends Activity implements ProvidesBoards, ProvidesThreads {
 	protected static final String TAG = "KCThreadListActivity";
 	private ListView list = null;
+	private CommandBar cmdBar;
 	private Eisenheinrich heini = Eisenheinrich.getInstance();
-	private ProgressBar progress = null;
+	//private ProgressBar progress = null;
 	private ThreadListAdapter adapter = null;
 	private KCBoard curBoard;
 	private String token;
@@ -84,7 +79,7 @@ public class KCThreadListActivity extends Activity {
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 		setContentView(R.layout.thread_list);
 		list = (ListView)findViewById(R.id.thread_listview);
-		adapter = new ThreadListAdapter(this, this, 0, 0);
+		adapter = new ThreadListAdapter(this, this, this, R.layout.thread_list_item);
 	    Bundle bndl;
 	    if (null != savedInstanceState) {
 	    	bndl = savedInstanceState;
@@ -116,14 +111,16 @@ public class KCThreadListActivity extends Activity {
 			}
 	    }
 	    
-	    final View progWrapper = findViewById(R.id.threadlist_watcher_wrapper);
-	    progress = (ProgressBar)findViewById(R.id.threadlist_watcher);
+	    cmdBar = (CommandBar) findViewById(R.id.command_bar);
+	    
+	    //final View progWrapper = findViewById(R.id.threadlist_watcher_wrapper);
+	    /*progress = (ProgressBar)findViewById(R.id.threadlist_watcher);
 	    progress.setMax(100);
-	    progress.setProgress(0);
+	    progress.setProgress(0);*/
 	    
 	    new AlertDialog.Builder(KCThreadListActivity.this)
-        .setMessage ("Der Krautkanal ist nicht erreichbar oder dein Netz ist unten")
-        .setTitle("KC Down")
+        .setMessage (R.string.bord_unreachable)
+        .setTitle(R.string.error_network)
         .setPositiveButton (android.R.string.yes, new OnClickListener () {
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
@@ -134,11 +131,13 @@ public class KCThreadListActivity extends Activity {
 	    final Handler progressHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	        	if (0 == msg.arg1) {
-	        		progWrapper.setVisibility(View.GONE);
-				    progress.setMax(100);
-				    progress.setProgress(0);
+	        		cmdBar.hideProgressBar();
+	        		//progWrapper.setVisibility(View.GONE);
+				   // progress.setMax(100);
+				   // progress.setProgress(0);
 	        	} else if (1 == msg.arg1) {
-		        	progress.incrementProgressBy(10);
+	        		cmdBar.setProgress(10);
+		        	//progress.incrementProgressBy(10);
 	        	}
 	        }
 	    };
@@ -169,7 +168,8 @@ public class KCThreadListActivity extends Activity {
 							threads.add(item);
 							adapter.add(item);
 							adapter.notifyDataSetChanged(); 
-				        	progress.incrementProgressBy(10);
+							cmdBar.setProgress(10);
+				        	//progress.incrementProgressBy(10);
 				        }
 				    });
 				}
@@ -226,13 +226,26 @@ public class KCThreadListActivity extends Activity {
            } 
       }); 
 	}
-	
-	protected KCThread getThread(long dbId) {
+
+	@Override
+	public KCThread getThread(long dbId) {
 		Iterator<KCThread> iter = threads.iterator();
 		while (iter.hasNext()) {
 			KCThread t = iter.next();
 			if (t.dbId == dbId) {
 				return t;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public KCBoard getBoard(long dbId) {
+		Iterator<KCBoard> iter = Eisenheinrich.GLOBALS.getBoardCache().getAll().iterator();
+		while (iter.hasNext()) {
+			KCBoard b = iter.next();
+			if (b.dbId == dbId) {
+				return b;
 			}
 		}
 		return null;
@@ -307,13 +320,13 @@ public class KCThreadListActivity extends Activity {
 		}
 		title = "/"+curBoard.shortName+"/ - "+curBoard.name;
 	    if (board.banned) {
-	    	this.setTitle(title + " ("+this.getString(R.string.banned)+")");
+	    	cmdBar.setTitle(title + " ("+this.getString(R.string.banned)+")");
 		} else {
-			this.setTitle(title);
+			cmdBar.setTitle(title);
 		}
 	}
 	
-	final class ThreadListAdapter extends ArrayAdapter<KCThread> {
+	/*final class ThreadListAdapter extends ArrayAdapter<KCThread> {
 		private final KCThreadListActivity kcThreadListActivity;
 		ArrayList<Long> ids = new ArrayList<Long>();
 		List<Long> hiddenIds = new ArrayList<Long>();
@@ -410,7 +423,7 @@ public class KCThreadListActivity extends Activity {
 					id = iter.next();
 				}
 			}
-			return id; 
+			return id; */
 			/*Iterator<KCThread> iter = threads.iterator();
 			if (null == iter)
 				return -1;
@@ -421,7 +434,7 @@ public class KCThreadListActivity extends Activity {
 			}
 			if (null == item)
 				return -1;
-			return item.dbId;*/
+			return item.dbId;*//*
 		}
 
 		
@@ -429,7 +442,7 @@ public class KCThreadListActivity extends Activity {
 		public boolean hasStableIds() {
 			return true;
 		}
-	}
+	}*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -480,5 +493,6 @@ public class KCThreadListActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
 
 }

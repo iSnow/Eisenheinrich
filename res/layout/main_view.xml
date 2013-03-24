@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:eisenheinrich="http://schemas.android.com/apk/res/net.krautchan"
 	android:orientation="vertical" 
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
@@ -29,7 +30,8 @@
 	            android:id="@+id/command_bar"
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
-	            android:background="@color/Red"/>
+	            android:background="@color/Red"
+        eisenheinrich:show_progress="true"/>
         
 		<ScrollView
 		    android:id="@+id/main_buttons_scrollview"
@@ -50,7 +52,8 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:text="@string/test"
-		    android:textSize="16dp"
+		    android:visibility="gone"
+		    android:textSize="16sp"
 		    />
 
 		<Button
@@ -58,7 +61,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:text="@string/go_to_krautchan"
-		    android:textSize="16dp" />
+		    android:textSize="16sp" />
 
 	</LinearLayout>
 </FrameLayout>

@@ -15,6 +15,7 @@ import net.krautchan.data.KCThread;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.graphics.Typeface;
@@ -26,33 +27,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBoards {
 	private ThreadListAdapter adapter;
+	private static final int MAX_PROGRESS = 100;
+	private int progressState = 0;
+	private ProgressBar progress;
 
 	public CommandBar(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		prepare(context);
+		prepare(context, attrs);
 	}
 
 	public CommandBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		prepare(context);
+		prepare(context, attrs);
 	}
 
 	public CommandBar(Context context) {
 		super(context);
-		prepare(context);
+		prepare(context, null);
 	}
 	
-	protected void prepare(final Context context) {
+	protected void prepare(final Context context, AttributeSet attrs) {
 	    LayoutInflater inflater = (LayoutInflater) context
 	        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    ViewGroup parentView = (ViewGroup) inflater.inflate(R.layout.command_bar, this, true);
 	    
 	    final View viewHeader = (View)parentView.findViewById(R.id.command_bar_widget);
-	  
+	    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CommandBar);
+	    boolean showProgress = a.getBoolean (R.styleable.CommandBar_show_progress, false);
+	    a.recycle();
+	   
 		ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
 		    @Override
 		    public Shader resize(int width, int height) {
@@ -107,6 +115,32 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 		});
 		
 		adapter = new ThreadListAdapter(this, this, context, R.layout.spinner_list_item);
+		
+		progress = (ProgressBar) viewHeader.findViewById(R.id.progressbar);
+	    progress.setMax(MAX_PROGRESS);
+	    progressState = 0;
+	    progress.setProgress(progressState);
+	    if (!showProgress) {
+	    	progress.setVisibility(GONE);
+	    }
+	}
+	
+	public void hideProgressBar() {
+		progress.setVisibility(View.GONE);
+		progress.setMax(MAX_PROGRESS);	    
+		progressState = 0;
+	    progress.setProgress(progressState);
+		progress.setProgress(0);
+	}
+	
+	public void setProgress(int increment) {
+		progressState += increment;
+		progress.setProgress(progressState);
+	}
+	
+	public void setTitle (String title) {
+		TextView headline = (TextView)findViewById(R.id.headline);
+		headline.setText(title);
 	}
 
 	@Override
@@ -137,6 +171,7 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 		return null;
 	}
 
+	@Override
 	public KCThread getThread(long dbId) {
 		Iterator<KCThread> iter = Eisenheinrich.GLOBALS.getThreadCache().getAll().iterator();
 		while (iter.hasNext()) {

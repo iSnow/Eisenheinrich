@@ -16,28 +16,25 @@ package net.krautchan.android.dialog;
 * limitations under the License.
 */
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
+import net.krautchan.android.activity.ProvidesBoards;
+import net.krautchan.android.activity.ProvidesThreads;
 import net.krautchan.android.helpers.ActivityHelpers;
+import net.krautchan.android.widget.ThreadListAdapter;
+import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
-public class ThreadHistoryDialog {
+public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 	private Activity parentActivity; 
 	private String title;
 	private AlertDialog dialog;
@@ -55,7 +52,7 @@ public class ThreadHistoryDialog {
 		.create();
         dialog.show();
 
-		final ThreadListAdapter adapter = new ThreadListAdapter(this, dialogView.getContext(), R.layout.thread_list_item);
+		final ThreadListAdapter adapter = new ThreadListAdapter(this, this, dialogView.getContext(), R.layout.thread_list_item);
 		ListView list = (ListView) dialog.findViewById(R.id.thread_dialog_listview);
 		list.setAdapter(adapter);
 		List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
@@ -75,8 +72,21 @@ public class ThreadHistoryDialog {
 		});
 	}
 	
-	protected KCThread getThread(long dbId) {
-		Eisenheinrich.getInstance();
+	
+	@Override
+	public KCBoard getBoard(long dbId) {
+		Iterator<KCBoard> iter = Eisenheinrich.GLOBALS.getBoardCache().getAll().iterator();
+		while (iter.hasNext()) {
+			KCBoard b = iter.next();
+			if (b.dbId == dbId) {
+				return b;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public KCThread getThread(long dbId) {
 		Iterator<KCThread> iter = Eisenheinrich.GLOBALS.getThreadCache().getAll().iterator();
 		while (iter.hasNext()) {
 			KCThread t = iter.next();
@@ -87,7 +97,7 @@ public class ThreadHistoryDialog {
 		return null;
 	}
 	
-	final static protected class ThreadListAdapter extends ArrayAdapter<KCThread> {
+	/*final static protected class ThreadListAdapter extends ArrayAdapter<KCThread> {
 		private static SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
 		private final ThreadHistoryDialog kcThreadListActivity;
 		private ArrayList<Long> ids = new ArrayList<Long>();
@@ -180,17 +190,7 @@ public class ThreadHistoryDialog {
 				}
 			}
 			return id; 
-			/*Iterator<KCThread> iter = threads.iterator();
-			if (null == iter)
-				return -1;
-			KCThread item = null;
-			int count = 0;
-			while (iter.hasNext() && count++ <= position) {
-				item = iter.next();
-			}
-			if (null == item)
-				return -1;
-			return item.dbId;*/
+			
 		}
 
 
@@ -198,7 +198,7 @@ public class ThreadHistoryDialog {
 		public boolean hasStableIds() {
 			return true;
 		}
-	}
+	}*/
 
 	
 }
