@@ -95,23 +95,15 @@ public class KCThreadViewActivity extends Activity {
 		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 
 		View v = this.getLayoutInflater().inflate(R.layout.kc_web_view, null);
-
 	    cmdBar = (CommandBar) v.findViewById(R.id.command_bar);
 		webView = (WebView) v.findViewById(R.id.kcWebView);
 		setContentView(v);
-		//findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
-		//final ProgressBar progress = (ProgressBar)findViewById(R.id.threadview_watcher);
-	    //progress.setMax(100);
-	    //progress.setProgress(0);
+		
 	    progressHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	        	if (0 == msg.arg1) {
 	        		cmdBar.hideProgressBar();
-	        		//findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.GONE);
-				    //progress.setMax(100);
-				    //progress.setProgress(0);
 	        	} else if (1 == msg.arg1) {
-		        	//progress.incrementProgressBy(progressIncrement);
 	        		cmdBar.incrementProgressBy (progressIncrement);
 	        	} 
 	        }
@@ -350,7 +342,6 @@ public class KCThreadViewActivity extends Activity {
 			if (KCThreadViewActivity.this.token.equals(token)) {
 				even = !even;
 				cmdBar.incrementProgressBy(progressIncrement);
-				//((ProgressBar)findViewById(R.id.threadview_watcher)).incrementProgressBy(progressIncrement);
 				Log.i("THREADVIEW", "notifyAdded 1: "+item.kcNummer);
 				if (pageFinished) {
 					renderBacklog (thread.previousLastKcNum, even);
@@ -658,7 +649,6 @@ public class KCThreadViewActivity extends Activity {
 		thread.board_id = board.dbId;
 		thread.kcNummer = threadKcNum;
 		thread.clearPostings();
-		//findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
 		cmdBar.showProgressBar();
 		setTitle (board);
 		token = "http://krautchan.net/" + board.shortName + "/thread-" + threadKcNum + ".html";
@@ -672,7 +662,7 @@ public class KCThreadViewActivity extends Activity {
 	}
 	
 	private void setTitle (KCBoard board) {
-		String title = "/"+board.name+"/"+thread.kcNummer;
+		String title = "/"+board.shortName+"/"+thread.kcNummer;
 		if (board.banned) {
 			title = title + " ("+this.getString(R.string.banned)+")";
 		}
@@ -687,7 +677,6 @@ public class KCThreadViewActivity extends Activity {
 		} 
 		webView.loadUrl("javascript:showCollapsed (true)");
 		cmdBar.showProgressBar();
-		//findViewById(R.id.threadview_watcher_wrapper).setVisibility(View.VISIBLE);
 		missedPostings = false;
 		postings = new LinkedHashSet<KCPosting>(); 
 		Thread t = new Thread(new KCPageParser(thread)

@@ -127,8 +127,6 @@ public class KCBoardListActivity extends ListActivity {
 	protected void onRestart() {
 	    super.onRestart();
 	    setFilteredBoards();
-		KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
-		Eisenheinrich.getInstance().dbHelper.persistBoards(boardCache.getAll());
 	    checkNetwork();
 	}
 
@@ -137,16 +135,7 @@ public class KCBoardListActivity extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 		setFilteredBoards();
-		Eisenheinrich.GLOBALS.getBoardCache();
-		//Eisenheinrich.getInstance().dbHelper.persistBoards(boardCache.getAll());
 		checkNetwork();
-	}
-	
-	@Override
-	protected void onStop() {
-		super.onStop();
-		KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
-		Eisenheinrich.getInstance().dbHelper.persistBoards(boardCache.getAll());
 	}
 
 	@Override
@@ -196,23 +185,16 @@ public class KCBoardListActivity extends ListActivity {
 	}
 
 	private void setFilteredBoards () {
-		List<String> selectedBoards = Eisenheinrich.getInstance().getSelectedBoards();
-	    if (null != selectedBoards) {
-		    List<KCBoard> newBoards = new ArrayList<KCBoard>();
-		    KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
-		    boardCache.getAll();
-		    for (KCBoard board : boardCache.getAll()) {
-		    	if (selectedBoards.contains(board.shortName)) {
-		    		board.show = true;
-		    		newBoards.add(board);
-		    	} else {
-		    		board.show = false;
-		    	}
-		    }
-		    BoardListAdapter ad = (BoardListAdapter)this.getListAdapter();
-		    ad.setBoards(newBoards);
-	        ad.notifyDataSetChanged();
+	    List<KCBoard> newBoards = new ArrayList<KCBoard>();
+	    KCCache<KCBoard> boardCache = Eisenheinrich.GLOBALS.getBoardCache();
+	    for (KCBoard board : boardCache.getAll()) {
+	    	if (board.show) {
+	    		newBoards.add(board);
+	    	}
 	    }
+	    BoardListAdapter ad = (BoardListAdapter)this.getListAdapter();
+	    ad.setBoards(newBoards);
+        ad.notifyDataSetChanged();
 	}
 	
 	private void checkNetwork() {

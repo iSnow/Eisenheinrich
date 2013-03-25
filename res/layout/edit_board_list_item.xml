@@ -12,7 +12,7 @@
 		android:layout_weight="1"
 		android:layout_width="25dp" 
 		android:textSize="24sp"
-		android:textColor="@color/GreenYellow" 
+		android:textColor="@color/TextGreen" 
 		android:textStyle="bold"
 		android:gravity="left" 
 		android:focusable="false" /> 

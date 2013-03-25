@@ -59,13 +59,9 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	protected static final String TAG = "KCThreadListActivity";
 	private ListView list = null;
 	private CommandBar cmdBar;
-	private Eisenheinrich heini = Eisenheinrich.getInstance();
 	private ThreadListAdapter adapter = null;
 	private KCBoard curBoard;
 	private String token;
-	private String title; 
-	//TODO at some point, factor this out into a cache
-	//private List<KCThread> threads = new CopyOnWriteArrayList<KCThread>();
 	private Timer siteReachableWatchdog = new Timer();
 
 	@Override
@@ -143,7 +139,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 			}
 		}, 5000);
 		list.setAdapter(adapter);
-		heini.addThreadListener(new KODataListener<KCThread>() {
+		Eisenheinrich.getInstance().addThreadListener(new KODataListener<KCThread>() {
 			@Override
 			public void notifyAdded(final KCThread item, Object token) {
 				if (KCThreadListActivity.this.token.equals(token)) {
@@ -181,13 +177,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 				if (null != siteReachableWatchdog) {
 					siteReachableWatchdog.cancel();
 				}
-				/*Iterator<KCThread> iter = threads.iterator();
-				KCThread curThread = null;
-				boolean found = false;
-				while (iter.hasNext() && !found) {
-					curThread = iter.next();
-					found = curThread.dbId == id;
-				}*/
+				
 				KCThread curThread = KCThreadListActivity.this.getThread(id);
 				if (null != curThread) {
 					ActivityHelpers.switchToThread (curThread, KCThreadListActivity.this); 
@@ -199,14 +189,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 			@Override 
 			public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id) { 
 				Eisenheinrich.getInstance();
-				/*Iterator<KCThread> iter = threads.iterator();
-				KCThread curThread = null;
-				boolean found = false;
-				while (iter.hasNext() && !found) {
-					curThread = iter.next();
-					found = curThread.dbId == id;
-				}
-				if (found) {*/
+			
 				KCThread curThread = Eisenheinrich.GLOBALS.getThreadCache().get(id);
 				if (null != curThread) {
 					list.setTag(curThread);
@@ -217,18 +200,6 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
       }); 
 	}
 
-	/*@Override
-	public KCThread getThread(long dbId) {
-		Iterator<KCThread> iter = threads.iterator();
-		while (iter.hasNext()) {
-			KCThread t = iter.next();
-			if (t.dbId == dbId) {
-				return t;
-			}
-		}
-		return null;
-	}*/
-	
 	@Override
 	public KCThread getThread(long dbId) {
 		return Eisenheinrich.GLOBALS.getThreadCache().get(dbId);
@@ -308,7 +279,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 		if (null == board) {
 			return;
 		}
-		title = "/"+curBoard.shortName+"/ - "+curBoard.name;
+		String title = "/"+curBoard.shortName+"/ - "+curBoard.name;
 	    if (board.banned) {
 	    	cmdBar.setTitle(title + " ("+this.getString(R.string.banned)+")");
 		} else {

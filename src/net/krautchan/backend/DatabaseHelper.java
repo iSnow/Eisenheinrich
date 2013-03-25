@@ -20,12 +20,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import junit.framework.Assert;
@@ -138,7 +135,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	public void deleteThread(Long dbId) {
 		SQLiteDatabase db = getReadableDatabase();
-		db.delete(THREAD_TABLE, "ID="+dbId, null);
+		try {
+			db.beginTransaction();
+			db.delete(THREAD_TABLE, "ID="+dbId, null);
+			db.setTransactionSuccessful();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
 	}
 	
 	public void bookmarkThread (KCThread thread) {
@@ -240,16 +245,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return threads;
 	}
 	
-	public void persistBoards (Map<String, KCBoard> boards) {
-		Set<String> keys = boards.keySet();
-		List<KCBoard> boardL = new ArrayList<KCBoard>(keys.size());
-		for (String key: keys) {
-			boardL.add(boards.get(key));
-		}
-		persistBoards(boardL);
-	}
-
 	public void persistBoards (Collection<KCBoard> boards) {
+		HashMap<Long, KCBoard> storedBoardMap = new HashMap<Long, KCBoard>();
+		Collection <KCBoard> storedBoards = getBoards();
+		for (KCBoard board : storedBoards) {
+			storedBoardMap.put(board.dbId, board);
+		}
+		for (KCBoard board : boards) {
+			KCBoard storedBoard = storedBoardMap.get(board.dbId);
+			if (null != storedBoard) {
+				board.show = storedBoard.show;
+			}
+		}
 		SQLiteDatabase db = getReadableDatabase();
 		try{
 			db.beginTransaction();

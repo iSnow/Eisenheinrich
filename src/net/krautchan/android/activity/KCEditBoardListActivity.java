@@ -50,7 +50,6 @@ public class KCEditBoardListActivity extends ListActivity {
 	private Map<String, KCBoard> boards = null;
 	private ListView list;
 	private EditBoardListAdapter adapter;
-	private boolean fullSelectionState = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +95,21 @@ public class KCEditBoardListActivity extends ListActivity {
 		Button okButton = (Button)findViewById(R.id.edit_board_list_button_ok);
 	    okButton.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
-		    	Eisenheinrich.getInstance().setSelectedBoards(getSelectedItems());
+		    	final SparseBooleanArray checkedItems = list.getCheckedItemPositions();
+				if (checkedItems != null) {		
+					List<KCBoard> storedBoards = Eisenheinrich.GLOBALS.getBoardCache().getAll();
+					for (KCBoard board : storedBoards) {
+						board.show = false; 
+					}
+					final int checkedItemsCount = checkedItems.size();
+					for (int i = 0; i < checkedItemsCount; ++i) {
+						final int position = checkedItems.keyAt(i);
+						
+						KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(adapter.getItemId(position));
+						board.show = checkedItems.valueAt(i);
+					}
+				};
+		    	Eisenheinrich.GLOBALS.getBoardCache().freeze();
 		    	KCEditBoardListActivity.this.finish();
 		    }
 	    });
@@ -125,9 +138,10 @@ public class KCEditBoardListActivity extends ListActivity {
 			for (int i = 0; i < checkedItemsCount; ++i) {
 				final int position = checkedItems.keyAt(i);
 				final boolean isChecked = checkedItems.valueAt(i);
-				if (isChecked) {
+				KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(adapter.getItemId(position));
+				/*if (isChecked) {
 					selectedBoards.add(adapter.getShortName(position));
-				}
+				}*/
 			}
 		}
 		if (selectedBoards.size() == 0) {

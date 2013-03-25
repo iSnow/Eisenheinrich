@@ -60,7 +60,6 @@ public class Eisenheinrich extends Application {
 	public static Defaults DEFAULTS = new Defaults();
 	public static Globals  GLOBALS = null;
 	public static Styles   STYLES; 
-	private List<String> selectedBoards;
 	public boolean hasImagesDir = false;
 	private static Eisenheinrich sInstance;
 	public DatabaseHelper dbHelper = new DatabaseHelper (this);
@@ -266,13 +265,6 @@ public class Eisenheinrich extends Application {
 		return postListener;
 	}
 
-	public List<String> getSelectedBoards() {
-		return selectedBoards;
-	}
-
-	public void setSelectedBoards(List<String> selectedBoards) {
-		this.selectedBoards = selectedBoards;
-	}
 
 	public void addPostListener (KODataListener<KCPosting> listener) {
 		pListeners.add(listener);

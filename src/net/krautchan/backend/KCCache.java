@@ -84,7 +84,7 @@ public class KCCache<T extends KrautObject> implements KODataListener<T> {
 			removed.add(sorter.get(i));
 		}
 		if (null != persister) {
-			persister.persist(removed);
+			persister.persist(removed); 
 		}
 	}
 	
