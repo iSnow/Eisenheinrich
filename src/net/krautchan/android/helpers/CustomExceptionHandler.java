@@ -8,6 +8,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import net.krautchan.android.Eisenheinrich;
 
 import org.apache.http.Header;
@@ -18,6 +19,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -60,7 +62,7 @@ public class CustomExceptionHandler implements UncaughtExceptionHandler {
 		if (localPath != null) {
 			FileHelpers.writeToSDFile(filename, stacktrace);
 		}
-		if ((null != t) && (null != e)) {
+		if (null != t) {
 			defaultUEH.uncaughtException(t, e);
 		}
 	}

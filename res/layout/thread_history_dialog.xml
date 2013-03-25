@@ -3,19 +3,10 @@
 	android:orientation="vertical" 
 	android:background="@color/Charcoal"
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent" 
-	>
+	android:layout_height="fill_parent" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/thread_history"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    
 	<ListView android:id="@+id/thread_dialog_listview" 
 		android:layout_width="fill_parent"
-        android:textColor="@color/LightGrey"
 		android:layout_height="wrap_content"/>
 </LinearLayout>
 

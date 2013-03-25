@@ -10,7 +10,7 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<application android:icon="@drawable/icon" 
 			android:label="@string/app_name"
-			android:name=".android.Eisenheinrich" android:persistent="false" android:theme="@android:style/Theme.Light.NoTitleBar">
+			android:name=".android.Eisenheinrich" android:persistent="false" android:theme="@android:style/Theme.Light.NoTitleBar" android:allowBackup="true">
 		<activity android:name=".android.activity.Prefs" android:excludeFromRecents="true" android:alwaysRetainTaskState="false" android:noHistory="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -64,7 +64,5 @@
 		<provider android:authorities="net.krautchan.filecontentprovider" android:name=".android.helpers.FileContentProvider"></provider>
 		<activity android:name=".android.activity.KCPostActivity"></activity>
 		<activity android:name=".android.activity.KCEditBoardListActivity"></activity>
-		<activity android:name=".android.activity.SpinnerActivity"></activity>
-		<activity android:name=".android.activity.ThreadSpinnerActivity"></activity>
 	</application>
 </manifest>

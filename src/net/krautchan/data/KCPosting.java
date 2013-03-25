@@ -181,7 +181,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 			case IMAGES: {
 				Matcher m = imgPat.matcher(arg);
 				int i = 0;
-				while (m.find()) {
+				while (m.find() && i < imgs.length) {
 					imgs[i] = m.group(1);
 					thumbs[i] = m.group(2);
 					i++;

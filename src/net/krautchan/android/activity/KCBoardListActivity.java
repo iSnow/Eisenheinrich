@@ -35,6 +35,7 @@ import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.network.BanCheck;
+import net.krautchan.android.widget.CommandBar;
 import net.krautchan.backend.KCCache;
 import net.krautchan.data.KCBoard;
 import net.krautchan.parser.KCBoardListParser;
@@ -42,12 +43,7 @@ import net.krautchan.parser.KCPageParser;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.graphics.Typeface;
-import android.graphics.drawable.PaintDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,6 +59,7 @@ import android.widget.Toast;
 public class KCBoardListActivity extends ListActivity {
 	protected static final String TAG = "KCBoardListActivity";
 	private ListView list = null;
+	private CommandBar cmdBar;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -74,48 +71,9 @@ public class KCBoardListActivity extends ListActivity {
 
 		this.setContentView(R.layout.board_list);
 		list = getListView();
-		
-		TextView history = (TextView) findViewById(R.id.board_list_history);
-		history.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf"));
-		history.setClickable(true);
-		history.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
-				System.out.println ("CLACK");
-			}
-			
-		});
-		
-		final View viewHeader = (View)findViewById(R.id.board_list_watcher_wrapper);
-		ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
-		    @Override
-		    public Shader resize(int width, int height) {
-		        LinearGradient lg = new LinearGradient(0, 0, 0, viewHeader.getHeight(),
-		            new int[] { 
-		        		getResources().getColor(R.color.Greengradient3a), 
-		        		getResources().getColor(R.color.Greengradient3b), 
-		                getResources().getColor(R.color.Greengradient3c), 
-		                getResources().getColor(R.color.Greengradient3d), 
-		                getResources().getColor(R.color.Greendarkborder) },
-		            new float[] {
-		                0, 0.45f, 0.55f, 0.98f, 1 },
-		            Shader.TileMode.REPEAT);
-		         return lg;
-		    }
-		};
-		PaintDrawable p = new PaintDrawable();
-		p.setShape(new RectShape());
-		p.setShaderFactory(sf);
-		viewHeader.setBackgroundDrawable(p);
-		
-		//viewHeader.setBackgroundDrawable(ActivityHelpers.generateViewHeanderBackground(viewHeader.getHeight()));
-
-
-		
-		
-		
-		
+	    cmdBar = (CommandBar) findViewById(R.id.command_bar);
+	    cmdBar.setTitle(R.string.boardlist_headline);
 		
 		if (boardCache.size() == 0) {
 			try {
@@ -210,6 +168,9 @@ public class KCBoardListActivity extends ListActivity {
 			out.writeObject(curBoard);
 			out.close();
 			boss.close();
+			if (null == curBoard) {
+				return;
+			}
 			Thread t = new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
 				.setBasePath(Defaults.BASE_URL)
 				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())

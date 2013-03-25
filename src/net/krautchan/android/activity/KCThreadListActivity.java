@@ -20,13 +20,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.dialog.GoToThreadDialog;
@@ -62,15 +60,13 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	private ListView list = null;
 	private CommandBar cmdBar;
 	private Eisenheinrich heini = Eisenheinrich.getInstance();
-	//private ProgressBar progress = null;
 	private ThreadListAdapter adapter = null;
 	private KCBoard curBoard;
 	private String token;
 	private String title; 
 	//TODO at some point, factor this out into a cache
-	private List<KCThread> threads = new CopyOnWriteArrayList<KCThread>();
+	//private List<KCThread> threads = new CopyOnWriteArrayList<KCThread>();
 	private Timer siteReachableWatchdog = new Timer();
-	//private AlertDialog siteDownDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +82,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 			curBoard = Eisenheinrich.GLOBALS.getBoardCache().get(bndl.getLong("boardId"));
 			Log.i("THREADLIST", "onCreate. Board: "+curBoard.shortName +" - "+curBoard.name);
 			Thread t = new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
-			.setBasePath(Eisenheinrich.DEFAULTS.BASE_URL)
+			.setBasePath(Defaults.BASE_URL)
 			.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
 			.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
 			);
@@ -113,11 +109,6 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	    
 	    cmdBar = (CommandBar) findViewById(R.id.command_bar);
 	    
-	    //final View progWrapper = findViewById(R.id.threadlist_watcher_wrapper);
-	    /*progress = (ProgressBar)findViewById(R.id.threadlist_watcher);
-	    progress.setMax(100);
-	    progress.setProgress(0);*/
-	    
 	    new AlertDialog.Builder(KCThreadListActivity.this)
         .setMessage (R.string.bord_unreachable)
         .setTitle(R.string.error_network)
@@ -132,12 +123,8 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	        public void handleMessage(Message msg) {
 	        	if (0 == msg.arg1) {
 	        		cmdBar.hideProgressBar();
-	        		//progWrapper.setVisibility(View.GONE);
-				   // progress.setMax(100);
-				   // progress.setProgress(0);
 	        	} else if (1 == msg.arg1) {
-	        		cmdBar.setProgress(10);
-		        	//progress.incrementProgressBy(10);
+	        		cmdBar.incrementProgressBy(10);
 	        	}
 	        }
 	    };
@@ -165,11 +152,10 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 					// not the UI thread. Therefore, post a runnable to UI thread to handle this
 					runOnUiThread(new Runnable() {
 				        public void run() {
-							threads.add(item);
+							//threads.add(item);
 							adapter.add(item);
 							adapter.notifyDataSetChanged(); 
-							cmdBar.setProgress(10);
-				        	//progress.incrementProgressBy(10);
+							cmdBar.incrementProgressBy(10);
 				        }
 				    });
 				}
@@ -195,14 +181,15 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 				if (null != siteReachableWatchdog) {
 					siteReachableWatchdog.cancel();
 				}
-				Iterator<KCThread> iter = threads.iterator();
+				/*Iterator<KCThread> iter = threads.iterator();
 				KCThread curThread = null;
 				boolean found = false;
 				while (iter.hasNext() && !found) {
 					curThread = iter.next();
 					found = curThread.dbId == id;
-				}
-				if (found) {
+				}*/
+				KCThread curThread = KCThreadListActivity.this.getThread(id);
+				if (null != curThread) {
 					ActivityHelpers.switchToThread (curThread, KCThreadListActivity.this); 
 				}
 			}
@@ -211,14 +198,17 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){ 
 			@Override 
 			public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id) { 
-				Iterator<KCThread> iter = threads.iterator();
+				Eisenheinrich.getInstance();
+				/*Iterator<KCThread> iter = threads.iterator();
 				KCThread curThread = null;
 				boolean found = false;
 				while (iter.hasNext() && !found) {
 					curThread = iter.next();
 					found = curThread.dbId == id;
 				}
-				if (found) {
+				if (found) {*/
+				KCThread curThread = Eisenheinrich.GLOBALS.getThreadCache().get(id);
+				if (null != curThread) {
 					list.setTag(curThread);
 				}
 				openContextMenu(list);
@@ -227,7 +217,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
       }); 
 	}
 
-	@Override
+	/*@Override
 	public KCThread getThread(long dbId) {
 		Iterator<KCThread> iter = threads.iterator();
 		while (iter.hasNext()) {
@@ -237,18 +227,16 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 			}
 		}
 		return null;
+	}*/
+	
+	@Override
+	public KCThread getThread(long dbId) {
+		return Eisenheinrich.GLOBALS.getThreadCache().get(dbId);
 	}
 	
 	@Override
 	public KCBoard getBoard(long dbId) {
-		Iterator<KCBoard> iter = Eisenheinrich.GLOBALS.getBoardCache().getAll().iterator();
-		while (iter.hasNext()) {
-			KCBoard b = iter.next();
-			if (b.dbId == dbId) {
-				return b;
-			}
-		}
-		return null;
+		return Eisenheinrich.GLOBALS.getBoardCache().get(dbId);
 	}
 	
 	@Override
@@ -288,7 +276,8 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	protected void onStop() {
 	    super.onStop();
 	    list.setVisibility(View.GONE);
-		Eisenheinrich.getInstance().GLOBALS.getThreadCache().freeze();
+		Eisenheinrich.getInstance();
+		Eisenheinrich.GLOBALS.getThreadCache().freeze();
 	}
 
 	@Override
@@ -310,7 +299,8 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 		super.onSaveInstanceState(outState);
 		outState.putLong("boardId", curBoard.dbId);
 		outState.putString("token", token);
-		Eisenheinrich.getInstance().GLOBALS.getThreadCache().freeze();
+		Eisenheinrich.getInstance();
+		Eisenheinrich.GLOBALS.getThreadCache().freeze();
 	}
 	
 	private void adjustTitle () {
@@ -326,124 +316,6 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 		}
 	}
 	
-	/*final class ThreadListAdapter extends ArrayAdapter<KCThread> {
-		private final KCThreadListActivity kcThreadListActivity;
-		ArrayList<Long> ids = new ArrayList<Long>();
-		List<Long> hiddenIds = new ArrayList<Long>();
-		
-		ThreadListAdapter(KCThreadListActivity kcThreadListActivity, Context context, int resource,
-				int textViewResourceId) {
-			super(context, resource, textViewResourceId);
-			this.kcThreadListActivity = kcThreadListActivity;
-		}
-		
-		@Override
-		public void add(KCThread thread) {
-			if ((!ids.contains(thread.dbId)) && (!hiddenIds.contains(thread.dbId)) && (!thread.hidden)) {
-				ids.add(thread.dbId);
-				super.add(thread);
-			}
-		}
-		
-		public void remove (KCThread thread) {
-			ids.remove(thread.dbId);
-			super.remove(thread);
-		}
-		
-		public void hide (KCThread thread) {
-			hiddenIds.add(thread.dbId);
-			remove(thread);
-			notifyDataSetChanged();
-		}
-		
-		public void clear () {
-			ids.clear();
-		}
-		
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View v = null;
-			if (null == convertView) {
-				v = this.kcThreadListActivity.getLayoutInflater().inflate(R.layout.thread_list_item, null);
-			} else {
-				v = convertView;
-			}
-			Long id = ids.get(position);
-			KCThread thread = kcThreadListActivity.getThread (id);
-			if (thread == null) {
-				TextView shortLabel = (TextView) v.findViewById(R.id.threadListNumber);
-				shortLabel.setText("Nothing found");
-			} else {
-				TextView numberLabel = (TextView) v.findViewById(R.id.threadListNumber);
-				String numLabel = "null";
-				if (null != thread.kcNummer) {
-					numLabel = thread.kcNummer.toString();
-				};
-				numberLabel.setText(numLabel);
-				Collection<Long> postIds = thread.getIds();
-				if (postIds.isEmpty()) {
-					numberLabel.setText("No Posting found");
-				} else {
-					KCPosting post = thread.getFirstPosting();
-					if (null != post) {
-						TextView titleLabel = (TextView) v.findViewById(R.id.threadListTitle);
-						if ((null != post.title) && (post.title.length() != 0)) {
-							titleLabel.setText(post.title);
-						} else {
-							titleLabel.setVisibility(View.GONE);
-						}
-						TextView dateLabel = (TextView) v.findViewById(R.id.threadListDate);
-						dateLabel.setText(post.creationShortDate);
-						TextView authorLabel = (TextView) v.findViewById(R.id.threadListAuthor);
-						authorLabel.setText(post.user);
-						TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
-						contentLabel.setText(thread.digest);
-						TextView numPostsLabel = (TextView) v.findViewById(R.id.threadListNumPostings);
-						numPostsLabel.setText(" "+thread.numPostings+ " Posts");
-					}
-				}
-			}
-			return v;
-		}
-		
-		
-		@Override
-		public int getCount() {
-			return ids.size();
-		}
-
-		@Override
-		public long getItemId(int position) {
-			Iterator<Long> iter = ids.iterator();
-			int count = 0;
-			long id = -1;
-			while (iter.hasNext() && count++ <= position) {
-				id = iter.next();
-				while (iter.hasNext() && count <= position && hiddenIds.contains(id)) {
-					id = iter.next();
-				}
-			}
-			return id; */
-			/*Iterator<KCThread> iter = threads.iterator();
-			if (null == iter)
-				return -1;
-			KCThread item = null;
-			int count = 0;
-			while (iter.hasNext() && count++ <= position) {
-				item = iter.next();
-			}
-			if (null == item)
-				return -1;
-			return item.dbId;*//*
-		}
-
-		
-		@Override
-		public boolean hasStableIds() {
-			return true;
-		}
-	}*/
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
@@ -453,44 +325,42 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.go_thread:
-			new GoToThreadDialog (this, curBoard, Eisenheinrich.getInstance().getHttpClient()).showDialog();
-			return true;
-		case R.id.bookmark:
-			return true;
-		case R.id.reload: {
-			threads.clear(); 
-			adapter.clear();
-			adapter.notifyDataSetInvalidated();
-			new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
-				.setBasePath("http://krautchan.net/")
-				.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
-				.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
-				).start();
-			View progWrapper = findViewById(R.id.threadlist_watcher_wrapper);
-			progWrapper.setVisibility(View.VISIBLE);
-			return true; 
-		}
-		case R.id.new_thread: {
-			KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(curBoard.dbId);
-			if ((board.banned) && (null == Eisenheinrich.GLOBALS.getKomturCode())) {
-				new BannedDialog (this).show();
-				Toast.makeText(KCThreadListActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();
-			} else {
-				ActivityHelpers.createThreadMask (null, curBoard.dbId, "", this);
+			case R.id.go_thread:
+				new GoToThreadDialog (this, curBoard, Eisenheinrich.getInstance().getHttpClient()).showDialog();
+				return true;
+			case R.id.bookmark:
+				return true;
+			case R.id.reload: {
+				//threads.clear(); 
+				adapter.clear();
+				adapter.notifyDataSetInvalidated();
+				new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
+					.setBasePath("http://krautchan.net/")
+					.setThreadHandler(Eisenheinrich.getInstance().getThreadListener())
+					.setPostingHandler(Eisenheinrich.getInstance().getPostListener())
+					).start();
+				cmdBar.showProgressBar();
+				return true; 
 			}
-			return true; 
-		}
-		case R.id.prefs:
-			return true;
-		case R.id.forward:
-			return true;
-		case R.id.home:
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.new_thread: {
+				KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(curBoard.dbId);
+				if ((board.banned) && (null == Eisenheinrich.GLOBALS.getKomturCode())) {
+					new BannedDialog (this).show();
+					Toast.makeText(KCThreadListActivity.this, R.string.banned_message, Toast.LENGTH_LONG).show();
+				} else {
+					ActivityHelpers.createThreadMask (null, curBoard.dbId, "", this);
+				}
+				return true; 
+			}
+			case R.id.prefs:
+				return true;
+			case R.id.forward:
+				return true;
+			case R.id.home:
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 

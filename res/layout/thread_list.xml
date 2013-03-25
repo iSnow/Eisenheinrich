@@ -9,29 +9,10 @@
     android:orientation="vertical"
     android:weightSum="1" >
 
-    <FrameLayout
-        android:id="@+id/threadlist_watcher_wrapper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:visibility="gone" >
-
-        <ProgressBar
-            android:id="@+id/threadlist_watcher"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp" >
-        </ProgressBar>
-    </FrameLayout>
-
     <net.krautchan.android.widget.CommandBar
         android:id="@+id/command_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/Red"
         eisenheinrich:show_progress="true" />
 
     <ListView

@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.helpers.ActivityHelpers;
@@ -114,15 +115,10 @@ public class KCPostActivity extends Activity {
 						public void notifyDone(boolean successful, final String message) {
 							if (successful) {
 								final Intent data = KCPostActivity.this.getIntent();
-								if (getParent() == null) {
-								    setResult(Activity.RESULT_OK, data);
-								} else {
-								    getParent().setResult(Activity.RESULT_OK, data);
-								}
-
+								setResult(Activity.RESULT_OK, data);
 								KCPostActivity.this.finish();
 							} else {
-								if (message.equals(R.string.banned_message)) {
+								if (message.equals(getResources().getString(R.string.banned_message))) {
 									KCPostActivity.this.runOnUiThread(new Runnable () {
 										@Override
 										public void run() {	
@@ -163,6 +159,8 @@ public class KCPostActivity extends Activity {
 		    		((EditText) KCPostActivity.this.findViewById(R.id.edit_posting_title)).setText("");
 		    		((EditText) KCPostActivity.this.findViewById(R.id.edit_posting_content)).setText("");
 		    		((CheckBox) KCPostActivity.this.findViewById(R.id.sage)).setChecked(false);
+		    		final Intent data = KCPostActivity.this.getIntent();
+					setResult(Activity.RESULT_CANCELED, data);
 		    		KCPostActivity.this.finish();
 		    	}
 		    });

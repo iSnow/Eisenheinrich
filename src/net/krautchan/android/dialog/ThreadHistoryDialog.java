@@ -36,7 +36,6 @@ import android.widget.ListView;
 
 public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 	private Activity parentActivity; 
-	private String title;
 	private AlertDialog dialog;
 	
 	public ThreadHistoryDialog (Activity parent) {
@@ -48,12 +47,14 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 
 		dialog = new AlertDialog.Builder(parentActivity) 
     	.setView(dialogView)
-        .setTitle(title)
+        .setTitle(R.string.thread_history)
 		.create();
         dialog.show();
 
-		final ThreadListAdapter adapter = new ThreadListAdapter(this, this, dialogView.getContext(), R.layout.thread_list_item);
-		ListView list = (ListView) dialog.findViewById(R.id.thread_dialog_listview);
+		final ThreadListAdapter adapter = new ThreadListAdapter(this, this, dialogView.getContext(), R.layout.cmdbar_history_item);
+		ListView list = (ListView) dialogView.findViewById(R.id.thread_dialog_listview);
+		//TextView v2 = ((TextView)dialogView.findViewById(R.id.threadListDate));
+		//v2.setTextColor(parentActivity.getResources().getColor(R.color.LightGrey));
 		list.setAdapter(adapter);
 		List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
 		for (int i = threads.size()-1; i >= 0; i--) {
@@ -97,108 +98,5 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 		return null;
 	}
 	
-	/*final static protected class ThreadListAdapter extends ArrayAdapter<KCThread> {
-		private static SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
-		private final ThreadHistoryDialog kcThreadListActivity;
-		private ArrayList<Long> ids = new ArrayList<Long>();
-		private LayoutInflater mInflater;
-		private int mViewResourceId;
-
-		ThreadListAdapter(ThreadHistoryDialog kcThreadListActivity, Context context, int textViewResourceId) {
-			super(context,  textViewResourceId);
-			this.kcThreadListActivity = kcThreadListActivity;
-			mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			mViewResourceId = textViewResourceId;
-		}
-
-		@Override
-		public void add(KCThread thread) {
-			if ((!ids.contains(thread.dbId)) && (!thread.hidden)) {
-				ids.add(ids.size(), thread.dbId);
-				super.add(thread);
-			}
-		}
-
-		public void remove (KCThread thread) {
-			ids.remove(thread.dbId);
-			super.remove(thread);
-		}
-
-		public void hide (KCThread thread) {
-			remove(thread);
-			notifyDataSetChanged();
-		}
-
-		public void clear () {
-			ids.clear();
-		}
-
-		@Override
-		public View getDropDownView (int position, View convertView, ViewGroup parent) {
-			return getView(position, convertView, parent);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View v = null;
-			if (null == convertView) {
-				//v = mInflater.inflate(mViewResourceId, null);
-				v = mInflater.inflate(mViewResourceId, null);
-			} else {
-				v = convertView;
-			}
-			Long id = ids.get(position);
-			KCThread thread = kcThreadListActivity.getThread (id);
-			if (thread == null) {
-				TextView shortLabel = (TextView) v.findViewById(R.id.threadListNumber);
-				shortLabel.setText("Nothing found");
-			} else {
-				TextView numberLabel = (TextView) v.findViewById(R.id.threadListNumber);
-				String numLabel = "null";
-				if (null != thread.kcNummer) {
-					numLabel = thread.kcNummer.toString();
-				};
-				numberLabel.setText(numLabel);
-
-				TextView dateLabel = (TextView) v.findViewById(R.id.threadListDate);
-				dateLabel.setText(dfShort.format(thread.firstPostDate));
-
-				TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
-				contentLabel.setText(thread.digest);
-				TextView numPostsLabel = (TextView) v.findViewById(R.id.threadListNumPostings);
-				numPostsLabel.setText(" "+thread.numPostings+ " Posts");
-
-			}
-			return v;
-		}
-
-
-		@Override
-		public int getCount() {
-			return ids.size();
-		}
-
-		@Override
-		public long getItemId(int position) {
-			Iterator<Long> iter = ids.iterator();
-			int count = 0;
-			long id = -1;
-			while (iter.hasNext() && count++ <= position) {
-				id = iter.next();
-				while (iter.hasNext() && count <= position) {
-					id = iter.next();
-				}
-			}
-			return id; 
-			
-		}
-
-
-		@Override
-		public boolean hasStableIds() {
-			return true;
-		}
-	}*/
-
 	
 }

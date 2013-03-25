@@ -22,7 +22,7 @@
         android:layout_marginLeft="8dp"
         android:ems="10"
         android:inputType="none"
-        android:textSize="13dp" >
+        android:textSize="13sp" >
 
         <requestFocus />
     </EditText>
@@ -45,7 +45,7 @@
         android:layout_marginLeft="8dp"
         android:ems="10"
         android:inputType="none"
-        android:textSize="13dp" />
+        android:textSize="13sp" />
 
     <CheckBox
         android:id="@+id/checkBox1"

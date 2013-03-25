@@ -1,6 +1,6 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-	android:id="@+id/threadSpinnerLayout1" 
+	android:id="@+id/linearLayout1" 
 	android:layout_height="wrap_content" 
 	android:layout_width="match_parent"
 	android:background="@color/Charcoal"
@@ -9,11 +9,11 @@
 	android:paddingRight="6sp"
 	android:paddingBottom="6sp"
 	android:paddingLeft="6sp">
-	<LinearLayout android:id="@+id/threadSpinnerLayout2"
+	<LinearLayout android:id="@+id/linearLayout2"
 		android:layout_width="match_parent" 
 		android:layout_height="wrap_content"
 		android:gravity="left" >
-		<TextView android:id="@+id/threadSpinnerListNumber"
+		<TextView android:id="@+id/threadListNumber"
 			android:layout_height="wrap_content"
 			android:layout_width="0dp" 
 			android:layout_weight="1"
@@ -21,7 +21,7 @@
 			android:textColor="@color/TextGreen" 
 			android:textStyle="bold"
 			android:gravity="left" />
-		<TextView android:id="@+id/threadSpinnerListAuthor"
+		<TextView android:id="@+id/threadListAuthor"
 			android:layout_height="wrap_content" 
 			android:layout_width="0dp" 
 			android:layout_weight="2"
@@ -29,12 +29,21 @@
 			android:textSize="15sp" 
 			android:gravity="left" 
 		/>
-		<TextView android:id="@+id/threadSpinnerListDate"
+		<TextView android:id="@+id/threadListDate"
 			android:layout_height="wrap_content" 
 			android:layout_width="0dp" 
 			android:layout_weight="1"
 			android:textColor="@color/LightGrey"
 			android:textSize="14sp" 
+			android:gravity="left" 
+		/>
+		<TextView android:id="@+id/threadListBoard"
+			android:layout_height="wrap_content" 
+			android:layout_width="0dp" 
+			android:layout_weight="1"
+			android:textSize="18sp" 
+			android:textColor="@color/TextGreen" 
+			android:textStyle="bold"
 			android:gravity="left" 
 		/>
 	</LinearLayout>
@@ -45,7 +54,7 @@
 		android:gravity="left" >
 
 		<TextView
-		    android:id="@+id/threadSpinnerListTitle"
+		    android:id="@+id/threadListTitle"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:gravity="left"
@@ -54,7 +63,7 @@
 		    android:textSize="15sp" />
 
 		<TextView
-		    android:id="@+id/threadSpinnerListNumPostings"
+		    android:id="@+id/threadListNumPostings"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:layout_weight="0.2"
@@ -64,12 +73,12 @@
 
 	</LinearLayout>
 
-	<TextView android:id="@+id/threadSpinnerListContent"
-		android:layout_height="wrap_content" 
+	<TextView android:id="@+id/threadListContent"
+		android:layout_height="0dip" 
 		android:layout_width="match_parent" 
 		android:layout_weight="1"
 		android:textSize="16sp" 
-		android:textColor="@color/LightGrey"
+		android:textColor="@color/MediumGrey"
 		android:gravity="left"
 		/>
 </LinearLayout>
