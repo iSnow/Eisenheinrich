@@ -76,6 +76,9 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	    if (null != savedInstanceState) {
 	    	bndl = savedInstanceState;
 			curBoard = Eisenheinrich.GLOBALS.getBoardCache().get(bndl.getLong("boardId"));
+			if (null == curBoard) {
+				throw new NullPointerException ("Cache returned null for BoardID "+bndl.getLong("boardId"));
+			}
 			Log.i("THREADLIST", "onCreate. Board: "+curBoard.shortName +" - "+curBoard.name);
 			Thread t = new Thread (new KCPageParser(curBoard.uri, curBoard.dbId)
 			.setBasePath(Defaults.BASE_URL)

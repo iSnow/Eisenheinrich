@@ -18,6 +18,8 @@ package net.krautchan.android.activity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -57,6 +59,20 @@ public class Prefs extends Activity {
 				for (Entry<String, KCBoard> entry : boards.entrySet()) {
 					boardL.add(entry.getValue());
 				}
+				
+				HashMap<Long, KCBoard> storedBoardMap = new HashMap<Long, KCBoard>();
+				Collection <KCBoard> storedBoards = Eisenheinrich.GLOBALS.getBoardCache().getAll();
+				for (KCBoard board : storedBoards) {
+					storedBoardMap.put(board.dbId, board);
+				}
+				for (KCBoard board : boardL) {
+					KCBoard storedBoard = storedBoardMap.get(board.dbId);
+					if (null != storedBoard) {
+						board.show = storedBoard.show; 
+						storedBoard.name = board.name;
+					}
+				}
+				
 				DatabaseHelper dbH = Eisenheinrich.getInstance().dbHelper;
 				dbH.persistBoards(boardL);
 			} catch (IOException e) {

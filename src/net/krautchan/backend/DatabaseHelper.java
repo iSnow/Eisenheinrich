@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import junit.framework.Assert;
@@ -246,17 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public void persistBoards (Collection<KCBoard> boards) {
-		HashMap<Long, KCBoard> storedBoardMap = new HashMap<Long, KCBoard>();
-		Collection <KCBoard> storedBoards = getBoards();
-		for (KCBoard board : storedBoards) {
-			storedBoardMap.put(board.dbId, board);
-		}
-		for (KCBoard board : boards) {
-			KCBoard storedBoard = storedBoardMap.get(board.dbId);
-			if (null != storedBoard) {
-				board.show = storedBoard.show;
-			}
-		}
+		
 		SQLiteDatabase db = getReadableDatabase();
 		try{
 			db.beginTransaction();

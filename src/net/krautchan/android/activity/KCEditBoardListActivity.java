@@ -106,6 +106,7 @@ public class KCEditBoardListActivity extends ListActivity {
 						final int position = checkedItems.keyAt(i);
 						
 						KCBoard board = Eisenheinrich.GLOBALS.getBoardCache().get(adapter.getItemId(position));
+						System.out.println (board.shortName+" "+checkedItems.valueAt(i));
 						board.show = checkedItems.valueAt(i);
 					}
 				};

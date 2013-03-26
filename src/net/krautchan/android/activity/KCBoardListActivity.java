@@ -275,75 +275,6 @@ public class KCBoardListActivity extends ListActivity {
 			}
 		}
 	}
-
-/*	protected class BoardListAdapter extends ArrayAdapter<String> {
-		private final static int viewId = R.layout.board_list_item;
-		private LayoutInflater inflater;
-		Map<String, KCBoard> rowVals;
-
-		public BoardListAdapter(ListActivity context, Map<String, KCBoard> boards) {
-			super(context, viewId);
-			this.inflater = context.getLayoutInflater();
-			this.rowVals = boards;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View v = null;
-			if (null == convertView) {
-				v = inflater.inflate(R.layout.board_list_item, null);
-				TextView shortLabel = (TextView) v.findViewById(R.id.boardlist_shortname);
-				TextView longLabel = (TextView) v.findViewById(R.id.boardlist_longname);
-				shortLabel.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/juicebold.ttf"));
-				longLabel.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/juiceregular.ttf"));
-			} else {
-				v = convertView;
-			}
-
-			TextView shortLabel = (TextView) v.findViewById(R.id.boardlist_shortname);
-			shortLabel.setText(getShortName(position));
-
-			TextView longLabel = (TextView) v.findViewById(R.id.boardlist_longname);
-			longLabel.setText(rowVals.get(getShortName(position)).name);
-			return v;
-		}
-
-
-		@Override
-		public int getCount() {
-			return rowVals.size();
-		}
-
-		@Override
-		public long getItemId(int position) {
-			Iterator<String> iter = rowVals.keySet().iterator();
-			String key = null;
-			int count = 0;
-			while (iter.hasNext() && count++ <= position) {
-				key = iter.next();
-			}
-			return rowVals.get(key).dbId;
-		}
-
-		private String getShortName(int position) {
-			if (position > rowVals.size()) {
-				throw new IllegalArgumentException(
-				"BoardListAdapter:: getShortName -> position > rowVals");
-			}
-			Iterator<String> iter = rowVals.keySet().iterator();
-			int pos = 0;
-			while (pos < position) {
-				iter.next();
-				pos++;
-			}
-			String key = iter.next();
-			return key;
-		}
-		
-		public void setBoards (Map<String, KCBoard> boards) {
-			this.rowVals = boards;
-		}
-	}*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -359,7 +290,7 @@ public class KCBoardListActivity extends ListActivity {
 			return true;
 		case R.id.reload:
 			return true;
-		case R.id.edit_boards:
+		case R.id.edit_boards: 
 			KCBoardListActivity.this.startActivity(new Intent(KCBoardListActivity.this, KCEditBoardListActivity.class));
 			return true;
 		case R.id.prefs:
