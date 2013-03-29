@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import net.krautchan.android.helpers.CustomExceptionHandler;
 import net.krautchan.android.helpers.FileHelpers;
 import net.krautchan.android.network.AsyncPoster.AsyncPosterPeer;
+import net.krautchan.android.network.BoardListUpdater;
 import net.krautchan.android.network.PostVariables;
 import net.krautchan.android.network.ThreadExistenceCheck;
 import net.krautchan.android.network.ThreadExistenceCheck.ThreadExistencePeer;
@@ -173,6 +174,7 @@ public class Eisenheinrich extends Application {
 		boardCache.thaw();
 		sInstance = this;
 		sInstance.initializeInstance();
+		new BoardListUpdater().updateBoards();
 		ThreadExistenceCheck t = new ThreadExistenceCheck (storedThreads, new ThreadExistencePeer() {
 			@Override
 			public void threadChecked(KCThread thread, boolean valid) {

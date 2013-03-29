@@ -11,18 +11,13 @@
 	<application android:icon="@drawable/icon" 
 			android:label="@string/app_name"
 			android:name=".android.Eisenheinrich" android:persistent="false" android:theme="@android:style/Theme.Light.NoTitleBar" android:allowBackup="true">
-		<activity android:name=".android.activity.Prefs" android:excludeFromRecents="true" android:alwaysRetainTaskState="false" android:noHistory="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
+		
 		<activity android:label="@string/app_name" 
 		    android:launchMode="singleTask" 
 		    android:name=".android.activity.EisenheinrichActivity" android:alwaysRetainTaskState="true" android:excludeFromRecents="false" android:theme="@android:style/Theme.Black.NoTitleBar">
 			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity android:name=".android.activity.KCBoardListActivity"	

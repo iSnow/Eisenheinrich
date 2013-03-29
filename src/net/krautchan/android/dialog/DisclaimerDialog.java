@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.krautchan.R;
-import net.krautchan.android.activity.Prefs;
+import net.krautchan.android.activity.EisenheinrichActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -34,14 +34,14 @@ import android.os.Process;
 import android.widget.TextView;
 
 public class DisclaimerDialog {
-	private Activity parent; 
+	private EisenheinrichActivity parent; 
 	//private String fileName;
 	private String message;
 	private String title;
 	private AlertDialog disclaimerDialog;
 	
 	public DisclaimerDialog (Activity parent) {
-		this.parent = parent;
+		this.parent = (EisenheinrichActivity)parent;
 	}
 	
 	public void show ()  throws IOException {
@@ -56,7 +56,7 @@ public class DisclaimerDialog {
         .setPositiveButton (android.R.string.yes, new OnClickListener () {
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
-				Prefs.getInstance().setDisclaimerAck(true);
+				parent.setDisclaimerAck(true);
 				disclaimerDialog.dismiss();
 			}})
         .setNegativeButton (android.R.string.no, new OnClickListener () {

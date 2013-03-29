@@ -39,6 +39,7 @@ import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCThread;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Process;
 import android.util.TypedValue;
@@ -53,6 +54,7 @@ import android.widget.TableRow;
 
 public class EisenheinrichActivity extends Activity {
 	public static final String TAG = "EisenheinrichActivity";
+	private boolean disclaimerAck = false;
 	
 
 	@Override
@@ -88,8 +90,19 @@ public class EisenheinrichActivity extends Activity {
 	    up.checkForUpdate(this);
 	    
 	    CookieHelper.getSessionCookie(Eisenheinrich.GLOBALS);
-	    
-		Prefs prefs = Prefs.getInstance();
+	    initializeInstance();
+	    // Restore preferences
+	       SharedPreferences settings = getPreferences(0);
+	       disclaimerAck = settings.getBoolean("disclaimerAck", false);
+	       if (!isDisclaimerAck()) {
+				DisclaimerDialog dlg = new DisclaimerDialog(this);
+				try {
+					dlg.show();
+				} catch (IOException e) {
+					Process.killProcess(Process.myPid());
+				}
+			}
+		/*Prefs prefs = Prefs.getInstance();
 		if (null == prefs) {
 			this.finish();
 		} else {
@@ -103,6 +116,7 @@ public class EisenheinrichActivity extends Activity {
 				Process.killProcess(Process.myPid());
 			}
 		}
+		*/
 	}
 	
 	
@@ -146,6 +160,23 @@ public class EisenheinrichActivity extends Activity {
 			count++;
 		}
 		showBookmarks (validBookmarks);
+	}
+	
+	protected void initializeInstance() {
+        SharedPreferences settings = getPreferences(0);
+        disclaimerAck = settings.getBoolean("disclaimerAck", false);
+    }
+
+	public boolean isDisclaimerAck() {
+		return disclaimerAck;
+	}
+
+	public void setDisclaimerAck(boolean disclaimerAck) {
+		this.disclaimerAck = disclaimerAck;
+		SharedPreferences settings = getPreferences(0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean("disclaimerAck", disclaimerAck);
+		editor.commit();
 	}
 	
 	public void showBookmarks (Collection <KCThread> validBookmarks) {
