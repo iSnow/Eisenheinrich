@@ -88,6 +88,11 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 				TextView dateLabel = (TextView) v.findViewById(R.id.threadListDate);
 				dateLabel.setText(dfShort.format(thread.firstPostDate));
 
+				TextView titleLabel = (TextView) v.findViewById(R.id.threadListTitle);
+			
+				if (null != thread.title) {
+					titleLabel.setText(thread.title);
+				}	
 				TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
 				contentLabel.setText(thread.digest);
 				TextView numPostsLabel = (TextView) v.findViewById(R.id.threadListNumPostings);

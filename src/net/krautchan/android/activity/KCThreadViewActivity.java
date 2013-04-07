@@ -29,11 +29,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import junit.framework.Assert;
 import net.krautchan.R;
+import net.krautchan.android.Defaults;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.dialog.BannedDialog;
 import net.krautchan.android.helpers.ActivityHelpers;
 import net.krautchan.android.helpers.CustomExceptionHandler;
-import net.krautchan.android.helpers.FileContentProvider;
 import net.krautchan.android.widget.CommandBar;
 import net.krautchan.data.KCBoard;
 import net.krautchan.data.KCPosting;
@@ -161,6 +161,7 @@ public class KCThreadViewActivity extends Activity {
 			template = prepareTemplate (getPageTemplate ());
 		} 
 		if ((null != thread) && (null != thread.getFirstPosting())) {
+			thread.visited = true;
     		String locTemplate = template.replace("<ul id='kc-postlist'>", "<ul id='kc-postlist'><li class='odd unread' id='"+thread.getFirstPosting().dbId+"'>"+thread.getFirstPosting().asHtml(Eisenheinrich.GLOBALS.shouldShowImages())+"</li>");
 			renderHtml(locTemplate);
 		}  else {
@@ -519,7 +520,7 @@ public class KCThreadViewActivity extends Activity {
 	
 	private void openImage (String fileName) {
 		try {
-			final Uri uri = Uri.parse(FileContentProvider.URI_PREFIX+"/"+fileName);
+			final Uri uri = Uri.parse(Defaults.FILE_PATH+"/"+fileName);
 			new Thread(new Runnable() {
 				@Override
 				public void run() {

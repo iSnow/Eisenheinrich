@@ -89,7 +89,10 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 			public void onClick(View arg0) {
 				List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
 				for (int i = threads.size()-1; i >= 0; i--) {
-					adapter.add(threads.get(i));
+					KCThread t = threads.get(i);
+					if (t.visited) {
+						adapter.add(threads.get(i));
+					}
 				}
 				adapter.notifyDataSetChanged();
 				ThreadHistoryDialog d = new ThreadHistoryDialog((Activity) context);
@@ -136,6 +139,11 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 	public void incrementProgressBy (int increment) {
 		progressState += increment;
 		progress.setProgress(progressState);
+	}
+	
+	public void clearThreads () {
+		adapter.clear();
+		adapter.notifyDataSetInvalidated();
 	}
 	
 	public void setTitle (int resourceId) {

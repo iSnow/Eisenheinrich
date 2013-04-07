@@ -32,9 +32,11 @@ public class KCThread extends KrautObject {
 	public Long board_id = null;
 	public Long firstPostDate = null;
 	public Long lastPostDate = null;
+	public String title = null;
 	public String digest = null;
 	public boolean hidden = false;
 	public boolean bookmarked = false;
+	public boolean visited = false;
 	public Long previousLastKcNum = null;
 	public transient int numPostings = 0;
 	
@@ -92,6 +94,9 @@ public class KCThread extends KrautObject {
 		if (null == digest) {
 			makeDigest (posting);
 		}
+		if (null == title) {
+			title = posting.title;
+		}
 		lastPostDate = posting.created;
 		if (!postings.contains(posting)) {
 			posting.threadId = dbId;
@@ -110,6 +115,10 @@ public class KCThread extends KrautObject {
 			if (null == digest) {
 				makeDigest (posting);
 			}
+			if (null == title) {
+				this.title = posting.title;
+			}
+			
 			if (null == firstPostDate) {
 				firstPostDate = posting.created;
 			}
