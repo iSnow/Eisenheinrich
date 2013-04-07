@@ -164,12 +164,14 @@ public class ActivityHelpers {
 			HttpEntity responseEntity = response.getEntity();
 			InputStream st = responseEntity.getContent();
 			filePath = Defaults.IMAGE_TEMP_DIR+"/"+uri.getPath().replace("/", "");
+			//filePath = uri.getPath().replace("/", "");
 			FileHelpers.writeToSDFile(filePath, st) ;
 			st.close(); 
+			return FileHelpers.getSDFile (filePath).getAbsolutePath();
 		} catch (Exception e) {
 			Log.v(TAG, "EXCEPTION: " + e.getMessage());
 		}
-		return filePath;
+		return null;
 	}
 
 	public static Bitmap loadBitmap(URL url) {

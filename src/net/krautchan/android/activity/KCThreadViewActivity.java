@@ -17,6 +17,7 @@ package net.krautchan.android.activity;
 */
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -524,7 +525,10 @@ public class KCThreadViewActivity extends Activity {
 				public void run() {
 					String filePath = ActivityHelpers.downloadToFile(uri);
 					if (null != filePath) {
-						startActivity(new Intent(Intent.ACTION_VIEW, uri));
+						Intent intent = new Intent();
+						intent.setAction(android.content.Intent.ACTION_VIEW);
+						intent.setDataAndType(Uri.fromFile(new File(filePath)), "image/*");
+						startActivity(intent);
 					}
 				}
 				

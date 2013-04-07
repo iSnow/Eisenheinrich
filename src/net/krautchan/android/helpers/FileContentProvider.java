@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import net.krautchan.android.Defaults;
+import android.annotation.SuppressLint;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -87,6 +88,7 @@ public class FileContentProvider extends ContentProvider {
 	}
 	
 
+	@SuppressLint("Override")
 	public String[] getStreamTypes (Uri uri, String mimeTypeFilter) {
 		String[] types = new String[1];
 		int delim = uri.getLastPathSegment().lastIndexOf('.');
@@ -125,8 +127,8 @@ public class FileContentProvider extends ContentProvider {
 		byte[] data = null;
 
 		String filePath = Defaults.IMAGE_TEMP_DIR+"/"+uri.getPath().replace("/", "");
-		if (null != filePath) {
-			File result = FileHelpers.getSDFile (filePath);
+		File result = FileHelpers.getSDFile (filePath);
+		if (result.exists()) {
 			try {
 				if (null != result) {
 					long size = result.length();
