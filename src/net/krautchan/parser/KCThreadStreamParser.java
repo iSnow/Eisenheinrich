@@ -17,6 +17,7 @@ package net.krautchan.parser;
 */
 
 import java.io.Reader;
+
 import net.krautchan.data.KCPosting;
 import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;

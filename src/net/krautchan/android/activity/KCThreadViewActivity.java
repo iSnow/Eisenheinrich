@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import junit.framework.Assert;
@@ -47,7 +49,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -109,7 +110,7 @@ public class KCThreadViewActivity extends Activity {
 	        	} 
 	        }
 	    };
-		webView.setBackgroundColor(Color.BLACK);
+		//webView.setBackgroundColor(Color.BLACK);
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setSavePassword(false);
 		webSettings.setSaveFormData(false);
@@ -189,7 +190,7 @@ public class KCThreadViewActivity extends Activity {
 		runOnUiThread(new Runnable() {
 	        public void run() {
 				Button toggleCollapsedButton = (Button)findViewById(R.id.show_collapsed);
-				if ((null == thread) || (null == thread.previousLastKcNum)) {
+				if ((null == thread) || (!thread.visited)) {
 					toggleCollapsedButton.setVisibility(View.GONE);
 				} else {
 					toggleCollapsedButton.setVisibility(View.VISIBLE);
@@ -521,7 +522,19 @@ public class KCThreadViewActivity extends Activity {
 	private void openImage (String fileName) {
 		try {
 			final Uri uri = Uri.parse(Defaults.FILE_PATH+"/"+fileName);
-			new Thread(new Runnable() {
+			new Timer().schedule(new TimerTask() {
+
+				@Override
+				public void run() {
+					String filePath = ActivityHelpers.downloadToFile(uri);
+					if (null != filePath) {
+						Intent intent = new Intent();
+						intent.setAction(android.content.Intent.ACTION_VIEW);
+						intent.setDataAndType(Uri.fromFile(new File(filePath)), "image/*");
+						startActivity(intent);
+					}
+				}}, 300);
+			/*new Thread(new Runnable() {
 				@Override
 				public void run() {
 					String filePath = ActivityHelpers.downloadToFile(uri);
@@ -533,7 +546,7 @@ public class KCThreadViewActivity extends Activity {
 					}
 				}
 				
-			}).start();
+			}).start();*/ 
 		} catch (ActivityNotFoundException ex) {
 			Toast.makeText(getApplicationContext(), this.getText(R.string.could_not_open_image_viewer), Toast.LENGTH_LONG).show();
 		}

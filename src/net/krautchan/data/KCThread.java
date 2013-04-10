@@ -102,7 +102,7 @@ public class KCThread extends KrautObject {
 			posting.threadId = dbId;
 			postings.add(posting);
 		}
-		if ((null != previousLastKcNum) && (previousLastKcNum < posting.kcNummer)) {
+		if ((null == previousLastKcNum) || (previousLastKcNum < posting.kcNummer)) {
 			previousLastKcNum = posting.kcNummer;
 		}
 		Assert.assertNotNull(dbId);	

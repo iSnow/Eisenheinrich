@@ -189,6 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					valHolder.put("is_bookmarked", 1);
 				}
 				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
+				valHolder.put("is_visited", thread.visited ? 1 : 0);
 				db.update(THREAD_TABLE, valHolder, whereClause, null);
 			} else {
 				ContentValues valHolder = new ContentValues();
@@ -203,6 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("offset", 0);
 				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
 				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
+				valHolder.put("is_visited", thread.visited ? 1 : 0);
 				db.insert(THREAD_TABLE, null, valHolder);
 			} 
 		} catch (Exception e) {
@@ -284,6 +286,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			thread.digest = c.getString(c.getColumnIndex("digest"));
 			thread.hidden = (c.getInt(c.getColumnIndex("is_hidden")) == 1);
 			thread.bookmarked = (c.getInt(c.getColumnIndex("is_bookmarked")) == 1);
+			thread.visited = (c.getInt(c.getColumnIndex("is_visited")) == 1);
 		} catch (IllegalStateException ex) {
 			System.err.print(ex.getMessage());
 		}
@@ -307,7 +310,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				" t.digest, " +
 				" t.first_post_date first_post_date, "+
 				" t.is_bookmarked is_bookmarked, " +
-				" t.is_hidden is_hidden " +
+				" t.is_hidden is_hidden, " +
+				" t.is_visited is_visited " +
 				" from "
 			+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
 			+" on t.fk_board = b.id ";
@@ -328,7 +332,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " t.digest digest, "
 				+ " t.first_post_date first_post_date, " 
 				+ " t.is_bookmarked is_bookmarked, "
-				+ " t.is_hidden is_hidden "
+				+ " t.is_hidden is_hidden, "
+				+ " t.is_visited is_visited "
 			+" from "+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
 			+" on t.fk_board = b.id  where t.id = CAST(? AS INTEGER)" ;
 		return db.rawQuery(query,  new String[]{String.valueOf(id)});
@@ -357,6 +362,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " offset integer not null, " 
 				+ " is_bookmarked integer, " 
 				+ " is_hidden integer, "
+				+ " is_visited integer, "
 				+" FOREIGN KEY(fk_board) REFERENCES "+BOARD_TABLE+"(id))");	
 	}
 	

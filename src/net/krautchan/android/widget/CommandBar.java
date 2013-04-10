@@ -1,7 +1,6 @@
 package net.krautchan.android.widget;
 
 import java.util.Iterator;
-import java.util.List;
 
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
@@ -27,7 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBoards {
-	private ThreadListAdapter adapter;
+	//private ThreadListAdapter adapter;
 	private static final int MAX_PROGRESS = 100;
 	private int progressState = 0;
 	private ProgressBar progress;
@@ -87,14 +86,7 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 		history.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
-				for (int i = threads.size()-1; i >= 0; i--) {
-					KCThread t = threads.get(i);
-					if (t.visited) {
-						adapter.add(threads.get(i));
-					}
-				}
-				adapter.notifyDataSetChanged();
+				
 				ThreadHistoryDialog d = new ThreadHistoryDialog((Activity) context);
 				d.show();
 			}	
@@ -113,7 +105,6 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 			}	
 		});
 		
-		adapter = new ThreadListAdapter(this, this, context, R.layout.cmdbar_history_item);
 		
 		progress = (ProgressBar) viewHeader.findViewById(R.id.progressbar);
 	    progress.setMax(MAX_PROGRESS);
@@ -139,11 +130,6 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 	public void incrementProgressBy (int increment) {
 		progressState += increment;
 		progress.setProgress(progressState);
-	}
-	
-	public void clearThreads () {
-		adapter.clear();
-		adapter.notifyDataSetInvalidated();
 	}
 	
 	public void setTitle (int resourceId) {

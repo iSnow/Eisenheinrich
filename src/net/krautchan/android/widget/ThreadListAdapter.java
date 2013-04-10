@@ -20,7 +20,7 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 		private static SimpleDateFormat dfShort = new SimpleDateFormat ("dd.MM. HH:mm");
 		private final ProvidesBoards boardProvider;
 		private final ProvidesThreads threadProvider;
-		private ArrayList<Long> ids = new ArrayList<Long>();
+		private ArrayList<Long> ids;
 		private LayoutInflater mInflater;
 		private int mViewResourceId;
 
@@ -30,6 +30,7 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 			threadProvider = tProv;
 			mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			mViewResourceId = textViewResourceId;
+			ids = new ArrayList<Long>();
 		}
 
 		@Override
@@ -51,7 +52,7 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 		}
 
 		public void clear () {
-			ids.clear();
+			ids = new ArrayList<Long>();
 		}
 
 		@Override
@@ -89,10 +90,11 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 				dateLabel.setText(dfShort.format(thread.firstPostDate));
 
 				TextView titleLabel = (TextView) v.findViewById(R.id.threadListTitle);
-			
 				if (null != thread.title) {
 					titleLabel.setText(thread.title);
-				}	
+				} else {
+					titleLabel.setText("");
+				}
 				TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
 				contentLabel.setText(thread.digest);
 				TextView numPostsLabel = (TextView) v.findViewById(R.id.threadListNumPostings);

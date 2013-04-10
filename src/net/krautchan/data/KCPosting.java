@@ -119,7 +119,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 			innerHtml += "<div class=\"image-container\">";
 			for (int i = 0; i < imgs.length; i++) {
 				if (null != imgs[i]) {
-					innerHtml += "<a href=\"/files/"+imgs[i]+"\" onclick=\"Android.openImage('"+imgs[i]+"');return false;\"><img src=\"/thumbnails/"+thumbs[i]+"\"></a>";
+					innerHtml += "<a class=\"kcimglink\" href=\"/files/"+imgs[i]+"\" onclick=\"Android.openImage('"+imgs[i]+"');return false;\"><img src=\"/thumbnails/"+thumbs[i]+"\"></a>";
 				}
 			}
 			innerHtml += "</div>";
@@ -127,7 +127,7 @@ public class KCPosting extends KrautObject implements Comparable<KCPosting>{
 		return "<div id='"+kcNummer+"'>"+innerHtml+"</div>";
 	}
 	
-	public String getKcStyledContent () {
+	public String getKcStyledContent() {
 		String kcStyledContent = originalContent.replaceAll("<br>", "\n>");
 		Matcher kcMatcher = kcLinkPat.matcher(kcStyledContent);
 		while (kcMatcher.find()) {

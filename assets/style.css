@@ -194,14 +194,21 @@ a:active { background: -webkit-gradient(linear, left top, left bottom, from(#111
 		to(#999) );
 }
 
+div.image-container a img {
+	opacity: 1;
+}
 
+div.image-container a img:active{
+	opacity: 0.2;
+	background: yellow;
+	-webkit-transition: opacity 250ms step-start;
+	-webkit-transform: translate3d(0,0,0);
+}
 
 .ban_mark {
     color: #FF0000;
     font-weight: bold;
 }
-
-
 
 
 span.quote {
@@ -254,4 +261,79 @@ span.quote {
 
 * {
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);	
+}
+
+
+
+
+
+body {
+	color: #424140;
+	background-color: #fbf9f7;
+	font-size: 95%;
+}
+
+.even {
+}
+
+.spoiler {
+	background-color: #999;
+}
+
+ul#kc-postlist>li {
+	color: #5d5b5a;
+	border-bottom: 1px solid #ffffff;
+	border-bottom: 1px solid #d5d1cb;
+	background-color: #fbf9f7;
+}
+
+ul#kc-postlist>li:first-child {
+	background-color: #f0f8ff!important;
+}
+
+ul#kc-postlist>li.even {
+	background: transparent;
+}
+
+ul#kc-postlist>li.odd {
+	background: transparent;
+}
+
+ul#kc-postlist>li.unread {
+	border-left: 4px solid #28b1ff;
+}
+
+ul#kc-postlist>li>div>p {
+	color: #424140;
+}
+
+ul#kc-postlist>li:first-child>div>p {
+	color: #222;
+}
+
+
+li>div>div.posthead {
+	background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#eee) );
+}
+
+p.headline>b {
+	color: #424140;
+}
+
+p.headline>time {
+	color: #ffffff;
+}
+
+span.quote {
+	padding-left: 10dp;
+	color: #5d5b5a;
+}
+
+div.cloned {
+	background: white;
+}
+
+
+div.cloned>p {
+	color: black;
 }

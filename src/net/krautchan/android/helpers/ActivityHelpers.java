@@ -84,7 +84,7 @@ public class ActivityHelpers {
 		.setPostingHandler(
 				Eisenheinrich.getInstance().getPostListener()));
 		t.start();
-
+		
 		context.startActivity(intent);
 	}
 
@@ -156,9 +156,9 @@ public class ActivityHelpers {
 	public static String downloadToFile (Uri uri) {
 		String filePath = null;
 		try {
-			final String url = Defaults.FILE_PATH + uri.getPath();
+			//final String url = Defaults.FILE_PATH + uri.getPath();
 			HttpClient client = Eisenheinrich.getInstance().getHttpClient();
-			HttpGet request = new HttpGet(url); 
+			HttpGet request = new HttpGet(uri.toString()); 
 			HttpResponse response = client.execute(request);
 			Log.v(TAG, "GET response: " + response.getStatusLine());
 			HttpEntity responseEntity = response.getEntity();
@@ -174,6 +174,7 @@ public class ActivityHelpers {
 		return null;
 	}
 
+	
 	public static Bitmap loadBitmap(URL url) {
 		Bitmap bm = null;
 		InputStream is = null;

@@ -1,5 +1,5 @@
 function quoteReply (elem) {
-	if (!elem) {
+	if (elem != undefined) {
 		return;
 	}
 	//Android.debugString (">>>>QUOTEREPLY "+elem);
@@ -124,6 +124,15 @@ function appendPost (content, className, id) {
 		quoteReply(this);
 		
 	});
+}
+
+function imageClick(elem) {
+	//setImgOpacity (elem, 0.3);
+	//window.setTimeout(setImgOpacity (elem, 1),200);
+}
+
+function setImgOpacity (elem, opacity) {
+	elem.getElementsByTagName("img")[0].style.opacity=opacity;
 }
 
 function postingsDone() {

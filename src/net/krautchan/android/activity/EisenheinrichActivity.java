@@ -1,20 +1,20 @@
 package net.krautchan.android.activity;
 
 /*
-* Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (C) 2011 Johannes Jander (johannes@jandermail.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.io.IOException;
 import java.util.Collection;
@@ -55,71 +55,53 @@ import android.widget.TableRow;
 public class EisenheinrichActivity extends Activity {
 	public static final String TAG = "EisenheinrichActivity";
 	private boolean disclaimerAck = false;
-	
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
-		        "eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
+				"eisenheinrich", "http://eisenheinrich.datensalat.net:8080/Eisenweb/upload/logfile/test", this));
 
 		setContentView(R.layout.main_view);
-		
+
 		if (Eisenheinrich.GLOBALS.isDebugVersion()) {
 			findViewById (R.id.debug_marker).setVisibility(View.VISIBLE);
 		}
-		
-	    Button goKCButton = (Button)findViewById(R.id.main_goto_kc);
-	    goKCButton.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v) {
+
+		Button goKCButton = (Button)findViewById(R.id.main_goto_kc);
+		goKCButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
 				EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, KCBoardListActivity.class));
-		    }
-	    });
-	    
-	    Button testButton = (Button)findViewById(R.id.main_test);
-	    testButton.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v) {
-		    	ThreadHistoryDialog dlg = new ThreadHistoryDialog (EisenheinrichActivity.this);
-		    	dlg.show();
-		    	
-				//EisenheinrichActivity.this.startActivity(new Intent(EisenheinrichActivity.this, ThreadSpinnerActivity.class));
-		    }
-	    });
-	    
-	    UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Defaults.UPDATE_VERSION_URL);
-	    up.checkForUpdate(this);
-	    
-	    CookieHelper.getSessionCookie(Eisenheinrich.GLOBALS);
-	    initializeInstance();
-	    // Restore preferences
-	       SharedPreferences settings = getPreferences(0);
-	       disclaimerAck = settings.getBoolean("disclaimerAck", false);
-	       if (!isDisclaimerAck()) {
-				DisclaimerDialog dlg = new DisclaimerDialog(this);
-				try {
-					dlg.show();
-				} catch (IOException e) {
-					Process.killProcess(Process.myPid());
-				}
 			}
-		/*Prefs prefs = Prefs.getInstance();
-		if (null == prefs) {
-			this.finish();
-		} else {
+		});
+
+		Button testButton = (Button)findViewById(R.id.main_test);
+		testButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				ThreadHistoryDialog dlg = new ThreadHistoryDialog (EisenheinrichActivity.this);
+				dlg.show();
+			}
+		});
+
+		UpdateCheck up = new UpdateCheck(new UpdatePeer(), Eisenheinrich.getInstance().getHttpClient(), Defaults.UPDATE_VERSION_URL);
+		up.checkForUpdate(this);
+
+		CookieHelper.getSessionCookie(Eisenheinrich.GLOBALS);
+		initializeInstance();
+		SharedPreferences settings = getPreferences(0);
+		disclaimerAck = settings.getBoolean("disclaimerAck", false);
+		if (!isDisclaimerAck()) {
+			DisclaimerDialog dlg = new DisclaimerDialog(this);
 			try {
-				//FIXME we get nullpointer exceptions in the line below. Prefs should not be an activity
-				if (!prefs.isDisclaimerAck()) {
-					DisclaimerDialog dlg = new DisclaimerDialog(this);
-					dlg.show();
-				}
+				dlg.show();
 			} catch (IOException e) {
 				Process.killProcess(Process.myPid());
 			}
 		}
-		*/
 	}
-	
-	
+
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -143,7 +125,7 @@ public class EisenheinrichActivity extends Activity {
 		Eisenheinrich.getInstance().dbHelper.close();
 		this.finish();*/
 	}
-	
+
 	public void showBookmarks (Collection <KCThread> bookmarks, boolean[] valid) {
 		Collection <KCThread> validBookmarks = new HashSet<KCThread>();
 		Collection<KCBoard> boards = Eisenheinrich.getInstance().dbHelper.getBoards();
@@ -161,11 +143,11 @@ public class EisenheinrichActivity extends Activity {
 		}
 		showBookmarks (validBookmarks);
 	}
-	
+
 	protected void initializeInstance() {
-        SharedPreferences settings = getPreferences(0);
-        disclaimerAck = settings.getBoolean("disclaimerAck", false);
-    }
+		SharedPreferences settings = getPreferences(0);
+		disclaimerAck = settings.getBoolean("disclaimerAck", false);
+	}
 
 	public boolean isDisclaimerAck() {
 		return disclaimerAck;
@@ -178,7 +160,7 @@ public class EisenheinrichActivity extends Activity {
 		editor.putBoolean("disclaimerAck", disclaimerAck);
 		editor.commit();
 	}
-	
+
 	public void showBookmarks (Collection <KCThread> validBookmarks) {
 		if (validBookmarks.isEmpty()) {
 			return;
@@ -190,20 +172,20 @@ public class EisenheinrichActivity extends Activity {
 		while ((numCols >= 1) && ((numThreads / numCols) < numCols)) {
 			numCols--; 
 		} 
-		
+
 		int remainder = numThreads % numCols;
 		int rows = (int) Math.round(Math.floor((double)numThreads / (double)numCols));
 		TableLayout table = null;
 		table = (TableLayout) findViewById(R.id.bookmark_table);
-        Iterator<KCThread> iter = validBookmarks.iterator();
-        if (0 != remainder) {
-        	addBookmarksRow (iter, remainder, table);
-        }
+		Iterator<KCThread> iter = validBookmarks.iterator();
+		if (0 != remainder) {
+			addBookmarksRow (iter, remainder, table);
+		}
 		for (int i = 0; i < rows; i++) {
 			addBookmarksRow (iter, numCols, table);
 		}
 	}
-	
+
 	private void addBookmarksRow (Iterator<KCThread> iter, int numColumns, TableLayout table) {
 		if ((null == table)|| (null == iter)){
 			return;
@@ -214,9 +196,9 @@ public class EisenheinrichActivity extends Activity {
 		}
 		TableRow row = new TableRow(this);
 		Collection<KCBoard> boards = Eisenheinrich.getInstance().dbHelper.getBoards();
-        row.setLayoutParams(new LayoutParams(
-                LayoutParams.FILL_PARENT,
-                LayoutParams.WRAP_CONTENT));
+		row.setLayoutParams(new LayoutParams(
+				LayoutParams.FILL_PARENT,
+				LayoutParams.WRAP_CONTENT));
 		for (int j = 0; j < numColumns; j++) {			
 			Button bt = new Button(this);
 			if (iter.hasNext()) {
@@ -229,16 +211,16 @@ public class EisenheinrichActivity extends Activity {
 					}
 					bt.setText("/"+board.shortName+"/ - "+thread.kcNummer.toString()+"\n"+digest);
 					bt.setBackgroundDrawable(getResources().getDrawable(R.drawable.button));
-				    bt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-				    bt.setTextColor(getResources().getColor(R.color.White));
-				    bt.setOnClickListener(new BookmarkOnClickListener(thread, board));
-				    row.addView(bt);
+					bt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+					bt.setTextColor(getResources().getColor(R.color.White));
+					bt.setOnClickListener(new BookmarkOnClickListener(thread));
+					row.addView(bt);
 				}   
 			}
 		}	        
 		table.addView(row);
 	}
-	
+
 	private static KCBoard getBoard (Collection<KCBoard> boards, Long boardID) {
 		for (KCBoard board: boards) {
 			if (board.dbId.longValue() == boardID.longValue()) {
@@ -247,28 +229,26 @@ public class EisenheinrichActivity extends Activity {
 		}
 		return null;
 	}
-	
+
 	private final class BookmarkOnClickListener implements View.OnClickListener {
 		private KCThread thread;
-		private KCBoard board;
-		
-		public BookmarkOnClickListener(KCThread thread, KCBoard board) {
+
+		public BookmarkOnClickListener(KCThread thread) {
 			super();
 			this.thread = thread;
-			this.board = board;
 		}
-		
+
 		@Override
 		public void onClick(View v) {
 			ActivityHelpers.switchToThread (thread, EisenheinrichActivity.this);
 		}
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.options_menu_main, menu);
-	    return true;
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.options_menu_main, menu);
+		return true;
 	}
 
 	@Override
@@ -283,19 +263,19 @@ public class EisenheinrichActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	private class BookmarkPeer implements ThreadExistencePeer  {
 		//private final Collection <KCThread> bookmarks;
 		private Long lastId;
 		private final Collection <KCThread> valids = new HashSet<KCThread>();
-		
+
 		public BookmarkPeer(Collection<KCThread> bookmarks) {
 			super();
 			Iterator<KCThread> iter = bookmarks.iterator();
 			while (iter.hasNext()) {
 				lastId = iter.next().dbId;
 			}
-			
+
 		}
 
 		@Override
@@ -310,12 +290,12 @@ public class EisenheinrichActivity extends Activity {
 						public void run() {	
 							showBookmarks (valids);
 						}
-				    }); 
+					}); 
 				}
 			}
 		}
 	};
-	
+
 	private class UpdatePeer implements UpdateCheckPeer {
 
 		@Override
@@ -326,9 +306,9 @@ public class EisenheinrichActivity extends Activity {
 				public void run() {
 					if (!isFinishing()) {
 						new UpdateDialog (EisenheinrichActivity.this).show();
-				    }
+					}
 				}
-				
+
 			});
 		}
 	}

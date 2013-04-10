@@ -57,8 +57,12 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 		//v2.setTextColor(parentActivity.getResources().getColor(R.color.LightGrey));
 		list.setAdapter(adapter);
 		List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
+		adapter.clear();
 		for (int i = threads.size()-1; i >= 0; i--) {
-			adapter.add(threads.get(i));
+			KCThread t = threads.get(i);
+			if (t.visited) {
+				adapter.add(threads.get(i));
+			}
 		}
 		adapter.notifyDataSetChanged();
 		list.setOnItemClickListener(new OnItemClickListener() {
