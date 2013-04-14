@@ -116,18 +116,7 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 				return -1;
 			}
 			return ids.get(position);
-			/*Iterator<Long> iter = ids.iterator();
-			int count = 0;
-			long id = -1;
-			while (iter.hasNext() && count++ <= position) {
-				id = iter.next();
-				while (iter.hasNext() && count <= position) {
-					id = iter.next();
-				}
-			}
-			return id; */
 		}
-
 
 		@Override
 		public boolean hasStableIds() {

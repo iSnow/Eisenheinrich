@@ -36,7 +36,7 @@ public class KCThread extends KrautObject {
 	public String digest = null;
 	public boolean hidden = false;
 	public boolean bookmarked = false;
-	public boolean visited = false;
+	public Long visited = null;
 	public Long previousLastKcNum = null;
 	public transient int numPostings = 0;
 	
@@ -102,13 +102,11 @@ public class KCThread extends KrautObject {
 			posting.threadId = dbId;
 			postings.add(posting);
 		}
-		if ((null == previousLastKcNum) || (previousLastKcNum < posting.kcNummer)) {
-			previousLastKcNum = posting.kcNummer;
-		}
+		
 		Assert.assertNotNull(dbId);	
 	}
 	
-	public void recalc () {
+	public void doneLoading () {
 		try {
 			KCPosting posting = postings.first();
 			
@@ -125,6 +123,10 @@ public class KCThread extends KrautObject {
 			if ((null == dbId) && (null != uri)) {
 				dbId = (long)uri.hashCode();
 			} 
+			posting = postings.last();
+			if ((null == previousLastKcNum) || (previousLastKcNum < posting.kcNummer)) {
+				previousLastKcNum = posting.kcNummer;
+			}
 			Assert.assertNotNull(dbId);
 		} catch (Exception e) {
 			String trace = "Exception in KCThread "+kcNummer+" "+e.getClass().getCanonicalName()+"\n";

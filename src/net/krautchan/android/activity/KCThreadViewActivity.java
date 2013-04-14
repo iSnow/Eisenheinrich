@@ -162,7 +162,6 @@ public class KCThreadViewActivity extends Activity {
 			template = prepareTemplate (getPageTemplate ());
 		} 
 		if ((null != thread) && (null != thread.getFirstPosting())) {
-			thread.visited = true;
     		String locTemplate = template.replace("<ul id='kc-postlist'>", "<ul id='kc-postlist'><li class='odd unread' id='"+thread.getFirstPosting().dbId+"'>"+thread.getFirstPosting().asHtml(Eisenheinrich.GLOBALS.shouldShowImages())+"</li>");
 			renderHtml(locTemplate);
 		}  else {
@@ -190,7 +189,7 @@ public class KCThreadViewActivity extends Activity {
 		runOnUiThread(new Runnable() {
 	        public void run() {
 				Button toggleCollapsedButton = (Button)findViewById(R.id.show_collapsed);
-				if ((null == thread) || (!thread.visited)) {
+				if ((null == thread) || (thread.visited == null)) {
 					toggleCollapsedButton.setVisibility(View.GONE);
 				} else {
 					toggleCollapsedButton.setVisibility(View.VISIBLE);
@@ -297,6 +296,7 @@ public class KCThreadViewActivity extends Activity {
 	private void renderPosting (final KCPosting posting, boolean read, boolean even, boolean first) {
 		Log.i("THREADVIEW", "Render Posting: "+posting.kcNummer);
 		String classStr = ""; 
+		read = false;
 		if (!first) {
 			if (read) {
 				classStr = "read";
@@ -361,12 +361,13 @@ public class KCThreadViewActivity extends Activity {
 		public void notifyDone(Object token) {
 			if (KCThreadViewActivity.this.token.equals(token)) {
 				Log.i("THREADVIEW", "notifyDone");
+	    		thread.visited = System.currentTimeMillis();
 				Eisenheinrich.getInstance().dbHelper.persistThread(thread);
 				Message msg = progressHandler.obtainMessage();
 	        	msg.arg1 = 0;
 	        	progressHandler.sendMessage(msg);
 	        	//FIXME remove next line and implement thread caching.
-	        	thread.recalc();
+	        	//thread.doneLoading();
 	        	stopSpinner ();
 			}
 		}
@@ -374,6 +375,7 @@ public class KCThreadViewActivity extends Activity {
 		@Override
 		public void notifyError(Exception ex, Object token) {
 			if (KCThreadViewActivity.this.token.equals(token)) {
+	    		thread.visited = null;
 				KCThreadViewActivity.this.finish();
 			}
 		}

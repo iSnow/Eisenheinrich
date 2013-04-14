@@ -16,7 +16,8 @@ package net.krautchan.android.dialog;
 * limitations under the License.
 */
 
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.krautchan.R;
@@ -53,15 +54,20 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 
 		final ThreadListAdapter adapter = new ThreadListAdapter(this, this, dialogView.getContext(), R.layout.cmdbar_history_item);
 		ListView list = (ListView) dialogView.findViewById(R.id.thread_dialog_listview);
-		//TextView v2 = ((TextView)dialogView.findViewById(R.id.threadListDate));
-		//v2.setTextColor(parentActivity.getResources().getColor(R.color.LightGrey));
 		list.setAdapter(adapter);
 		List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
+ 		Collections.sort(threads, new Comparator<KCThread>() {
+			@Override
+			public int compare(KCThread lhs, KCThread rhs) {
+				if ((rhs.visited == null) || (lhs.visited == null)) {
+					return 0;
+				}
+				return (rhs.visited.compareTo(lhs.visited));
+			}});
 		adapter.clear();
-		for (int i = threads.size()-1; i >= 0; i--) {
-			KCThread t = threads.get(i);
-			if (t.visited) {
-				adapter.add(threads.get(i));
+		for (KCThread t : threads) {
+			if (t.visited != null) {
+				adapter.add(t);
 			}
 		}
 		adapter.notifyDataSetChanged();
@@ -77,29 +83,14 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 		});
 	}
 	
-	
 	@Override
 	public KCBoard getBoard(long dbId) {
-		Iterator<KCBoard> iter = Eisenheinrich.GLOBALS.getBoardCache().getAll().iterator();
-		while (iter.hasNext()) {
-			KCBoard b = iter.next();
-			if (b.dbId == dbId) {
-				return b;
-			}
-		}
-		return null;
+		return  Eisenheinrich.GLOBALS.getBoardCache().get(dbId);
 	}
 
 	@Override
 	public KCThread getThread(long dbId) {
-		Iterator<KCThread> iter = Eisenheinrich.GLOBALS.getThreadCache().getAll().iterator();
-		while (iter.hasNext()) {
-			KCThread t = iter.next();
-			if (t.dbId == dbId) {
-				return t;
-			}
-		}
-		return null;
+		return Eisenheinrich.GLOBALS.getThreadCache().get(dbId);
 	}
 	
 	

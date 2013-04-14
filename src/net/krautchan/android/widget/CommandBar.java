@@ -1,7 +1,5 @@
 package net.krautchan.android.widget;
 
-import java.util.Iterator;
-
 import net.krautchan.R;
 import net.krautchan.android.Eisenheinrich;
 import net.krautchan.android.activity.ProvidesBoards;
@@ -26,7 +24,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBoards {
-	//private ThreadListAdapter adapter;
 	private static final int MAX_PROGRESS = 100;
 	private int progressState = 0;
 	private ProgressBar progress;
@@ -81,7 +78,6 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 		TextView history = (TextView) parentView.findViewById(R.id.history_button);
 		history.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/fontawesome-webfont.ttf"));
 		history.setClickable(true);
-		
 		history.setTextColor(getResources().getColor(R.color.White));
 		history.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -137,13 +133,15 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 	}
 	
 	public void setTitle (String title) {
+		if (null == title) 
+			return;
 		TextView headline = (TextView)findViewById(R.id.headline);
-		headline.setText(title);
+		String locTitle = (title.length() < 33) ? title : title.substring(0, 32); 
+		headline.setText(locTitle);
 	}
 
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		
 		View container = findViewById(R.id.command_bar_widget);
 		container.layout(0, 0, r, this.getHeight());
 	}
@@ -158,25 +156,11 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 
 	@Override
 	public KCBoard getBoard(long dbId) {
-		Iterator<KCBoard> iter = Eisenheinrich.GLOBALS.getBoardCache().getAll().iterator();
-		while (iter.hasNext()) {
-			KCBoard b = iter.next();
-			if (b.dbId == dbId) {
-				return b;
-			}
-		}
-		return null;
+		return  Eisenheinrich.GLOBALS.getBoardCache().get(dbId);
 	}
-
+	
 	@Override
 	public KCThread getThread(long dbId) {
-		Iterator<KCThread> iter = Eisenheinrich.GLOBALS.getThreadCache().getAll().iterator();
-		while (iter.hasNext()) {
-			KCThread t = iter.next();
-			if (t.dbId == dbId) {
-				return t;
-			}
-		}
-		return null;
+		return Eisenheinrich.GLOBALS.getThreadCache().get(dbId);
 	}
 }

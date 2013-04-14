@@ -70,7 +70,7 @@ public class Eisenheinrich extends Application {
 		public void notifyAdded(KCThread item, Object token) {
 			for (KODataListener<KCThread> listener: tListeners) {
 				listener.notifyAdded(item, token);
-				dbHelper.persistThread(item);
+				//dbHelper.persistThread(item);
 			}
 		}
 

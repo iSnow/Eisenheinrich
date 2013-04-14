@@ -189,7 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					valHolder.put("is_bookmarked", 1);
 				}
 				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
-				valHolder.put("is_visited", thread.visited ? 1 : 0);
+				valHolder.put("is_visited", (thread.visited == null) ?  0 : thread.visited);
 				db.update(THREAD_TABLE, valHolder, whereClause, null);
 			} else {
 				ContentValues valHolder = new ContentValues();
@@ -204,7 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				valHolder.put("offset", 0);
 				valHolder.put("is_bookmarked", thread.bookmarked ? 1 : 0);
 				valHolder.put("is_hidden", thread.hidden ? 1 : 0);
-				valHolder.put("is_visited", thread.visited ? 1 : 0);
+				valHolder.put("is_visited", (thread.visited == null) ?  0 : thread.visited);
 				db.insert(THREAD_TABLE, null, valHolder);
 			} 
 		} catch (Exception e) {
@@ -286,7 +286,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			thread.digest = c.getString(c.getColumnIndex("digest"));
 			thread.hidden = (c.getInt(c.getColumnIndex("is_hidden")) == 1);
 			thread.bookmarked = (c.getInt(c.getColumnIndex("is_bookmarked")) == 1);
-			thread.visited = (c.getInt(c.getColumnIndex("is_visited")) == 1);
+			thread.visited = c.getLong(c.getColumnIndex("is_visited"));
 		} catch (IllegalStateException ex) {
 			System.err.print(ex.getMessage());
 		}

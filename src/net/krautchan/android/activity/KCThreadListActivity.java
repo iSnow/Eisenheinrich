@@ -266,6 +266,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	@Override
 	protected void onRestoreInstanceState(Bundle inState) {
 		super.onRestoreInstanceState(inState);
+		curBoard = Eisenheinrich.GLOBALS.getBoardCache().get(inState.getLong("boardId"));
 	}
 
 	@Override
@@ -273,7 +274,6 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 		super.onSaveInstanceState(outState);
 		outState.putLong("boardId", curBoard.dbId);
 		outState.putString("token", token);
-		Eisenheinrich.getInstance();
 		Eisenheinrich.GLOBALS.getThreadCache().freeze();
 	}
 	

@@ -126,10 +126,6 @@ function appendPost (content, className, id) {
 	});
 }
 
-function imageClick(elem) {
-	//setImgOpacity (elem, 0.3);
-	//window.setTimeout(setImgOpacity (elem, 1),200);
-}
 
 function setImgOpacity (elem, opacity) {
 	elem.getElementsByTagName("img")[0].style.opacity=opacity;

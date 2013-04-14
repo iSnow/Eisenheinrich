@@ -49,7 +49,7 @@ public class KCThreadStreamParser implements KCStreamParser<KCThread> {
 			if (curChar == threadFilter[threadPos]) {
 				threadPos++;
 				if (threadPos == threadFilter.length) {
-					thread.recalc();
+					thread.doneLoading();
 					pParser.notifyDone();
 					handler.notifyAdded(thread, token);
 					return thread;
