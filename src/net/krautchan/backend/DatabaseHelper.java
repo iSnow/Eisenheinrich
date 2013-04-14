@@ -246,6 +246,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return threads;
 	}
 	
+	public Collection <KCThread> getVisitedThreads () {
+		ConcurrentLinkedQueue<KCThread> threads = new ConcurrentLinkedQueue<KCThread>();
+		Cursor c = retrieveVisitedThreads();
+		c.moveToFirst();
+		while (!c.isAfterLast()) {
+			KCThread thread = populateThread (c);
+			threads.add(thread);
+			c.moveToNext();
+		}
+		c.close();
+		return threads;
+	}
+	
 	public void persistBoards (Collection<KCBoard> boards) {
 		
 		SQLiteDatabase db = getReadableDatabase();
@@ -301,42 +314,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	private Cursor retrieveAllThreads(boolean bookmarksOnly) {
 		SQLiteDatabase db = getReadableDatabase();
-		String query = "select " +
-				" t.id _id, " +
-				" b.id b_id, " +
-				" t.kc_number, " +
-				" t.last_kc_number, "+
-				" t.url t_url, " +
-				" t.digest, " +
-				" t.first_post_date first_post_date, "+
-				" t.is_bookmarked is_bookmarked, " +
-				" t.is_hidden is_hidden, " +
-				" t.is_visited is_visited " +
-				" from "
-			+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
-			+" on t.fk_board = b.id ";
+		String query = getSelectThreadsQuery();
 		if (bookmarksOnly) {
 			query += " where t.is_bookmarked = 1";
 		}
 		return db.rawQuery(query, null);
 	}
 	
+	private Cursor retrieveVisitedThreads() {
+		SQLiteDatabase db = getReadableDatabase();
+		String query = getSelectThreadsQuery()
+			+" where t.is_visited <> 0";
+		
+		return db.rawQuery(query, null);
+	}
+	
 	private Cursor retrieveThread(Long id) {
 		SQLiteDatabase db = getReadableDatabase();
-		String query = "select " 
-				+ " t.id _id, " 
-				+ " b.id b_id, " 
-				+ " t.kc_number, " 
-				+ " t.last_kc_number, "
-				+ " t.url t_url, "
-				+ " t.digest digest, "
-				+ " t.first_post_date first_post_date, " 
-				+ " t.is_bookmarked is_bookmarked, "
-				+ " t.is_hidden is_hidden, "
-				+ " t.is_visited is_visited "
-			+" from "+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
-			+" on t.fk_board = b.id  where t.id = CAST(? AS INTEGER)" ;
+		String query = getSelectThreadsQuery() +
+			" where t.id = CAST(? AS INTEGER)" ;
 		return db.rawQuery(query,  new String[]{String.valueOf(id)});
+	}
+	
+	
+	private String getSelectThreadsQuery() {
+		return "select " +
+		" t.id _id, " +
+		" b.id b_id, " +
+		" t.kc_number, " +
+		" t.last_kc_number, "+
+		" t.url t_url, " +
+		" t.digest, " +
+		" t.first_post_date first_post_date, "+
+		" t.is_bookmarked is_bookmarked, " +
+		" t.is_hidden is_hidden, " +
+		" t.is_visited is_visited " +
+		" from "
+		+THREAD_TABLE+" t join "+BOARD_TABLE+" b "
+		+" on t.fk_board = b.id ";
 	}
 
 	private void createBoardTable (SQLiteDatabase db) throws SQLException {

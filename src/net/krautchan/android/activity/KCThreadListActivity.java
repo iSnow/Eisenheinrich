@@ -37,12 +37,8 @@ import net.krautchan.data.KCThread;
 import net.krautchan.data.KODataListener;
 import net.krautchan.parser.KCPageParser;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -107,17 +103,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	    }
 	    
 	    cmdBar = (CommandBar) findViewById(R.id.command_bar);
-	    
-	    new AlertDialog.Builder(KCThreadListActivity.this)
-        .setMessage (R.string.bord_unreachable)
-        .setTitle(R.string.error_network)
-        .setPositiveButton (android.R.string.yes, new OnClickListener () {
-			@Override
-			public void onClick(DialogInterface arg0, int arg1) {
-				KCThreadListActivity.this.finish();
-			}})
-        .create();
-	    
+	    /*
 	    final Handler progressHandler = new Handler() {
 	        public void handleMessage(Message msg) {
 	        	if (0 == msg.arg1) {
@@ -126,7 +112,7 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 	        		cmdBar.incrementProgressBy(10);
 	        	}
 	        }
-	    };
+	    };*/
 	    token = bndl.getString("token");
 		
 	    Timer tm = new Timer();
@@ -162,9 +148,9 @@ public class KCThreadListActivity extends Activity implements ProvidesBoards, Pr
 
 			@Override
 			public void notifyDone(Object token) {
-				Message msg = progressHandler.obtainMessage();
+				Message msg = cmdBar.getProgressHandler().obtainMessage();
 	        	msg.arg1 = 0;
-	        	progressHandler.sendMessage(msg);
+	        	cmdBar.getProgressHandler().sendMessage(msg);
 			}
 			
 			@Override

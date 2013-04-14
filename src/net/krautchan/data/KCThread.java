@@ -207,6 +207,23 @@ public class KCThread extends KrautObject {
 			
 			;
 	}
+	
+
+	@Override	
+	public int hashCode () {
+		return toString().hashCode();
+	}
+
+	@Override
+	public boolean equals (Object arg0) {
+		if (!(arg0 instanceof KCThread)) {
+			return false;
+		}
+		if ((dbId != null) && (((KCThread)arg0).dbId != null)) {
+			return dbId.longValue() == ((KCThread)arg0).dbId.longValue();
+		}
+		return uri.equalsIgnoreCase( ((KCThread)arg0).uri);
+	}
 
 	
 }

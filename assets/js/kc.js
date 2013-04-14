@@ -1,5 +1,5 @@
 function quoteReply (elem) {
-	if (elem != undefined) {
+	if (elem == undefined) {
 		return;
 	}
 	//Android.debugString (">>>>QUOTEREPLY "+elem);
@@ -28,7 +28,7 @@ function quoteClick (elem) {
 	var href = $(elem).attr('href');
 	var segments = href.split("/");
 	var id = segments[segments.length - 1].replace ('#', '');
-	Android.debugString ('>>>>'+id);
+	//Android.debugString ('>>>>'+id);
 	var div = cloneNode (id, offset.top);
 	//Android.debugString ($(div).html());
 	var cButton = $(div).prepend('<p class="closebutton">close</p>');

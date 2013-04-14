@@ -98,7 +98,9 @@ public class ThreadListAdapter extends ArrayAdapter<KCThread> {
 				TextView contentLabel = (TextView) v.findViewById(R.id.threadListContent);
 				contentLabel.setText(thread.digest);
 				TextView numPostsLabel = (TextView) v.findViewById(R.id.threadListNumPostings);
-				numPostsLabel.setText(" "+thread.numPostings+ " Posts");
+				if (null != numPostsLabel) {
+					numPostsLabel.setText(" "+thread.numPostings+ " Posts");
+				}
 
 			}
 			return v;

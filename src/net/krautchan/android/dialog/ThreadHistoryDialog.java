@@ -16,6 +16,7 @@ package net.krautchan.android.dialog;
 * limitations under the License.
 */
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,7 +56,8 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 		final ThreadListAdapter adapter = new ThreadListAdapter(this, this, dialogView.getContext(), R.layout.cmdbar_history_item);
 		ListView list = (ListView) dialogView.findViewById(R.id.thread_dialog_listview);
 		list.setAdapter(adapter);
-		List<KCThread> threads = Eisenheinrich.GLOBALS.getThreadCache().getAll();
+		List<KCThread> threads = new ArrayList<KCThread>();
+		threads.addAll(Eisenheinrich.getInstance().dbHelper.getVisitedThreads());
  		Collections.sort(threads, new Comparator<KCThread>() {
 			@Override
 			public int compare(KCThread lhs, KCThread rhs) {
@@ -66,9 +68,7 @@ public class ThreadHistoryDialog  implements ProvidesThreads, ProvidesBoards {
 			}});
 		adapter.clear();
 		for (KCThread t : threads) {
-			if (t.visited != null) {
-				adapter.add(t);
-			}
+			adapter.add(t);
 		}
 		adapter.notifyDataSetChanged();
 		list.setOnItemClickListener(new OnItemClickListener() {

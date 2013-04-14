@@ -16,6 +16,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,7 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 	private static final int MAX_PROGRESS = 100;
 	private int progressState = 0;
 	private ProgressBar progress;
+	private Handler progressHandler;
 
 	public CommandBar(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -101,6 +104,15 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 			}	
 		});
 		
+		progressHandler = new Handler() {
+	        public void handleMessage(Message msg) {
+	        	if (0 == msg.arg1) {
+	        		hideProgressBar();
+	        	} else if (1 == msg.arg1) {
+	        		incrementProgressBy(10);
+	        	}
+	        }
+	    };
 		
 		progress = (ProgressBar) viewHeader.findViewById(R.id.progressbar);
 	    progress.setMax(MAX_PROGRESS);
@@ -111,6 +123,10 @@ public class CommandBar extends ViewGroup implements ProvidesThreads, ProvidesBo
 	    }
 	}
 	
+	public Handler getProgressHandler() {
+		return progressHandler;
+	}
+
 	public void showProgressBar() {
 		progress.setVisibility(View.VISIBLE);
 	}

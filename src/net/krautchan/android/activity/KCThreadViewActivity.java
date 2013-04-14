@@ -82,7 +82,6 @@ public class KCThreadViewActivity extends Activity {
 	private KCThread 				thread = null;
 	private String					token;
 	private boolean 				javascriptInterfaceBroken = false;
-	private Handler 				progressHandler = null;
 	private boolean					pageFinished = false;
 	private boolean 				visitedPostsAreCollapsed = true;
 	private boolean					missedPostings = false;
@@ -101,15 +100,6 @@ public class KCThreadViewActivity extends Activity {
 		webView = (WebView) v.findViewById(R.id.kcWebView);
 		setContentView(v);
 		
-	    progressHandler = new Handler() {
-	        public void handleMessage(Message msg) {
-	        	if (0 == msg.arg1) {
-	        		cmdBar.hideProgressBar();
-	        	} else if (1 == msg.arg1) {
-	        		cmdBar.incrementProgressBy (progressIncrement);
-	        	} 
-	        }
-	    };
 		//webView.setBackgroundColor(Color.BLACK);
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setSavePassword(false);
@@ -215,7 +205,7 @@ public class KCThreadViewActivity extends Activity {
         		"this.openImage = function(url){alert(\"open:image:\"+fileName)}; " +
         		"this.citePosting = function(postid){alert(\"cite:\"+postid)}; " +
         		"this.debugString = function(str){alert(\"debugstr:\"+str)};" +
-        		"}; " +
+        		"}; " + 
         		"var Android = new handler();";
     	}
     	locTemplate = locTemplate.replace("@@GINGERBREADFIX@@", gingerbreadFix);
@@ -363,9 +353,9 @@ public class KCThreadViewActivity extends Activity {
 				Log.i("THREADVIEW", "notifyDone");
 	    		thread.visited = System.currentTimeMillis();
 				Eisenheinrich.getInstance().dbHelper.persistThread(thread);
-				Message msg = progressHandler.obtainMessage();
+				Message msg = cmdBar.getProgressHandler().obtainMessage();
 	        	msg.arg1 = 0;
-	        	progressHandler.sendMessage(msg);
+	        	cmdBar.getProgressHandler().sendMessage(msg);
 	        	//FIXME remove next line and implement thread caching.
 	        	//thread.doneLoading();
 	        	stopSpinner ();
@@ -411,9 +401,9 @@ public class KCThreadViewActivity extends Activity {
 	} 
 	
 	private void stopSpinner () {
-		Message msg = progressHandler.obtainMessage();
+		Message msg = cmdBar.getProgressHandler().obtainMessage();
     	msg.arg1 = 2;
-    	progressHandler.sendMessage(msg);
+    	cmdBar.getProgressHandler().sendMessage(msg);
 	}
 
 	final class JavaScriptInterface {
